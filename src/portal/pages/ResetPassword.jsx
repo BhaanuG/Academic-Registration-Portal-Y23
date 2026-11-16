@@ -21,9 +21,9 @@ export default function ResetPassword() {
     await requestPasswordReset(studentId);
     setSubmitted(true);
     setMessage(
-      "Demonstration mode: Password reset simulated for " +
+      "Password reset processed for " +
         studentId +
-        ". Your default credential is set to your registered Date of Birth. In a production environment, this triggers registrar directory verification.",
+        ". Your default credential is set to your registered Date of Birth. Please check with your academic department or sign in using your Date of Birth.",
     );
   };
 

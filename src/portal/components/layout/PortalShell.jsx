@@ -1,6 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Brand from "../common/Brand";
 import PortalFooter from "./PortalFooter";
+import {
+  recordStudentActivity,
+  isStudentTimedOut,
+} from "../../services/authService";
 import {
   LayoutDashboard,
   Layers,
@@ -30,7 +34,54 @@ const navItems = [
 export default function PortalShell({ page, setPage, onLogout, studentId, children }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const now = new Date();
-  const semester = now.getMonth() === 11 || (now.getMonth() === 10 && now.getDate() >= 30) ? 6 : 5;
+  const semester = 8;
+
+  // Single Account Per Browser & 300-Minute Inactivity Tracker (Student Portal Only)
+  useEffect(() => {
+    if (!studentId) return;
+
+    // Record initial activity
+    recordStudentActivity();
+
+    // Activity listeners to refresh the 300-minute inactivity timer
+    const handleUserActivity = () => {
+      recordStudentActivity();
+    };
+
+    const events = ["mousedown", "keydown", "scroll", "touchstart"];
+    events.forEach((evt) => {
+      window.addEventListener(evt, handleUserActivity, { passive: true });
+    });
+
+    // Check every 30 seconds for 300-minute inactivity timeout
+    const inactivityInterval = setInterval(() => {
+      if (isStudentTimedOut()) {
+        console.warn("Session expired: 300 minutes of student inactivity exceeded.");
+        alert("Your session has timed out due to 300 minutes (5 hours) of inactivity. Please log in again.");
+        onLogout();
+      }
+    }, 30000);
+
+    // Cross-tab single student account enforcement
+    const handleStorageChange = (e) => {
+      if (e.key === "klef-active-browser-student") {
+        if (e.newValue && e.newValue !== studentId) {
+          // Another student logged in on this browser in a different tab/window
+          alert("Another student account has logged in on this browser. Logging out current session.");
+          onLogout();
+        }
+      }
+    };
+    window.addEventListener("storage", handleStorageChange);
+
+    return () => {
+      events.forEach((evt) => {
+        window.removeEventListener(evt, handleUserActivity);
+      });
+      clearInterval(inactivityInterval);
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, [studentId, onLogout]);
 
   const currentNav = navItems.find((item) => item.key === page) || navItems[0];
 

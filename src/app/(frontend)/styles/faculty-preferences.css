@@ -180,6 +180,35 @@
   border-bottom: 1.5px solid #e2e8f0;
 }
 
+.preference-subject-head .bucket-header-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.preference-subject-head .bucket-code-pill {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  color: #92400e;
+  background: #fefce8;
+  border: 1.5px solid #fde68a;
+  padding: 3px 10px;
+  border-radius: 6px;
+}
+
+.preference-subject-head .bucket-type-tag {
+  font-size: 14px;
+  font-weight: 750;
+  color: #1e293b;
+  background: #e2e8f0;
+  border: 1px solid #cbd5e1;
+  padding: 3px 11px;
+  border-radius: 6px;
+  letter-spacing: 0.03em;
+}
+
 .preference-subject-head h2 {
   font-size: 22px;
   font-weight: 700;
@@ -315,8 +344,8 @@
 }
 
 .cohort-ltps-grid-table .grid-row {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  display: flex;
+  align-items: stretch;
   width: 100%;
 }
 
@@ -326,6 +355,7 @@
 }
 
 .cohort-ltps-grid-table .grid-head span {
+  flex: 1 1 0%;
   font-size: 11px;
   font-weight: 800;
   color: #334155;
@@ -343,6 +373,7 @@
 }
 
 .cohort-ltps-grid-table .grid-body span {
+  flex: 1 1 0%;
   font-size: 12px;
   font-weight: 750;
   color: #0f172a;

@@ -14,25 +14,60 @@ import MyProfile from "../pages/MyProfile";
 import ResetPassword from "../pages/ResetPassword";
 import SubjectSelection from "../pages/SubjectSelection";
 import Admin from "../pages/Admin";
-import { loadPreferences, savePreferences } from "../services/preferenceService";
+import RegistrationGuidelinesModal from "../components/academic/RegistrationGuidelinesModal";
+import { loadPreferences, savePreferences, fetchRemotePreferences } from "../services/preferenceService";
 import { buckets, faculty, initialSelections } from "../services/academicData";
 import { getStudentCluster, saveLastRoute, saveStudentCluster } from "../services/studentService";
 import { portalPath, segmentPages } from "../utils/routes";
 
 function PortalRoute() {
   const navigate = useNavigate();
-  const { studentId = "", studentName = "Anirudh-Varma", pageName = "" } = useParams();
+  const { studentId = "", studentName = "", pageName = "" } = useParams();
   const page = segmentPages[pageName] || "overview";
   const { studentId: authenticatedStudent, signOut } = useAuth();
   const { selections, setSelections } = useSubjects(studentId);
   const [preferences, setPreferences] = useState(() => loadPreferences(studentId));
   const [cluster, setCluster] = useState(() => getStudentCluster(studentId));
   const [dataVersion, setDataVersion] = useState(0);
+  const [showGuidelines, setShowGuidelines] = useState(false);
 
-  // Pure frontend state synchronization using development data
+  // Check if student has agreed to registration guidelines
+  useEffect(() => {
+    if (!studentId) return;
+    try {
+      const agreedKey = `guidelines_agreed_${studentId}`;
+      const hasAgreed = localStorage.getItem(agreedKey);
+      if (!hasAgreed) {
+        setShowGuidelines(true);
+      }
+    } catch {
+      // In case localStorage is disabled
+    }
+  }, [studentId]);
+
+  const handleAgreeGuidelines = () => {
+    try {
+      localStorage.setItem(`guidelines_agreed_${studentId}`, 'true');
+    } catch {}
+    setShowGuidelines(false);
+    setPage("overview");
+  };
+
+  // Synchronize preferences from local storage and remote database
   useEffect(() => {
     setPreferences(loadPreferences(studentId));
     setCluster(getStudentCluster(studentId));
+
+    if (studentId) {
+      fetchRemotePreferences(studentId).then((remotePrefs) => {
+        if (remotePrefs && Object.keys(remotePrefs).length > 0) {
+          setPreferences((prev) => ({
+            ...prev,
+            ...remotePrefs,
+          }));
+        }
+      });
+    }
   }, [studentId]);
 
   useEffect(() => {
@@ -49,6 +84,7 @@ function PortalRoute() {
     if (page === "cluster")
       return (
         <ClusterSelection
+          studentId={studentId}
           cluster={cluster}
           setCluster={(nextCluster) => {
             setCluster(nextCluster);
@@ -59,23 +95,27 @@ function PortalRoute() {
       );
     if (page === "subjects")
       return (
-        <SubjectSelection selections={selections} setSelections={setSelections} goTo={setPage} />
+        <SubjectSelection studentId={studentId} selections={selections} setSelections={setSelections} goTo={setPage} />
       );
     if (page === "preferences")
       return (
         <FacultyPreferences
+          studentId={studentId}
           selections={selections}
           prefs={preferences}
           setPrefs={setPreferences}
           cluster={cluster || "Cluster 2"}
         />
       );
-    if (page === "directory") return <FacultyDirectory cluster={cluster || "Cluster 2"} />;
+    if (page === "directory") return <FacultyDirectory cluster={cluster || "Cluster 2"} studentId={studentId} selections={selections} />;
     if (page === "my-preference")
       return (
         <MyPreferences
+          studentId={studentId}
           selections={selections}
+          setSelections={setSelections}
           prefs={preferences}
+          setPrefs={setPreferences}
           cluster={cluster || "Cluster 2"}
           onResetAll={() => {
             setSelections({});
@@ -98,6 +138,12 @@ function PortalRoute() {
         navigate("/");
       }}
     >
+      {showGuidelines && (
+        <RegistrationGuidelinesModal
+          studentId={studentId}
+          onAgree={handleAgreeGuidelines}
+        />
+      )}
       {content}
     </PortalShell>
   );

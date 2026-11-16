@@ -1,5 +1,6 @@
 /* ==========================================================================
-   CLUSTER SELECTION SPECIFICATION STYLES (EXPAND BOX LENGTH TO FOOTER, PERFECT FIT)
+   CLUSTER SELECTION SPECIFICATION STYLES - PERFECT SCREEN FIT (ZERO SCROLL)
+   Expands to comfortably occupy the vertical viewport down to the footer
    ========================================================================== */
 
 .page-shell-cluster {
@@ -12,8 +13,9 @@
   flex: 1 1 0% !important;
   display: flex !important;
   flex-direction: column !important;
-  padding: 16px 36px 16px !important;
+  padding: 20px 32px 24px !important;
   min-height: 0 !important;
+  justify-content: space-between !important;
 }
 
 .page-shell-cluster .content > .page-transition {
@@ -21,315 +23,305 @@
   display: flex !important;
   flex-direction: column !important;
   min-height: 0 !important;
+  justify-content: space-between !important;
 }
 
-.cluster-selection-workspace {
-  max-width: 1240px;
+.cluster-selection-screen-fit {
+  max-width: 960px;
   width: 100%;
   margin: 0 auto;
   flex: 1 1 0% !important;
   display: flex !important;
   flex-direction: column !important;
   justify-content: space-between !important;
-  min-height: 0 !important;
+  gap: 16px;
 }
 
-.cluster-selection-workspace .page-heading {
-  flex: 0 0 auto !important;
-  margin-bottom: 12px !important;
-  padding-bottom: 8px !important;
-  border-bottom: 1px solid #ebdcc5 !important;
+/* Header with Top-Right Selected Cohort Pill */
+.cluster-fit-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex: 0 0 auto;
 }
 
-.cluster-selection-workspace .page-heading h1 {
-  font-size: 22px !important;
-  font-weight: 700 !important;
-  margin: 0 0 2px !important;
-  color: #1c1917 !important;
-  letter-spacing: -0.02em !important;
+.cluster-fit-title-wrap h1 {
+  font-size: 24px !important;
+  font-weight: 800 !important;
+  color: #0f172a !important;
+  margin: 0 0 4px !important;
+  letter-spacing: -0.01em !important;
 }
 
-.cluster-selection-workspace .page-heading .heading-description {
-  font-size: 13px !important;
-  color: #78716c !important;
-  line-height: 1.35 !important;
+.cluster-fit-title-wrap p {
+  font-size: 13.5px !important;
+  color: #64748b !important;
+  margin: 0 !important;
+  line-height: 1.45 !important;
 }
 
-.cluster-selection-workspace .status-stamp {
-  min-width: 200px !important;
-  padding: 8px 14px !important;
-  border-left: 3px solid #d97706 !important;
-  border-radius: 4px !important;
-  background: #ffffff !important;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04) !important;
+.cluster-fit-cohort-pill {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-left: 3.5px solid #ea580c;
+  padding: 6px 16px;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  flex-shrink: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
-.cluster-selection-workspace .status-stamp span {
-  font-size: 10px !important;
-  letter-spacing: 0.05em !important;
-  font-weight: 700 !important;
-  color: #78716c !important;
+.cluster-fit-cohort-pill .pill-kicker {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #64748b;
+  text-transform: uppercase;
 }
 
-.cluster-selection-workspace .status-stamp strong {
-  font-size: 13px !important;
-  color: #92400e !important;
-  margin-top: 2px !important;
+.cluster-fit-cohort-pill strong {
+  font-size: 13.5px;
+  font-weight: 800;
+  color: #c2410c;
 }
 
-/* Specialization Banner */
-.specialization-banner {
-  flex: 0 0 auto !important;
-  margin-top: 2px;
-  padding: 8px 18px;
+/* Specialization Banner Card: "Your Specialization" up, title down - Centered */
+.cluster-fit-spec-card {
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 14px 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  text-align: center;
   gap: 4px;
-  border: 1.5px solid #ebdcc5;
-  border-radius: 10px;
-  background: #ffffff;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
-  width: 100%;
-  box-sizing: border-box;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  flex: 0 0 auto;
+}
+
+.cluster-fit-spec-card .spec-tag {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #0284c7;
+  text-transform: none;
   text-align: center;
 }
 
-.specialization-tag {
-  display: inline-block;
-  color: #92400e;
-  font-size: 10.5px;
-  font-weight: 700;
-  letter-spacing: 0.03em;
-  background: #fefce8;
-  border: 1px solid #fde68a;
-  padding: 3px 9px;
-  border-radius: 6px;
-  flex-shrink: 0;
+.cluster-fit-spec-card .spec-name {
+  font-size: 15px;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: 0.01em;
+  text-align: center;
 }
 
-.specialization-banner strong {
-  font-size: 13.5px;
-  font-weight: 700;
-  color: #1c1917;
-}
-
-/* Cluster Grid & Selection Cards (Expanded to fill available height like overview cards) */
-.cluster-grid {
-  flex: 1 1 0% !important;
-  margin-top: 14px;
+/* 2-Column Minimal Cluster Grid */
+.cluster-fit-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: 1fr 1fr;
   gap: 20px;
-  width: 100%;
-  align-items: stretch !important;
-  min-height: 0 !important;
+  flex: 1 0 auto;
+  align-items: stretch;
 }
 
-.cluster-card {
-  padding: 22px 26px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  border: 1.5px solid #ebdcc5;
+.cluster-fit-card {
+  background: #ffffff;
   border-radius: 12px;
-  background: #ffffff;
-  color: #1c1917;
-  position: relative;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
-  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.04);
-  cursor: pointer;
-  user-select: none;
-  height: 100% !important;
-  box-sizing: border-box;
-}
-
-.cluster-card:hover {
-  border-color: #d97706;
-  box-shadow: 0 3px 10px rgba(217, 119, 6, 0.08);
-}
-
-.cluster-card.selected {
-  border: 2px solid #d97706;
-  background: #ffffff;
-  box-shadow: 0 3px 12px rgba(217, 119, 6, 0.12);
-}
-
-.cluster-card-header {
-  flex: 0 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-}
-
-.cluster-badge {
-  padding: 2px 8px;
-  background: #fefce8;
-  border: 1px solid #fde68a;
-  color: #854d0e;
-  font-size: 11px;
-  font-weight: 700;
-  border-radius: 6px;
-  display: inline-block;
-}
-
-.cluster-badge-neutral {
-  background: #fafaf9;
-  border-color: #e7e5e4;
-  color: #78716c;
-}
-
-/* Functional Single Selection Indicator */
-.cluster-radio-indicator {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  border: 2px solid #d6d3d1;
-  background: #ffffff;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: #ffffff;
-  transition: all 0.15s ease;
-  margin-left: auto;
-}
-
-.cluster-radio-indicator.is-selected {
-  border-color: #d97706;
-  background: #d97706;
-  color: #ffffff;
-}
-
-.cluster-body {
-  flex: 1 1 auto;
-  margin-top: 14px;
+  padding: 22px 24px 20px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: 8px;
+  justify-content: space-between;
+  gap: 14px;
+  transition: all 0.2s ease;
+  user-select: none;
+  min-height: 150px;
 }
 
-.cluster-title-row {
+.cluster-fit-card.is-selected {
+  border: 2px solid #ea580c;
+  box-shadow: 0 4px 18px rgba(234, 88, 12, 0.09);
+  cursor: default !important;
+}
+
+.cluster-fit-card.is-disabled-cohort {
+  border: 1.5px solid #e2e8f0;
+  background: #f8fafc;
+  opacity: 0.58;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+  user-select: none;
+}
+
+.cluster-fit-card.is-alternative {
+  border: 1.5px solid #e2e8f0;
+  background: #ffffff;
+}
+
+/* Top Row: Tag placeholder + Check circle */
+.cluster-fit-card .card-top-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
 }
 
-.cluster-title-row strong {
-  font-size: 18px;
-  font-weight: 700;
-  color: #1c1917;
+.status-badge-placeholder {
+  display: inline-block;
+  height: 20px;
 }
 
-.cluster-range-pill {
+.check-circle {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1.5px solid #cbd5e1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.check-circle.selected {
+  background: #ea580c;
+  border-color: #ea580c;
+}
+
+.check-circle.selected svg {
+  color: #ffffff;
+}
+
+/* Middle Row: Title + Range Badge */
+.card-center-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.cluster-name {
+  font-size: 20px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.range-badge {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  padding: 4px 10px;
+  border-radius: 5px;
 }
 
-.cluster-range-pill span {
-  font-size: 11px;
-  color: #78716c;
-  text-transform: uppercase;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-}
-
-.cluster-range-pill em {
-  font-style: normal;
-  font-size: 12px;
-  font-weight: 700;
+.range-lbl {
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
   color: #92400e;
-  background: #fefce8;
-  border: 1px solid #fde68a;
-  padding: 2px 7px;
-  border-radius: 4px;
-  font-family: var(--font-mono);
 }
 
-.cluster-desc {
-  font-size: 13px;
-  color: #57534e;
-  line-height: 1.45;
-  margin-top: 4px;
-}
-
-/* Notice Banner */
-.cluster-notice {
-  flex: 0 0 auto !important;
-  margin-top: 12px;
-  padding: 9px 16px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  border: 1px solid #fde68a;
-  border-radius: 10px;
-  background: #fffdf5;
-  color: #78716c;
+.range-num {
   font-size: 12px;
-  line-height: 1.45;
-  width: 100%;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.02);
-  box-sizing: border-box;
+  font-weight: 800;
+  color: #b45309;
 }
 
-.notice-icon-wrap {
-  flex-shrink: 0;
-  color: #d97706;
+/* Card Description */
+.card-desc {
+  font-size: 13px;
+  color: #64748b;
+  line-height: 1.5;
+  margin: 0;
 }
 
-/* Action Buttons */
-.cluster-actions {
-  flex: 0 0 auto !important;
-  margin-top: 12px;
+/* Bottom Alert Box */
+.cluster-fit-alert {
+  background: #fffbeb;
+  border: 1px solid #fef3c7;
+  border-radius: 8px;
+  padding: 12px 16px;
   display: flex;
-  justify-content: center;
   align-items: center;
   gap: 12px;
+  color: #92400e;
+  flex: 0 0 auto;
 }
 
-.secondary-btn {
+.alert-info-icon {
+  font-size: 15px;
+  color: #d97706;
+  flex-shrink: 0;
+}
+
+.cluster-fit-alert p {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: #92400e;
+}
+
+/* Actions Row */
+.cluster-fit-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 4px;
+  flex: 0 0 auto;
+}
+
+.cluster-fit-back-btn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 0.5rem 1rem;
+  padding: 10px 22px;
+  border-radius: 6px;
   background: #ffffff;
-  color: #44403c;
-  border: 1px solid #e7e5e4;
-  border-radius: 8px;
-  font-size: 13px;
+  color: #1e293b;
+  border: 1px solid #cbd5e1;
+  font-size: 13.5px;
   font-weight: 600;
-  box-shadow: var(--shadow-xs);
-  transition: all var(--transition-fast);
   cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
 }
 
-.secondary-btn:hover {
-  background: #fafaf9;
-  border-color: #d6d3d1;
-  color: #1c1917;
+.cluster-fit-back-btn:hover {
+  background: #f8fafc;
+  border-color: #94a3b8;
 }
 
-.primary-btn {
+.cluster-fit-confirm-btn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 0.5rem 1.15rem;
-  background: #d97706;
+  gap: 8px;
+  padding: 10px 26px;
+  border-radius: 6px;
+  background: #ea580c;
   color: #ffffff;
-  border: 1px solid #b45309;
-  border-radius: 8px;
-  font-size: 13px;
+  border: 1px solid #c2410c;
+  font-size: 13.5px;
   font-weight: 600;
-  box-shadow: 0 1px 2px rgba(180, 83, 9, 0.2);
-  transition: all var(--transition-fast);
   cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 0 2px 5px rgba(234, 88, 12, 0.22);
 }
 
-.primary-btn:hover {
-  background: #b45309;
-  border-color: #92400e;
+.cluster-fit-confirm-btn:hover:not(.disabled) {
+  background: #c2410c;
+}
+
+.cluster-fit-confirm-btn.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 640px) {
+  .cluster-fit-grid {
+    grid-template-columns: 1fr;
+  }
 }

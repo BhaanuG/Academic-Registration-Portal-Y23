@@ -1,3 +1,8 @@
 'use client'
 
-export { figmaNextImageLoader as default } from '@payloadcms/figma/next-image-loader'
+export default function imageLoader({ src, width, quality }) {
+  if (src.startsWith('http://') || src.startsWith('https://') || src.startsWith('data:')) {
+    return src
+  }
+  return `${src}?w=${width}&q=${quality || 75}`
+}

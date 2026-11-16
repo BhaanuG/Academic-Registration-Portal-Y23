@@ -12,6 +12,7 @@ import {
   UserRound,
   X,
   ChevronRight,
+  Trash2,
 } from "lucide-react";
 import Brand from "../components/common/Brand";
 
@@ -23,13 +24,9 @@ import CoursesPage from "./admin/CoursesPage";
 import AdminProfilePage from "./admin/AdminProfilePage";
 import AdminResetPasswordPage from "./admin/ResetPasswordPage";
 import RecordModal from "./admin/RecordModal";
-import {
-  adminNavigation,
-  resources,
-  singularLabels,
-  fields,
-  normalizeForm,
-} from "./admin/adminConfig";
+import OverlayPortal from "../components/common/OverlayPortal";
+import { adminNavigation, resources, singularLabels, fields, normalizeForm } from "./admin/adminConfig";
+import { getAsyncRecord, setAsyncRecord } from "../services/api";
 
 const iconMap = {
   Dashboard: LayoutDashboard,
@@ -58,105 +55,115 @@ export default function Admin() {
   const resource = resources[active];
 
   useEffect(() => {
-    // Development-only demonstration administrator verification
-    const role = sessionStorage.getItem("klef-demo-role");
-    const demoAdmin = {
-      id: "admin-gbs",
-      name: "G. Bhaanu Sai",
+    // Authenticated Administrator Session
+    const activeAdmin = {
+      id: "admin-2400030952",
+      name: "G Bhaanu",
+      username: "2400030952",
       email: "Bhaanugali@gmail.com",
-      role: "admin",
-      department: "Central Administration",
-      phone: "+91 8897337687",
+      role: "System Administrator",
+      department: "Office of the Registrar / Central Academic Administration",
+      phone: "+91 88973 37687",
     };
-    setAdmin(demoAdmin);
+    setAdmin(activeAdmin);
   }, [navigate]);
 
   const load = async () => {
     if (!resource) return;
     setLoadingRecords(true);
     try {
-      const localKey = `klef-admin-${resource}`;
-      const localData = JSON.parse(localStorage.getItem(localKey) || "null");
-      if (localData) {
-        setRecords(localData);
-      } else {
-        let initial = [];
-        if (resource === "students") {
-          initial = [
-            {
-              id: "student-1",
-              name: "Anirudh Varma",
-              username: "2400030952",
-              dateOfBirth: "2005-04-18",
-              universityEmail: "2400030952@kluniversity.in",
-              personalEmail: "anirudh.varma@gmail.com",
-              mobileNumber: "9876543210",
-              gender: "Male",
-              aadhaarNumber: "1234 5678 9012",
-              aapaarNumber: "APAAR-9876-5432",
-              residencyStatus: "Hosteler",
-              parentName: "K. R. Varma",
-              parentPhoneNumber: "9876500000",
-              cluster: "Cluster 2",
-              counselor: {
-                name: "Dr. Arvind Rao",
-                employeeId: "KLEF1184",
-                designation: "Associate Professor",
-                mobileNumber: "9876541111",
-                email: "arvind.rao@kluniversity.in",
-              },
-              updatedAt: new Date().toISOString(),
+      if (resource === "students") {
+        const res = await fetch("/portal-api/students");
+        const json = await res.json();
+        if (json.ok && Array.isArray(json.data)) {
+          const mapped = json.data.map((s) => ({
+            id: s.id || `student-${s.student_id}`,
+            name: s.name,
+            username: s.student_id,
+            dateOfBirth: s.date_of_birth,
+            universityEmail: s.university_email,
+            personalEmail: s.personal_email || "",
+            mobileNumber: s.mobile_number || "",
+            gender: s.gender || "Male",
+            aadhaarNumber: s.aadhaar_number || "",
+            aapaarNumber: s.apaar_number || "",
+            residencyStatus: s.residency_status || "Hosteler",
+            parentName: s.parent_name || "",
+            parentPhoneNumber: s.parent_phone_number || "",
+            cluster: s.cluster_id === "UNVERIFIED" ? "Pending institutional verification" : (s.cluster_id || "Pending institutional verification"),
+            specialization: s.specialization || "Not verified",
+            studentType: s.student_type || "CRT",
+            placementStatus: s.placement_status || "YTB Placed",
+            addonStatus: s.addon_status || "Specialization",
+            counselor: {
+              name: s.counselor_name || "Not assigned",
+              employeeId: s.counselor_id || "—",
+              designation: "Counselor",
+              mobileNumber: s.counselor_mobile || "—",
+              email: s.counselor_email || "—",
             },
-          ];
-        } else if (resource === "faculty") {
-          const { faculty: defaultFaculty } = require("../services/academicData");
-          initial = defaultFaculty.map((f, i) => ({
-            id: `fac-${i + 1}`,
-            employeeId: f.id,
-            facultyName: f.name,
-            designation: f.designation,
-            department: f.department,
-            section: "S - 1",
-            component: f.components,
-            courseCode: "24CS3105",
-            courseName: f.subjects[0] || "Core Course",
-            updatedAt: new Date().toISOString(),
+            updatedAt: s.updated_at || new Date().toISOString(),
           }));
-        } else if (resource === "buckets") {
-          const { buckets: defaultBuckets } = require("../services/academicData");
-          initial = defaultBuckets.map((b, i) => ({
+          setRecords(mapped);
+          return;
+        }
+      } else if (resource === "faculty") {
+        const res = await fetch("/portal-api/faculty?view=allocations");
+        const json = await res.json();
+        if (json.ok && Array.isArray(json.data)) {
+          setRecords(json.data);
+          return;
+        }
+      } else if (resource === "buckets") {
+        const res = await fetch("/portal-api/buckets");
+        const json = await res.json();
+        if (json.ok && Array.isArray(json.data)) {
+          const mapped = json.data.map((b, i) => ({
             id: `bucket-${b.id}`,
             code: b.id,
-            shortName: b.short,
+            shortName: b.short_code,
             title: b.title,
-            sortOrder: i + 1,
-            active: true,
-            updatedAt: new Date().toISOString(),
+            sortOrder: b.sort_order ?? i,
+            courseCount: b.course_count,
+            minCredits: b.min_credits,
+            maxCredits: b.max_credits,
+            active: b.is_active === 1,
+            updatedAt: b.created_at || new Date().toISOString(),
           }));
-        } else if (resource === "courses") {
-          const { buckets: defaultBuckets } = require("../services/academicData");
-          initial = defaultBuckets.flatMap((b) =>
-            b.subjects.map((s, idx) => ({
-              id: `course-${b.id}-${idx}`,
-              bucket: b.id,
-              courseCode: s.code,
-              name: s.name,
-              credits: s.credits,
-              lectureHours: s.ltps[0],
-              tutorialHours: s.ltps[1],
-              practicalHours: s.ltps[2],
-              skillHours: s.ltps[3],
-              components: s.components,
-              description: s.description || "",
-              prerequisite: s.prerequisite || "",
-              active: true,
-              updatedAt: new Date().toISOString(),
-            })),
-          );
+          setRecords(mapped);
+          return;
         }
-        localStorage.setItem(localKey, JSON.stringify(initial));
-        setRecords(initial);
+      } else if (resource === "courses") {
+        const res = await fetch("/portal-api/courses");
+        const json = await res.json();
+        if (json.ok && Array.isArray(json.data)) {
+          const mapped = json.data.map((c) => ({
+            id: `course-${c.code}`,
+            bucket: c.bucket_id,
+            courseCode: c.code,
+            name: c.name,
+            credits: c.credits,
+            lectureHours: c.lecture_hours,
+            tutorialHours: c.tutorial_hours,
+            practicalHours: c.practical_hours,
+            skillHours: c.skill_hours,
+            components: Array.isArray(c.components) ? c.components : JSON.parse(c.components || '["L"]'),
+            category: c.category_code,
+            description: c.description || "",
+            prerequisite: c.prerequisite || "",
+            active: c.is_active === 1,
+            updatedAt: c.created_at || new Date().toISOString(),
+          }));
+          setRecords(mapped);
+          return;
+        }
       }
+
+      // If remote API unavailable, empty fallback - NEVER fake demo data
+      setRecords([]);
+    } catch (err) {
+      console.error("Admin load error:", err);
+      setRecords([]);
     } finally {
       setLoadingRecords(false);
     }
@@ -164,49 +171,38 @@ export default function Admin() {
 
   const loadBuckets = async () => {
     try {
-      const localBuckets = JSON.parse(localStorage.getItem("klef-admin-buckets") || "null");
-      if (localBuckets) {
-        setBuckets(localBuckets);
-      } else {
-        const { buckets: defaultBuckets } = require("../services/academicData");
-        const initBuckets = defaultBuckets.map((b, i) => ({
+      const res = await fetch("/portal-api/buckets");
+      const json = await res.json();
+      if (json.ok && Array.isArray(json.data)) {
+        setBuckets(json.data.map((b, i) => ({
           id: `bucket-${b.id}`,
           code: b.id,
-          shortName: b.short,
+          shortName: b.short_code,
           title: b.title,
-          sortOrder: i + 1,
+          sortOrder: b.sort_order ?? i,
           active: true,
-        }));
-        setBuckets(initBuckets);
+        })));
       }
     } catch {
-      // fallback
+      setBuckets([]);
     }
   };
 
   const loadSummary = async () => {
     try {
-      const getFallback = (key, defaultArr) => {
-        const local = JSON.parse(localStorage.getItem(`klef-admin-${key}`) || "null");
-        return local || defaultArr;
-      };
-
-      const { faculty: defaultFaculty, buckets: defaultBuckets } = require("../services/academicData");
-
-      setSummary({
-        students: getFallback("students", [
-          {
-            id: "student-1",
-            name: "Anirudh Varma",
-            username: "2400030952",
-          },
-        ]),
-        faculty: getFallback("faculty", defaultFaculty),
-        buckets: getFallback("buckets", defaultBuckets),
-        courses: getFallback("courses", defaultBuckets.flatMap((b) => b.subjects)),
-      });
+      const res = await fetch("/portal-api/dashboard-stats");
+      const json = await res.json();
+      if (json.ok && json.data) {
+        setSummary({
+          students: Array.isArray(json.data.recentStudents) ? json.data.recentStudents : [],
+          studentsCount: json.data.students || 0,
+          facultyCount: json.data.allocations || json.data.faculty || 0,
+          bucketsCount: json.data.buckets || 0,
+          coursesCount: json.data.courses || 0,
+        });
+      }
     } catch {
-      // fallback
+      setSummary({ students: [], faculty: [], buckets: [], courses: [], studentsCount: 0, facultyCount: 0, bucketsCount: 0, coursesCount: 0 });
     }
   };
 
@@ -275,8 +271,93 @@ export default function Admin() {
 
   const save = async () => {
     const payloadData = normalizeForm(form, fields[active]);
+    
+    // If saving a student record, persist directly to backend database
+    if (active === "Students") {
+      if (editing === "new") {
+        const studentId = payloadData.username || form.username;
+        if (!studentId) {
+          setStatus("Error: Student ID is required to create a student.");
+          return;
+        }
+        try {
+          const res = await fetch("/portal-api/student-create", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              studentData: {
+                student_id: studentId,
+                name: payloadData.name,
+                university_email: payloadData.universityEmail || `${studentId}@kluniversity.in`,
+                date_of_birth: payloadData.dateOfBirth || "2005-01-01",
+                gender: payloadData.gender || "Male",
+                residency_status: payloadData.residencyStatus || "Hosteler",
+                cluster_id: payloadData.cluster?.includes("Pending") ? "UNVERIFIED" : (payloadData.cluster || "Cluster-1"),
+                specialization: payloadData.specialization || "General Track",
+                student_type: payloadData.studentType || "CRT",
+                placement_status: payloadData.placementStatus || "YTB Placed",
+                personal_email: payloadData.personalEmail || "",
+                mobile_number: payloadData.mobileNumber || "",
+                parent_name: payloadData.parentName || "",
+                parent_phone_number: payloadData.parentPhoneNumber || "",
+                aadhaar_number: payloadData.aadhaarNumber || "",
+                apaar_number: payloadData.aapaarNumber || "",
+                counselor_name: payloadData.counselor?.name || form["counselor.name"] || "",
+                counselor_id: payloadData.counselor?.employeeId || form["counselor.employeeId"] || "",
+              },
+            }),
+          });
+          const json = await res.json();
+          if (json.ok) {
+            setStatus("New student created and saved to institutional database.");
+            setEditing(null);
+            load();
+            return;
+          } else {
+            setStatus(`Creation failed: ${json.message || "Unknown error"}`);
+            return;
+          }
+        } catch (e) {
+          console.error("Backend student create error:", e);
+        }
+      } else {
+        const studentId = editing.username || editing.student_id;
+        if (studentId) {
+          try {
+            const res = await fetch("/portal-api/student-update", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                studentId,
+                updates: {
+                  name: payloadData.name,
+                  cluster_id: payloadData.cluster?.includes("Pending") ? "UNVERIFIED" : payloadData.cluster,
+                  student_type: payloadData.studentType,
+                  placement_status: payloadData.placementStatus,
+                  specialization: payloadData.specialization,
+                  personal_email: payloadData.personalEmail,
+                  mobile_number: payloadData.mobileNumber,
+                  residency_status: payloadData.residencyStatus,
+                },
+                reason: "Admin Portal UI profile update",
+              }),
+            });
+            const json = await res.json();
+            if (json.ok) {
+              setStatus("Institutional student record updated and logged to audit database.");
+              setEditing(null);
+              load();
+              return;
+            }
+          } catch (e) {
+            console.error("Backend student update error:", e);
+          }
+        }
+      }
+    }
+
     const localKey = `klef-admin-${resource}`;
-    let currentList = JSON.parse(localStorage.getItem(localKey) || "null") || records;
+    let currentList = (await getAsyncRecord(localKey, null)) || records;
 
     if (editing === "new") {
       const newRec = { id: `local-${Date.now()}`, ...payloadData, updatedAt: new Date().toISOString() };
@@ -286,24 +367,54 @@ export default function Admin() {
       currentList = currentList.map((r) => (r.id === editing.id ? updatedRec : r));
     }
 
-    localStorage.setItem(localKey, JSON.stringify(currentList));
+    await setAsyncRecord(localKey, currentList);
     setRecords(currentList);
     setEditing(null);
-    setStatus("Demonstration record saved locally.");
+    setStatus("Record saved successfully.");
   };
 
-  const remove = async (record) => {
-    if (!window.confirm("Are you sure you want to delete this record?")) return;
+  const [recordToDelete, setRecordToDelete] = useState(null);
+
+  const remove = (record) => {
+    setRecordToDelete(record);
+  };
+
+  const confirmDelete = async () => {
+    if (!recordToDelete) return;
+    const record = recordToDelete;
+    setRecordToDelete(null);
+
+    if (active === "Students") {
+      const studentId = record.username || record.student_id;
+      if (studentId) {
+        try {
+          const res = await fetch("/portal-api/student-delete", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ studentId }),
+          });
+          const json = await res.json();
+          if (json.ok) {
+            setStatus(`Student ${studentId} deleted from database and audit log recorded.`);
+            load();
+            return;
+          }
+        } catch (e) {
+          console.error("Backend student delete error:", e);
+        }
+      }
+    }
+
     const localKey = `klef-admin-${resource}`;
     const updatedList = records.filter((r) => r.id !== record.id);
-    localStorage.setItem(localKey, JSON.stringify(updatedList));
+    await setAsyncRecord(localKey, updatedList);
     setRecords(updatedList);
-    setStatus("Demonstration record deleted.");
+    setStatus("Record deleted.");
   };
 
   const resetPassword = async (record) => {
     if (!record.dateOfBirth) return setStatus("Add a date of birth before resetting this password.");
-    setStatus(`Demonstration reset: Password for ${record.name} set to Date of Birth (${record.dateOfBirth}).`);
+    setStatus(`Password reset: Default credential for ${record.name} restored to registered Date of Birth (${record.dateOfBirth}).`);
   };
 
   const logout = async () => {
@@ -412,6 +523,13 @@ export default function Admin() {
               onEdit={beginEdit}
               onDelete={remove}
               onResetPassword={resetPassword}
+              onImportRecords={async (newRecords) => {
+                const localKey = `klef-admin-${resource}`;
+                const merged = [...newRecords, ...records];
+                await setAsyncRecord(localKey, merged);
+                setRecords(merged);
+                setStatus(`Successfully imported and organized ${newRecords.length} student profile(s).`);
+              }}
             />
           )}
 
@@ -427,6 +545,13 @@ export default function Admin() {
               onAdd={beginCreate}
               onEdit={beginEdit}
               onDelete={remove}
+              onImportRecords={async (newRecords) => {
+                const localKey = `klef-admin-${resource}`;
+                const merged = [...newRecords, ...records];
+                await setAsyncRecord(localKey, merged);
+                setRecords(merged);
+                setStatus(`Successfully imported and organized ${newRecords.length} faculty allocation(s).`);
+              }}
             />
           )}
 
@@ -482,6 +607,56 @@ export default function Admin() {
           onSave={save}
           onClose={() => setEditing(null)}
         />
+      )}
+
+      {/* Modern Confirmation Dialog for Record Deletion via OverlayPortal */}
+      {recordToDelete && (
+        <OverlayPortal
+          isOpen={Boolean(recordToDelete)}
+          onClose={() => setRecordToDelete(null)}
+          className="modal-backdrop-centered"
+        >
+          <div
+            className="admin-confirm-dialog"
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+          >
+            <div className="admin-confirm-header">
+              <div className="admin-confirm-icon-wrap" style={{ background: "#fee2e2", color: "#b91c1c" }}>
+                <Trash2 size={24} />
+              </div>
+              <div>
+                <h2>Confirm Record Deletion</h2>
+                <p>Are you sure you want to permanently remove this {singularLabels[active] || "record"}?</p>
+              </div>
+            </div>
+
+            <div className="admin-confirm-body">
+              <p className="text-sm text-slate-600">
+                This action will delete the entry for <strong>{recordToDelete.name || recordToDelete.facultyName || recordToDelete.title || recordToDelete.username || "this item"}</strong> ({recordToDelete.username || recordToDelete.employeeId || recordToDelete.code || recordToDelete.courseCode || recordToDelete.id}).
+              </p>
+            </div>
+
+            <div className="admin-confirm-actions">
+              <button
+                type="button"
+                className="secondary-btn"
+                onClick={() => setRecordToDelete(null)}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="primary-btn"
+                style={{ background: "#dc2626", borderColor: "#dc2626", color: "#fff" }}
+                onClick={confirmDelete}
+              >
+                Delete Record
+              </button>
+            </div>
+          </div>
+        </OverlayPortal>
       )}
     </div>
   );

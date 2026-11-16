@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
+import OverlayPortal from "../../components/common/OverlayPortal";
 import {
   Pencil,
   Plus,
@@ -214,6 +215,15 @@ export default function CoursesPage({
             <tr>
               <th
                 onClick={() => toggleSort("courseCode")}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    toggleSort("courseCode");
+                  }
+                }}
+                tabIndex={0}
+                role="button"
+                aria-label={`Sort by Course Code, currently ${sortBy === "courseCode" ? sortOrder : "none"}`}
                 className="sortable-th"
                 style={{ width: "16%" }}
               >
@@ -224,6 +234,15 @@ export default function CoursesPage({
               </th>
               <th
                 onClick={() => toggleSort("name")}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    toggleSort("name");
+                  }
+                }}
+                tabIndex={0}
+                role="button"
+                aria-label={`Sort by Course Name, currently ${sortBy === "name" ? sortOrder : "none"}`}
                 className="sortable-th"
                 style={{ width: "32%" }}
               >
@@ -234,6 +253,15 @@ export default function CoursesPage({
               </th>
               <th
                 onClick={() => toggleSort("bucket")}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    toggleSort("bucket");
+                  }
+                }}
+                tabIndex={0}
+                role="button"
+                aria-label={`Sort by Bucket, currently ${sortBy === "bucket" ? sortOrder : "none"}`}
                 className="sortable-th"
                 style={{ width: "14%" }}
               >
@@ -244,6 +272,15 @@ export default function CoursesPage({
               </th>
               <th
                 onClick={() => toggleSort("credits")}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    toggleSort("credits");
+                  }
+                }}
+                tabIndex={0}
+                role="button"
+                aria-label={`Sort by Credits, currently ${sortBy === "credits" ? sortOrder : "none"}`}
                 className="sortable-th"
                 style={{ width: "12%" }}
               >
@@ -356,111 +393,116 @@ export default function CoursesPage({
         </table>
       </div>
 
-      {/* Slide-out Course Detail Drawer */}
+      {/* Clean Floating Pop-Up Modal for Course Details via OverlayPortal */}
       {selectedCourse && (
-        <div className="student-detail-drawer-scrim" onClick={() => setSelectedCourse(null)}>
+        <OverlayPortal
+          isOpen={Boolean(selectedCourse)}
+          onClose={() => setSelectedCourse(null)}
+          className="clean-popup-backdrop"
+        >
           <aside
-            className="student-detail-drawer"
+            className="clean-popup-card"
+            style={{ width: "min(680px, 94vw)" }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="drawer-header">
-              <div className="drawer-title-group">
-                <span className="kicker">Course Specification</span>
-                <h2>{selectedCourse.name}</h2>
-                <span className="drawer-id-tag">{selectedCourse.courseCode}</span>
+            <div className="clean-popup-header">
+              <div className="clean-popup-header-icon">
+                <BookOpen size={20} className="text-white" />
+              </div>
+              <div className="clean-popup-header-text">
+                <h3>{selectedCourse.name}</h3>
+                <p>Course Code: {selectedCourse.courseCode} · Bucket {typeof selectedCourse.bucket === "object" ? selectedCourse.bucket?.code : selectedCourse.bucket}</p>
               </div>
               <button
                 type="button"
-                className="drawer-close-btn"
+                className="clean-popup-close-btn"
                 onClick={() => setSelectedCourse(null)}
+                aria-label="Close dialog"
               >
                 <X size={18} />
               </button>
             </div>
 
-            <div className="drawer-content">
-              {/* Section: Course Information */}
-              <div className="drawer-section">
-                <h3>Course Details</h3>
-                <dl className="drawer-dl">
-                  <div>
-                    <dt>Course Code</dt>
-                    <dd>{selectedCourse.courseCode}</dd>
-                  </div>
-                  <div>
-                    <dt>Total Credits</dt>
-                    <dd>{selectedCourse.credits} Credits</dd>
-                  </div>
-                  <div>
-                    <dt>Assigned Bucket</dt>
-                    <dd>
-                      Bucket {typeof selectedCourse.bucket === "object" ? selectedCourse.bucket?.code : selectedCourse.bucket}
-                    </dd>
-                  </div>
-                  <div>
-                    <dt>Hour Distribution</dt>
-                    <dd>
-                      {selectedCourse.lectureHours || 0}L – {selectedCourse.tutorialHours || 0}T – {selectedCourse.practicalHours || 0}P – {selectedCourse.skillHours || 0}S
-                    </dd>
-                  </div>
-                  <div>
-                    <dt>Teaching Components</dt>
-                    <dd>
-                      {(Array.isArray(selectedCourse.components) ? selectedCourse.components : [selectedCourse.components])
-                        .filter(Boolean)
-                        .join(", ") || "Lecture (L)"}
-                    </dd>
-                  </div>
-                  {selectedCourse.prerequisite && (
-                    <div>
-                      <dt>Prerequisites</dt>
-                      <dd>{selectedCourse.prerequisite}</dd>
-                    </div>
-                  )}
-                </dl>
+            <div className="clean-popup-body">
+              {/* Stat / Metric Pills */}
+              <div className="clean-popup-pill-grid">
+                <div className="clean-popup-pill-card active-blue">
+                  <span className="clean-popup-pill-label">COURSE CREDITS</span>
+                  <strong className="clean-popup-pill-val">{selectedCourse.credits}</strong>
+                  <span className="clean-popup-pill-desc">Total academic credit weight</span>
+                </div>
+                <div className="clean-popup-pill-card">
+                  <span className="clean-popup-pill-label">L-T-P-S STRUCTURE</span>
+                  <strong className="clean-popup-pill-val" style={{ fontSize: "17px" }}>
+                    {selectedCourse.lectureHours || 0}L : {selectedCourse.tutorialHours || 0}T : {selectedCourse.practicalHours || 0}P : {selectedCourse.skillHours || 0}S
+                  </strong>
+                  <span className="clean-popup-pill-desc">Lecture, Tutorial, Practical &amp; Skill</span>
+                </div>
               </div>
 
-              {/* Section: Academic Context & Description */}
-              <div className="drawer-section">
-                <h3>Curriculum Overview</h3>
-                <dl className="drawer-dl">
-                  <div>
-                    <dt>Department</dt>
-                    <dd>Computer Science &amp; Engineering</dd>
+              {/* Course Detail Box */}
+              <div className="clean-popup-detail-box">
+                <span className="clean-popup-detail-title">SPECIFICATIONS &amp; COMPONENTS</span>
+
+                <div className="clean-popup-detail-row">
+                  <span className="clean-popup-detail-label">Teaching Components</span>
+                  <span className="clean-popup-detail-value">
+                    {(Array.isArray(selectedCourse.components) ? selectedCourse.components : [selectedCourse.components])
+                      .filter(Boolean)
+                      .join(", ") || "Lecture (L)"}
+                  </span>
+                </div>
+
+                <div className="clean-popup-detail-row">
+                  <span className="clean-popup-detail-label">Department</span>
+                  <span className="clean-popup-detail-value">Computer Science &amp; Engineering</span>
+                </div>
+
+                <div className="clean-popup-detail-row">
+                  <span className="clean-popup-detail-label">Academic Semester</span>
+                  <span className="clean-popup-detail-value">Semester 8 · Even 2026–27</span>
+                </div>
+
+                {selectedCourse.prerequisite && (
+                  <div className="clean-popup-detail-row">
+                    <span className="clean-popup-detail-label">Prerequisites</span>
+                    <span className="clean-popup-detail-value">{selectedCourse.prerequisite}</span>
                   </div>
-                  <div>
-                    <dt>Programme Level</dt>
-                    <dd>Undergraduate (B.Tech)</dd>
-                  </div>
-                  <div>
-                    <dt>Semester</dt>
-                    <dd>Semester 5 (Odd 2026–27)</dd>
-                  </div>
-                </dl>
+                )}
+
                 {selectedCourse.description && (
-                  <div className="mt-3 p-3 bg-slate-50 border border-slate-200 rounded-md">
-                    <span className="text-xs font-bold text-slate-500 uppercase block mb-1">Course Description</span>
-                    <p className="text-xs text-slate-700 leading-relaxed m-0">{selectedCourse.description}</p>
+                  <div className="clean-popup-detail-row full-col" style={{ marginTop: "4px" }}>
+                    <span className="clean-popup-detail-label">Curriculum Description</span>
+                    <p style={{ margin: 0, fontSize: "12.5px", color: "#334155", lineHeight: 1.6 }}>
+                      {selectedCourse.description}
+                    </p>
                   </div>
                 )}
               </div>
+            </div>
 
-              <div className="drawer-actions">
-                <button
-                  type="button"
-                  className="primary-btn w-full"
-                  onClick={() => {
-                    onEdit(selectedCourse);
-                    setSelectedCourse(null);
-                  }}
-                >
-                  <Pencil size={15} />
-                  <span>Edit Course Specification</span>
-                </button>
-              </div>
+            <div className="clean-popup-footer">
+              <button
+                type="button"
+                className="clean-popup-btn-dismiss"
+                onClick={() => setSelectedCourse(null)}
+              >
+                Close
+              </button>
+              <button
+                type="button"
+                className="clean-popup-btn-action"
+                onClick={() => {
+                  onEdit(selectedCourse);
+                  setSelectedCourse(null);
+                }}
+              >
+                <Pencil size={15} />
+                <span>Edit Course</span>
+              </button>
             </div>
           </aside>
-        </div>
+        </OverlayPortal>
       )}
     </section>
   );

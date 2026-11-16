@@ -15,9 +15,26 @@ logs/
 .tmp-*
 /.figma/design-context/
 
-# Platform-managed agentplat state, not project source. In the
-# client-initiated single-repo workspace layout (make's `Path: "."` spec) the
-# repo root IS the workspace root, so these land inside this repo rather than
-# beside it.
+# Platform-managed agentplat state
 /.plugins/
 /.opencode-skills/
+
+# Audit, Test & Generated Artifacts
+coverage/
+*.csv
+*.tsv
+*.xlsx.bak
+*.bak
+*.old
+*.orig
+*.dump
+*.tmp
+*.zip
+!public/**/*.csv
+tests/
+__tests__/
+test/
+__mocks__/
+docs/*.csv
+docs/*.json
+!docs/*.md

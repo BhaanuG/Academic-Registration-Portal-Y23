@@ -123,22 +123,23 @@
   flex-direction: column;
 }
 .login-page {
-  background: var(--institution-navy);
+  background: var(--wash);
 }
 .login-shell {
   min-height: calc(100vh - 55px);
   flex: 1;
   display: grid;
   grid-template-columns: minmax(0, 1.15fr) minmax(430px, 0.85fr);
-  background: var(--paper);
+  background: var(--wash);
 }
 .login-context {
   min-height: calc(100vh - 55px);
   padding: 48px clamp(48px, 8vw, 132px);
   display: flex;
   flex-direction: column;
-  color: #f5f7f5;
-  background: var(--institution-navy);
+  color: var(--subject-text);
+  background: #fefce8;
+  border-right: 1.5px solid #ebdcc5;
   position: relative;
   overflow: hidden;
 }
@@ -149,14 +150,14 @@
   height: 460px;
   right: -120px;
   bottom: -180px;
-  border: 1px solid rgba(255, 255, 255, 0.11);
+  border: 1px solid rgba(234, 179, 8, 0.2);
   border-radius: 50%;
   box-shadow:
-    0 0 0 70px rgba(255, 255, 255, 0.025),
-    0 0 0 140px rgba(255, 255, 255, 0.018);
+    0 0 0 70px rgba(254, 240, 138, 0.25),
+    0 0 0 140px rgba(254, 240, 138, 0.15);
 }
 .login-context .brand {
-  color: white;
+  color: var(--subject-text);
 }
 .login-context .brand-logo,
 .topbar .brand-logo {
@@ -167,7 +168,7 @@
   opacity: 1;
 }
 .login-context .brand span {
-  color: #b9c6db;
+  color: #78716c;
 }
 .login-intro {
   margin: auto 0;
@@ -176,7 +177,10 @@
   z-index: 1;
 }
 .login-intro .eyebrow {
-  color: #c5d2e6;
+  color: #a16207;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
 .login-intro h1 {
   max-width: 620px;
@@ -186,17 +190,18 @@
   font-weight: 600;
   line-height: 0.98;
   letter-spacing: -0.045em;
+  color: #1c1917;
 }
 .login-intro > p:last-child {
   max-width: 590px;
-  color: #c8d3e4;
+  color: #57534e;
   font-size: 17px;
   line-height: 1.7;
 }
 .term-note {
   width: fit-content;
   padding: 13px 0 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.25);
+  border-top: 1px solid #e7d8be;
   display: flex;
   flex-direction: column;
   gap: 3px;
@@ -204,19 +209,20 @@
   z-index: 1;
 }
 .term-note span {
-  color: #9fb0ca;
+  color: #78716c;
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.09em;
 }
 .term-note strong {
   font-size: 13px;
+  color: #1c1917;
 }
 .login-panel {
   display: grid;
   place-items: center;
   padding: 48px;
-  background: var(--paper);
+  background: var(--wash);
 }
 .login-form-wrap {
   width: min(100%, 410px);
@@ -4338,6 +4344,7 @@ select:focus {
 @import "./styles/portal-shell.css";
 @import "./styles/academic-overview.css";
 @import "./styles/cluster-selection.css";
+@import "./styles/guidelines-modal.css";
 @import "./styles/subject-selection.css";
 @import "./styles/faculty-preferences.css";
 @import "./styles/faculty-directory.css";
@@ -4350,5 +4357,7 @@ select:focus {
 @import "./styles/admin-reset-password.css";
 @import "./styles/admin-profile.css";
 @import "./styles/motion-interactions.css";
+@import "./styles/modal-positioning.css";
 @import "./styles/developer-page.css";
+@import "./styles/clean-popup-modal.css";
 @import "./styles/platform-responsive.css";

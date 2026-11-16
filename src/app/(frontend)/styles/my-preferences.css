@@ -233,26 +233,27 @@
   background: #fdfbf7 !important;
   border-right: 1.5px solid #ebdcc5 !important;
   border-bottom: 2px solid #d6c3a5 !important;
-  padding: 18px !important;
+  padding: 12px 14px !important;
+  vertical-align: top !important;
 }
 
 .subject-meta-cell strong {
   display: block !important;
-  font-size: 14px !important;
+  font-size: 13px !important;
   font-weight: 700 !important;
   color: #0f172a !important;
-  margin: 6px 0 4px !important;
-  line-height: 1.35 !important;
+  margin: 4px 0 6px !important;
+  line-height: 1.3 !important;
 }
 
 .summary-bucket-tag {
   display: inline-block !important;
-  font-size: 11px !important;
+  font-size: 10.5px !important;
   font-weight: 700 !important;
   color: #92400e !important;
   background: #fefce8 !important;
   border: 1px solid #fde68a !important;
-  padding: 2px 7px !important;
+  padding: 2px 6px !important;
   border-radius: 4px !important;
 }
 
@@ -285,11 +286,43 @@
 
 .summary-subject-sub {
   display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: wrap !important;
   align-items: center !important;
   gap: 6px !important;
-  font-size: 11.5px !important;
+  font-size: 11px !important;
   color: #64748b !important;
+  line-height: 1.4 !important;
+}
+
+.summary-subject-sub .sub-tag-code {
   font-family: var(--font-mono) !important;
+  font-weight: 700 !important;
+  color: #1e3a8a !important;
+  background: #eff6ff !important;
+  border: 1px solid #bfdbfe !important;
+  padding: 1px 5px !important;
+  border-radius: 4px !important;
+}
+
+.summary-subject-sub .sub-tag-credits {
+  font-weight: 600 !important;
+  color: #047857 !important;
+  background: #ecfdf5 !important;
+  border: 1px solid #a7f3d0 !important;
+  padding: 1px 5px !important;
+  border-radius: 4px !important;
+}
+
+.summary-subject-sub .sub-tag-ltps {
+  font-family: var(--font-mono) !important;
+  font-weight: 600 !important;
+  color: #7c2d12 !important;
+  background: #fff7ed !important;
+  border: 1px solid #fed7aa !important;
+  padding: 1px 5px !important;
+  border-radius: 4px !important;
+  letter-spacing: 0.02em !important;
 }
 
 .component-tag-cell {
@@ -491,6 +524,109 @@
   opacity: 0.65 !important;
   cursor: not-allowed !important;
 }
+
+/* Phase 2.8 Advisory Notice Banner */
+.portal-advisory-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-left: 4px solid #0284c7;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.advisory-pill {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: #e0f2fe;
+  color: #0369a1;
+  padding: 4px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.portal-advisory-banner p {
+  margin: 0;
+  font-size: 12.5px;
+  color: #334155;
+  line-height: 1.5;
+}
+
+/* Finalize and Reopen Action Buttons */
+.finalize-action-btn {
+  background: #047857 !important;
+  color: #ffffff !important;
+  border-color: #047857 !important;
+}
+
+.finalize-action-btn:hover {
+  background: #065f46 !important;
+  border-color: #065f46 !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(4, 120, 87, 0.25) !important;
+}
+
+.reopen-action-btn {
+  background: #fffbeb !important;
+  color: #b45309 !important;
+  border-color: #fcd34d !important;
+}
+
+.reopen-action-btn:hover {
+  background: #fef3c7 !important;
+  border-color: #f59e0b !important;
+  color: #92400e !important;
+}
+
+/* Action Notification Toast */
+.action-notification-toast {
+  background: #0f172a;
+  color: #f8fafc;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  margin-bottom: 14px;
+  display: inline-block;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+/* Delete Row Action */
+.action-delete-cell {
+  text-align: center;
+  vertical-align: middle;
+  padding: 8px;
+  background: #f8fafc;
+  border-left: 1px solid #e2e8f0;
+}
+
+.preference-delete-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 1px solid #fecaca;
+  background: #fff;
+  color: #ef4444;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+}
+
+.preference-delete-btn:hover {
+  background: #fef2f2;
+  border-color: #dc2626;
+  color: #b91c1c;
+  box-shadow: 0 1px 4px rgba(239, 68, 68, 0.2);
+}
+
 
 
 

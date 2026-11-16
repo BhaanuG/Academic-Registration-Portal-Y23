@@ -1,6 +1,6 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import PageHeading from "../components/common/PageHeading";
-import { buckets, initialSelections } from "../services/academicData";
+import { buckets as fallbackBuckets, initialSelections } from "../services/academicData";
 import {
   BookOpen,
   Check,
@@ -11,28 +11,135 @@ import {
   RotateCcw,
   AlertTriangle,
   X,
+  User,
 } from "lucide-react";
+import OverlayPortal from "../components/common/OverlayPortal";
 
-export default function Subjects({ selections, setSelections, goTo }) {
+export default function Subjects({ studentId, selections, setSelections, goTo }) {
   const [active, setActive] = useState("C0");
   const [showResetModal, setShowResetModal] = useState(false);
   const [resetStatus, setResetStatus] = useState("");
 
-  const bucket = buckets.find((item) => item.id === active) || buckets[0];
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        setShowResetModal(false);
+      }
+    };
+    if (showResetModal) {
+      window.addEventListener("keydown", handleKeyDown);
+      return () => window.removeEventListener("keydown", handleKeyDown);
+    }
+  }, [showResetModal]);
+  const [studentBuckets, setStudentBuckets] = useState([]);
+  const [studentSubjects, setStudentSubjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!studentId) return;
+    setLoading(true);
+    Promise.all([
+      fetch(`/portal-api/student-eligible-buckets?studentId=${studentId}`).then((r) => r.json()),
+      fetch(`/portal-api/my-subjects?studentId=${studentId}`).then((r) => r.json()),
+    ])
+      .then(([bRes, sRes]) => {
+        if (bRes.ok && bRes.data && bRes.data.length > 0) {
+          setStudentBuckets(bRes.data);
+          if (!active || !bRes.data.some((b) => b.id === active)) {
+            setActive(bRes.data[0].id);
+          }
+        }
+        if (sRes.ok && sRes.data) {
+          setStudentSubjects(sRes.data);
+          // Auto-select prescribed courses if not already selected
+          sRes.data.forEach((s) => {
+            if (s.is_prescribed && s.course_code && s.course_code !== "OE1" && s.course_code !== "OE2") {
+              setSelections((curr) => {
+                if (!curr[s.bucket_id]) {
+                  return { ...curr, [s.bucket_id]: s.course_code };
+                }
+                return curr;
+              });
+            }
+          });
+        }
+      })
+      .catch((err) => console.error("Error loading student eligible buckets:", err))
+      .finally(() => setLoading(false));
+  }, [studentId]);
+
+  // Use dynamic student buckets or fallback
+  const displayBuckets = useMemo(() => {
+    if (studentBuckets && studentBuckets.length > 0) {
+      return studentBuckets.map((b) => {
+        // Map courses for this bucket from studentSubjects or catalog
+        const matchingSubjects = studentSubjects.filter((s) => s.bucket_id === b.id);
+        const subjectsList = matchingSubjects.flatMap((ms) => {
+          if (ms.is_elective && ms.eligible_courses && ms.eligible_courses.length > 0) {
+            return ms.eligible_courses.map((ec) => ({
+              code: ec.code,
+              name: ec.name,
+              credits: ec.credits ?? 3,
+              ltps: ec.ltps || (ec.lecture_hours !== undefined && ec.lecture_hours !== null ? [ec.lecture_hours, ec.tutorial_hours ?? 0, ec.practical_hours ?? 0, ec.skill_hours ?? 0] : null),
+              components: ec.components || ["L"],
+              description: ec.description || "",
+              faculty_display: ms.faculty_display,
+              sections: ms.sections,
+              is_prescribed: false,
+            }));
+          }
+          return [{
+            code: ms.course_code,
+            name: ms.course_name,
+            credits: ms.credits ?? 3,
+            ltps: ms.ltps || (ms.lecture_hours !== undefined && ms.lecture_hours !== null ? [ms.lecture_hours, ms.tutorial_hours ?? 0, ms.practical_hours ?? 0, ms.skill_hours ?? 0] : null),
+            components: ms.components || ["L"],
+            description: "",
+            faculty_display: ms.faculty_display,
+            sections: ms.sections,
+            is_prescribed: ms.is_prescribed,
+          }];
+        });
+
+        // Deduplicate subjects by course code to prevent duplicate key errors and repeated cards
+        const seenCodes = new Set();
+        const uniqueSubjects = [];
+        for (const subj of subjectsList) {
+          if (!seenCodes.has(subj.code)) {
+            seenCodes.add(subj.code);
+            uniqueSubjects.push(subj);
+          }
+        }
+
+        return {
+          id: b.id,
+          short: b.short_code || b.id,
+          title: b.title,
+          subjects: uniqueSubjects.length > 0 ? uniqueSubjects : (fallbackBuckets.find((fb) => fb.id === b.id)?.subjects || []),
+        };
+      });
+    }
+    return fallbackBuckets;
+  }, [studentBuckets, studentSubjects]);
+
+  // Alias displayBuckets as buckets for cleaner template bindings
+  const buckets = displayBuckets;
+
+  const bucket = displayBuckets.find((item) => item.id === active) || displayBuckets[0];
 
   const selectedSubjects = useMemo(() => {
-    return buckets
+    return displayBuckets
       .map((b) => b.subjects.find((s) => s.code === selections[b.id]))
       .filter(Boolean);
-  }, [selections]);
+  }, [displayBuckets, selections]);
 
   const credits = useMemo(() => {
     return selectedSubjects.reduce((sum, item) => sum + item.credits, 0);
   }, [selectedSubjects]);
 
   const complete = useMemo(() => {
-    return Object.keys(selections).length === buckets.length;
-  }, [selections]);
+    return Object.keys(selections).length === displayBuckets.length;
+  }, [displayBuckets, selections]);
 
   const handleResetCourseSelections = () => {
     setSelections({});
@@ -196,6 +303,9 @@ export default function Subjects({ selections, setSelections, goTo }) {
               return (
                 <article
                   key={item.code}
+                  role="radio"
+                  aria-checked={isSelected}
+                  tabIndex={0}
                   className={`subject-card ${isSelected ? "selected" : ""}`}
                   onClick={() =>
                     setSelections((current) => ({
@@ -203,47 +313,52 @@ export default function Subjects({ selections, setSelections, goTo }) {
                       [bucket.id]: item.code,
                     }))
                   }
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      setSelections((current) => ({
+                        ...current,
+                        [bucket.id]: item.code,
+                      }));
+                    }
+                  }}
+                  style={{ cursor: "pointer" }}
                 >
                   <div className="card-top">
-                    <div className="card-code-group">
-                      <span className="card-code">{item.code}</span>
-                      <span className="card-credits">{item.credits} Credits</span>
-                    </div>
-
-                    <div className="card-radio-mark" aria-hidden="true">
-                      {isSelected && <Check size={14} />}
-                    </div>
-                  </div>
-
-                  <h3 className="card-title">{item.name}</h3>
-
-                  <p className="card-description">
-                    {item.description || "Core foundational coursework and practical laboratory sessions designed for computer science engineering."}
-                  </p>
-
-                  {/* Components Badges & L-T-P-S Structure */}
-                  <div className="card-details-strip">
-                    <div className="component-badges">
-                      {item.components.map((c) => (
-                        <span key={c} className={`badge-comp badge-${c}`} title={`Component: ${c}`}>
-                          {c}
-                        </span>
-                      ))}
-                    </div>
-
-                    <div className="ltps-badge" title="Lecture - Tutorial - Practical - Skill hours per week">
-                      <div className="ltps-matrix-labels">
-                        <span>L</span>
-                        <span>T</span>
-                        <span>P</span>
-                        <span>S</span>
+                    <div className="card-left-content">
+                      <div className="card-code-group">
+                        <span className="card-code">{item.code}</span>
+                        <span className="card-credits">{item.credits} Credits</span>
                       </div>
-                      <div className="ltps-matrix-values">
-                        <span>{item.ltps[0]}</span>
-                        <span>{item.ltps[1]}</span>
-                        <span>{item.ltps[2]}</span>
-                        <span>{item.ltps[3]}</span>
+                      <h3 className="card-title">{item.name}</h3>
+                      {item.description && !item.description.includes(item.name) ? (
+                        <p className="card-description">{item.description}</p>
+                      ) : null}
+                    </div>
+
+                    <div className="card-right-group">
+                      <div className="card-radio-mark" aria-hidden="true">
+                        {isSelected && <Check size={14} />}
                       </div>
+
+                      {/* L-T-P-S Structure below the selection dot: Shows real numbers if available in curriculum, else "-" */}
+                      {(() => {
+                        const labels = ["L", "T", "P", "S"];
+                        return (
+                          <div className="ltps-badge" title="Course hours per week (L - T - P - S)">
+                            <div className="ltps-matrix-labels">
+                              {labels.map((lbl) => (
+                                <span key={lbl}>{lbl}</span>
+                              ))}
+                            </div>
+                            <div className="ltps-matrix-values">
+                              {labels.map((_, idx) => (
+                                <span key={idx}>-</span>
+                              ))}
+                            </div>
+                          </div>
+                        );
+                      })()}
                     </div>
                   </div>
 
@@ -266,6 +381,9 @@ export default function Subjects({ selections, setSelections, goTo }) {
               const isNoneSelected = selections[bucket.id] === "NONE";
               return (
                 <article
+                  role="radio"
+                  aria-checked={isNoneSelected}
+                  tabIndex={0}
                   className={`subject-card subject-card-none ${isNoneSelected ? "selected" : ""}`}
                   onClick={() =>
                     setSelections((current) => ({
@@ -273,6 +391,16 @@ export default function Subjects({ selections, setSelections, goTo }) {
                       [bucket.id]: "NONE",
                     }))
                   }
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      setSelections((current) => ({
+                        ...current,
+                        [bucket.id]: "NONE",
+                      }));
+                    }
+                  }}
+                  style={{ cursor: "pointer" }}
                 >
                   <div className="card-top">
                     <div className="card-code-group">
@@ -366,9 +494,13 @@ export default function Subjects({ selections, setSelections, goTo }) {
         </section>
       </div>
 
-      {/* Confirmation Modal for Resetting Course Selections */}
+      {/* Confirmation Modal for Resetting Course Selections via OverlayPortal */}
       {showResetModal && (
-        <div className="modal-backdrop-centered" onClick={() => setShowResetModal(false)}>
+        <OverlayPortal
+          isOpen={showResetModal}
+          onClose={() => setShowResetModal(false)}
+          className="modal-backdrop-centered"
+        >
           <div
             className="admin-confirm-dialog"
             onClick={(e) => e.stopPropagation()}
@@ -419,7 +551,7 @@ export default function Subjects({ selections, setSelections, goTo }) {
               </button>
             </div>
           </div>
-        </div>
+        </OverlayPortal>
       )}
     </div>
   );
