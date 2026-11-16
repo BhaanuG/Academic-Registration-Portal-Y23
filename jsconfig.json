@@ -6,6 +6,6 @@
     },
     "jsx": "react-jsx"
   },
-  "include": ["src/**/*", "next.config.mjs", "figma-image-loader.js", "oxfmt.config.js"],
+  "include": ["src/**/*", "next.config.mjs"],
   "exclude": ["node_modules", ".next", "dist"]
 }
