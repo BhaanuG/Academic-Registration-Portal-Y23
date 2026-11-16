@@ -10,7 +10,8 @@ next-env.d.ts
 *-debug.log*
 logs/
 *.log
-.claude-replay.*
+AGENTS.md
+CLAUDE.md
 .figma/runtime/
 .tmp-*
 /.figma/design-context/
