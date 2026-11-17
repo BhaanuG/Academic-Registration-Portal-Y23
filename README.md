@@ -1,7 +1,7 @@
 <div align="center">
 
 <a href="https://github.com/BhaanuG/Academic-Registration-Portal-Y23">
-  <img src="logo.png" alt="KLEF University Logo" width="280" />
+  <img src="logo.png" alt="KLEF University Logo" width="180" height="180" style="object-fit: contain; border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);" />
 </a>
 
 # ACADEMIC REGISTRATION PORTAL · Y23
