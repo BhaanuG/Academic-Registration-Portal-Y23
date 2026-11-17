@@ -459,14 +459,13 @@ export default function Admin() {
                 <ShieldCheck size={15} />
               </div>
               <div className="account-info-text">
-                <span className="account-role-label">Administrator</span>
+                <span className="account-role-label">Admin</span>
                 <strong className="account-id-label">{admin.name}</strong>
               </div>
             </div>
 
-            <button type="button" className="signout-button" onClick={logout} title="Sign out of admin console">
-              <LogOut size={15} />
-              <span>Sign out</span>
+            <button type="button" className="signout-button" onClick={logout} title="Sign out of admin console" aria-label="Sign out">
+              <LogOut size={16} />
             </button>
           </div>
         </div>

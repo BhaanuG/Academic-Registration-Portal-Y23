@@ -113,14 +113,13 @@ export default function PortalShell({ page, setPage, onLogout, studentId, childr
                 <GraduationCap size={15} />
               </div>
               <div className="account-info-text">
-                <span className="account-role-label">Enrolled Student</span>
+                <span className="account-role-label">Registration No</span>
                 <strong className="account-id-label">{studentId}</strong>
               </div>
             </div>
 
-            <button type="button" className="signout-button" onClick={onLogout} title="Sign out of student portal">
-              <LogOut size={15} />
-              <span>Sign out</span>
+            <button type="button" className="signout-button" onClick={onLogout} title="Sign out of student portal" aria-label="Sign out">
+              <LogOut size={16} />
             </button>
           </div>
         </div>
