@@ -44,6 +44,7 @@
   <a href="#-what-is-this-project-for-complete-beginners"><b>Beginner's Plain English Explanation</b></a> &bull;
   <a href="#-the-problem-this-portal-solves"><b>The Problem It Solves</b></a> &bull;
   <a href="#-repository-forensics--codebase-census"><b>Repository Census (Chars/Words/Lines)</b></a> &bull;
+  <a href="#-pin-to-pin-file-metrics-deep-dive"><b>Per-File Character & Word Deep Dive</b></a> &bull;
   <a href="#-folder--file-manifest-what-every-single-file-does"><b>Exhaustive File & Folder Manifest</b></a> &bull;
   <a href="#-system-architecture--technical-topology"><b>System Topology</b></a> &bull;
   <a href="#-multi-dimensional-cohort-eligibility-engine"><b>Cohort Engine</b></a> &bull;
@@ -77,25 +78,30 @@ In Tier-1 universities with thousands of concurrent students, course registratio
 
 If you have never built a software application before, here is what this project is in plain, simple English:
 
-### The Analogy
-Imagine a massive university with **1,159 engineering students** and **426 professors**. 
-Every semester, students have to register for their classes and choose which professor they want to learn from.
+### The Real-World Scenario
+Imagine a university campus with **1,159 final-year engineering students** and **426 professors**. 
+At the start of every academic semester, each student must register for their classes and choose which professor they want to study with.
 
-In the old days, universities gave students printed sheets of paper or massive Excel files with tens of thousands of rows. 
-- Students got confused and picked the wrong classes.
-- Students picked classes that clashed with their lab times.
-- 100 students would try to join a classroom that only had 30 seats.
-- Professors were given schedules that made no sense.
+In the past, this was done with paper forms or massive Excel spreadsheets with thousands of rows:
+- Students would choose conflicting classes that occurred at the same time.
+- Students in one branch (like Cloud Computing) would accidentally enroll into sections meant only for Artificial Intelligence students.
+- Placed students who needed soft-skills classes would get placed in technical interview classes meant for unplaced students.
+- Classrooms would get overcrowded with 100 students showing up to a 40-seat laboratory.
+- University staff spent weeks fixing human errors by hand!
 
-### What This Software Does
-This software is a **smart digital website and registration portal** that does all the thinking and checking automatically:
+### How This Platform Automates & Solves Everything
+This software application is a **smart, automated university web portal** that completely eliminates human error:
 
-1. **Who Are You?**: When a student enters their 10-digit ID card number and date of birth, the system instantly recognizes who they are, what batch they belong to, their cluster, and whether they are placed or not placed in a company.
-2. **Smart Filters**: The software hides everything the student is *not* allowed to choose. If a student is studying Artificial Intelligence, they will *only* see AI subjects and the exact professors assigned to teach AI sections. They can never accidentally click on an invalid class!
-3. **Choosing Teachers (Rank 1, 2, 3)**: For every subject, the student picks their 1st choice teacher, 2nd choice teacher, and 3rd choice teacher.
-4. **Mandatory Rules Pop-up**: Just like signing an agreement before an exam, students are shown 7 important university rules on their screen every time they sign in. They must check a box saying *"I understand"* before they can proceed.
-5. **Instant PDF**: When finished, the student clicks one button, and the browser automatically builds a clean, official PDF confirmation document that they can download and print.
-6. **Admin Command Center**: University administrators have a secure dashboard where they can see live graphs of how many students have registered, search any teacher, and reset student passwords if someone forgets theirs.
+1. **Smart Identity Recognition**: When a student enters their 10-digit ID number (like `2300030001`) and date of birth, the system queries the internal database and instantly knows:
+   - Their exact specialization (e.g. *Artificial Intelligence & Data Science*).
+   - Their cluster (`Cluster-1` for sections S1–S50 or `Cluster-2` for sections S51–S100).
+   - Their placement status (*Placed* or *Yet-To-Be-Placed*).
+   - Their assigned faculty counselor.
+2. **Invisible Safety Rails**: The portal only shows what the student is allowed to take. If a student is not allowed to take a certain elective, that elective does not even appear. If a professor does not teach their section range, that professor is completely hidden from their dropdown list. It is literally impossible to make a wrong selection!
+3. **Teacher Ranking (Rank 1, 2, 3)**: For each subject, the student picks their first-choice teacher (Rank 1), backup teacher (Rank 2), and third option (Rank 3).
+4. **Mandatory University Rules Pop-up**: Just like signing an agreement before writing an exam, students are shown 7 official university rules on their screen every time they sign in. They must check a confirmation box before accessing their dashboard.
+5. **One-Click Instant PDF**: As soon as the student finalizes their subjects and teachers, they can click "Download PDF" to immediately get a beautifully formatted, official registration receipt right on their device.
+6. **Administrator Control Center**: Deans and registrars have their own secure password-protected command center. They can see live graphs of how many students have registered, search any teacher, and reset student passwords if someone forgets theirs.
 
 ---
 
@@ -120,7 +126,7 @@ This software is a **smart digital website and registration portal** that does a
 
 Here is an exact, pin-to-pin forensic count of the repository's source code, computed directly from the repository filesystem:
 
-### 1. High-Level Inventory Metrics
+### 1. Cumulative Codebase Metrics
 | Metric Name | Absolute Count | Description & Scope |
 | :--- | :--- | :--- |
 | **Total Directories** | **30 Folders** | Unique folder paths inside the repository (excluding `node_modules`, `.git`, `.next`, `.data`) |
@@ -133,7 +139,18 @@ Here is an exact, pin-to-pin forensic count of the repository's source code, com
 | **Punctuation & Symbols** | **910,449 Symbols** | Brackets, commas, semicolons, quotes, operators, and special symbols |
 | **Whitespace Characters** | **422,685 Whitespaces** | Spaces, tabs, and carriage returns |
 
-### 2. Breakdown by File Extension
+### 2. Pure Source Code Metrics (Excluding Binary Assets)
+When excluding the binary image files (`public/assets/klef-logo.png`, `public/favicon.ico`, `public/favicon.png`), the pure text and source code metrics are:
+- **Source Code Files**: **104 Files**
+- **Source Lines**: **48,718 Lines**
+- **Source Words**: **145,918 Words**
+- **Source Characters**: **1,464,747 Characters**
+- **Source Letters**: **721,010 Letters**
+- **Source Digits**: **81,860 Digits**
+- **Source Symbols**: **259,819 Symbols**
+- **Source Whitespace**: **402,058 Characters**
+
+### 3. Breakdown by File Extension
 | File Extension | File Count | Description |
 | :--- | :--- | :--- |
 | `.jsx` | **37 Files** | React 19 UI component templates, modal overlays, and views |
@@ -148,6 +165,35 @@ Here is an exact, pin-to-pin forensic count of the repository's source code, com
 | `.md` | **1 File** | Master architectural documentation |
 | `.example` | **1 File** | Template environment variables configuration |
 | `.local` | **1 File** | Local runtime environment settings |
+
+---
+
+## 🔍 Pin-to-Pin File Metrics Deep Dive
+
+To provide total visibility, here is an exact forensic breakdown of characters, letters, digits, symbols, words, and lines across the primary core modules of this repository:
+
+| Core Module File Path | Lines | Words | Total Chars | Letters | Digits | Symbols | Whitespace | Primary System Role |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :--- |
+| `src/lib/db/eligibilityEngine.js` | 731 | 2,600 | 27,854 | 16,022 | 265 | 3,548 | 8,019 | Deterministic 5D cohort rules engine |
+| `src/lib/db/queries.js` | 626 | 2,125 | 22,854 | 13,768 | 48 | 3,976 | 5,062 | Parameterized SQLite query catalog |
+| `src/lib/db/client.js` | 245 | 1,081 | 9,917 | 5,750 | 289 | 1,575 | 2,303 | `node:sqlite` DB singleton & seeder |
+| `src/lib/db/schema.sql` | 239 | 1,216 | 10,568 | 7,259 | 227 | 1,151 | 1,931 | 16-table relational schema & indexes |
+| `src/lib/db/optionSheetRules.json` | 756 | 1,927 | 19,622 | 5,813 | 4,236 | 5,143 | 4,430 | University option sheet ruleset |
+| `src/app/(frontend)/portal-api/auth/route.js` | 125 | 399 | 4,019 | 2,396 | 117 | 562 | 944 | Constant-time HMAC authentication |
+| `src/app/(frontend)/portal-api/[resource]/route.js` | 548 | 2,133 | 24,626 | 14,692 | 238 | 2,922 | 6,774 | Dynamic REST gateway & handlers |
+| `src/portal/pages/Login.jsx` | 379 | 1,417 | 15,755 | 8,299 | 174 | 1,861 | 5,421 | Student & Admin login interface |
+| `src/portal/pages/AcademicOverview.jsx` | 196 | 889 | 9,028 | 4,901 | 188 | 1,434 | 2,505 | Academic hub & credit gauge |
+| `src/portal/pages/SubjectSelection.jsx` | 559 | 1,762 | 22,148 | 9,848 | 120 | 2,932 | 9,248 | C0–C8 Curriculum bucket picker |
+| `src/portal/pages/FacultyPreferences.jsx` | 682 | 2,199 | 31,086 | 13,139 | 126 | 3,703 | 14,118 | Rank 1/2/3 Faculty ranker |
+| `src/portal/pages/FacultyDirectory.jsx` | 382 | 1,319 | 14,301 | 7,177 | 220 | 2,076 | 4,828 | 7-Column directory & PDF generator |
+| `src/portal/pages/MyPreferences.jsx` | 414 | 1,455 | 16,525 | 8,456 | 97 | 2,368 | 5,604 | Selection confirmation docket |
+| `src/portal/pages/MyProfile.jsx` | 312 | 1,038 | 12,662 | 6,821 | 71 | 1,613 | 4,157 | Student demographics & counselor |
+| `src/portal/pages/admin/DashboardPage.jsx` | 205 | 655 | 7,668 | 3,744 | 62 | 1,044 | 2,818 | Executive KPI distribution dashboard |
+| `src/portal/pages/admin/FacultyPage.jsx` | 992 | 3,117 | 36,972 | 17,222 | 522 | 5,329 | 13,899 | 8-Column faculty allocation matrix |
+| `src/portal/pages/admin/StudentsPage.jsx` | 1,070 | 3,293 | 40,008 | 18,183 | 517 | 5,600 | 15,708 | 1,159 Student roster manager |
+| `src/portal/pages/admin/ResetPasswordPage.jsx` | 366 | 1,110 | 13,469 | 6,880 | 85 | 1,718 | 4,786 | Student password recovery tool |
+| `src/portal/services/academicData.js` | 18,355 | 49,389 | 511,679 | 217,705 | 49,697 | 105,402 | 138,875 | Embedded institutional dataset |
+| `src/portal/components/academic/RegistrationGuidelinesModal.jsx` | 144 | 516 | 5,472 | 2,898 | 36 | 783 | 1,755 | Mandatory session guidelines modal |
 
 ---
 
