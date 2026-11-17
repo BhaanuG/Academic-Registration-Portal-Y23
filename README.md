@@ -22,6 +22,7 @@
   <a href="#-technology-stack--runtime-specifications"><img src="https://img.shields.io/badge/Next.js-16.4.6%20(Turbopack)-black?style=for-the-badge&logo=next.js&logoColor=white" alt="Next.js 16" /></a>
   <a href="#-technology-stack--runtime-specifications"><img src="https://img.shields.io/badge/React-19.3.1-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React 19" /></a>
   <a href="#-technology-stack--runtime-specifications"><img src="https://img.shields.io/badge/React%20Router-8.5.1-CA4245?style=for-the-badge&logo=reactrouter&logoColor=white" alt="React Router 8" /></a>
+  <a href="#-technology-stack--runtime-specifications"><img src="https://img.shields.io/badge/Figma-UI%2FUX%20Design%20System-F24E1E?style=for-the-badge&logo=figma&logoColor=white" alt="Figma UI/UX Design System" /></a>
   <a href="#-technology-stack--runtime-specifications"><img src="https://img.shields.io/badge/TailwindCSS-v4.0-38BDF8?style=for-the-badge&logo=tailwindcss&logoColor=white" alt="TailwindCSS v4" /></a>
   <a href="#-technology-stack--runtime-specifications"><img src="https://img.shields.io/badge/SQLite-Native%20Node.js%20(node%3Asqlite)-003B57?style=for-the-badge&logo=sqlite&logoColor=white" alt="SQLite Engine" /></a>
   <a href="#-technology-stack--runtime-specifications"><img src="https://img.shields.io/badge/Node.js-22.x%20%2F%2024.x%20LTS-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" alt="Node.js LTS" /></a>
@@ -623,6 +624,27 @@ Upon authenticating to the portal during the **2026–27 EVEN Semester / Semeste
 8. `student_subject_selections`: Real-time student elective choices per bucket.
 9. `student_faculty_preferences`: Ranked faculty preferences (Rank 1, Rank 2, Rank 3).
 10. `student_preference_finalizations`: Lock status preventing modification once submitted.
+
+---
+
+## 🎨 Figma UI/UX Design System & Experience Architecture
+
+The Academic Registration Portal's frontend interface was crafted with an atomic **Figma Design System**, prioritizing clarity, cognitive ease, and responsive consistency across desktop and mobile screens:
+
+1. **Human-Centered Student Experience**:
+   - Engineered to reduce user anxiety during time-sensitive registration sessions.
+   - High-contrast visual cards immediately distinguish mandatory university courses from elective buckets.
+2. **Design Tokens & Palette Harmony**:
+   - **KLEF Presidential Navy** (`#1e3a8a` / `#0f172a`): Used for primary app bars, structural headers, and typography.
+   - **Academic Gold** (`#d97706` / `#f59e0b`): Used for alerts, mandatory guidelines borders, and cohort highlights.
+   - **Verification Emerald** (`#059669` / `#10b981`): Denotes finalized preference submissions and verified enrollment states.
+   - **Surface Neutrals** (`#f8fafc` / `#ffffff`): Off-white background canvas providing zero-glare readability.
+3. **Responsive Grid & Viewport Ergonomics**:
+   - Designed across 12-column desktop grids and adaptive 4-column mobile grids.
+   - Tabular matrices (e.g. 7-column Student Faculty Directory and 8-column Admin Allocation Grid) feature fluid horizontal scrolling and frozen headers for mobile ease.
+4. **Interactive Component Prototyping in Figma**:
+   - Standardized interactive states for all dropdowns (`PreferenceSelect`), interactive calendar flyouts (`DatePicker`), and modal overlays (`RegistrationGuidelinesModal`, `RecordModal`).
+   - Micro-interactions designed with smooth CSS spring transitions and hardware-accelerated transforms.
 
 ---
 
