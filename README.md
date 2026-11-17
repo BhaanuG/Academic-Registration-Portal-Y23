@@ -20,31 +20,37 @@
   <a href="#-system-architecture--technical-topology"><img src="https://img.shields.io/badge/Architecture-Deterministic%20Eligibility%20Engine-blueviolet?style=for-the-badge" alt="Architecture" /></a>
   <a href="#-technology-stack--runtime-specifications"><img src="https://img.shields.io/badge/Next.js-16.4.6%20(Turbopack)-black?style=for-the-badge&logo=next.js&logoColor=white" alt="Next.js 16" /></a>
   <a href="#-technology-stack--runtime-specifications"><img src="https://img.shields.io/badge/React-19.3.1-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React 19" /></a>
+  <a href="#-technology-stack--runtime-specifications"><img src="https://img.shields.io/badge/React%20Router-8.5.1-CA4245?style=for-the-badge&logo=reactrouter&logoColor=white" alt="React Router 8" /></a>
   <a href="#-technology-stack--runtime-specifications"><img src="https://img.shields.io/badge/TailwindCSS-v4.0-38BDF8?style=for-the-badge&logo=tailwindcss&logoColor=white" alt="TailwindCSS v4" /></a>
   <a href="#-technology-stack--runtime-specifications"><img src="https://img.shields.io/badge/SQLite-Native%20Node.js%20(node%3Asqlite)-003B57?style=for-the-badge&logo=sqlite&logoColor=white" alt="SQLite Engine" /></a>
   <a href="#-technology-stack--runtime-specifications"><img src="https://img.shields.io/badge/Node.js-22.x%20%2F%2024.x%20LTS-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" alt="Node.js LTS" /></a>
 </p>
 
 <p align="center">
-  <a href="#-institutional-data-matrix--production-benchmarks"><img src="https://img.shields.io/badge/Registered%20Students-1%2C159%20Profiles-success?style=flat-square" alt="Registered Students" /></a>
-  <a href="#-institutional-data-matrix--production-benchmarks"><img src="https://img.shields.io/badge/Faculty%20Registry-426%20Professors-blue?style=flat-square" alt="Faculty Registry" /></a>
-  <a href="#-institutional-data-matrix--production-benchmarks"><img src="https://img.shields.io/badge/Active%20Allocations-682%20Teaching%20Assignments-orange?style=flat-square" alt="Active Allocations" /></a>
+  <a href="#-repository-forensics--codebase-census"><img src="https://img.shields.io/badge/Repository%20Files-107%20Files-blue?style=flat-square" alt="Files" /></a>
+  <a href="#-repository-forensics--codebase-census"><img src="https://img.shields.io/badge/Codebase%20Directories-30%20Folders-informational?style=flat-square" alt="Directories" /></a>
+  <a href="#-repository-forensics--codebase-census"><img src="https://img.shields.io/badge/Lines%20of%20Code-52%2C276%20Lines-success?style=flat-square" alt="Lines of Code" /></a>
+  <a href="#-repository-forensics--codebase-census"><img src="https://img.shields.io/badge/Total%20Words-320%2C249%20Words-yellow?style=flat-square" alt="Total Words" /></a>
+  <a href="#-repository-forensics--codebase-census"><img src="https://img.shields.io/badge/Total%20Characters-2%2C356%2C082%20Chars-blueviolet?style=flat-square" alt="Total Characters" /></a>
+  <a href="#-institutional-data-matrix--production-benchmarks"><img src="https://img.shields.io/badge/Enrolled%20Students-1%2C159%20Profiles-success?style=flat-square" alt="Students" /></a>
+  <a href="#-institutional-data-matrix--production-benchmarks"><img src="https://img.shields.io/badge/Faculty%20Registry-426%20Professors-blue?style=flat-square" alt="Faculty" /></a>
+  <a href="#-institutional-data-matrix--production-benchmarks"><img src="https://img.shields.io/badge/Active%20Allocations-682%20Assignments-orange?style=flat-square" alt="Allocations" /></a>
   <a href="#-institutional-data-matrix--production-benchmarks"><img src="https://img.shields.io/badge/Pre--Assigned%20Buckets-11%2C227%20Rows-purple?style=flat-square" alt="Pre-Assigned Buckets" /></a>
-  <a href="#-production-build--deployment-runbook"><img src="https://img.shields.io/badge/Build%20Status-Passing%20(0%20Errors)-brightgreen?style=flat-square" alt="Build Status" /></a>
-  <a href="#-production-build--deployment-runbook"><img src="https://img.shields.io/badge/Deployment-Netlify%20%2F%20Standalone%20Node-00AD9F?style=flat-square" alt="Deployment" /></a>
   <a href="#-zero-leakage-security-architecture"><img src="https://img.shields.io/badge/Security-Zero%20Hardcoded%20Secrets-critical?style=flat-square" alt="Security" /></a>
 </p>
 
 <p align="center">
   <a href="#-executive-architectural-abstract"><b>Executive Abstract</b></a> &bull;
-  <a href="#-the-problem-this-portal-solves"><b>Why This Exists</b></a> &bull;
+  <a href="#-what-is-this-project-for-complete-beginners"><b>Beginner's Plain English Explanation</b></a> &bull;
+  <a href="#-the-problem-this-portal-solves"><b>The Problem It Solves</b></a> &bull;
+  <a href="#-repository-forensics--codebase-census"><b>Repository Census (Chars/Words/Lines)</b></a> &bull;
+  <a href="#-folder--file-manifest-what-every-single-file-does"><b>Exhaustive File & Folder Manifest</b></a> &bull;
   <a href="#-system-architecture--technical-topology"><b>System Topology</b></a> &bull;
   <a href="#-multi-dimensional-cohort-eligibility-engine"><b>Cohort Engine</b></a> &bull;
-  <a href="#-pin-to-pin-source-code--file-inventory"><b>File Inventory</b></a> &bull;
   <a href="#-database-schema--entity-relationship-model"><b>Database Schema</b></a> &bull;
-  <a href="#-complete-step-by-step-user-journeys-for-beginners"><b>Beginner's Guide</b></a> &bull;
+  <a href="#-complete-step-by-step-user-journeys"><b>User Journeys</b></a> &bull;
   <a href="#-restful-api-specification"><b>API Docs</b></a> &bull;
-  <a href="#-local-engineering-setup"><b>Quickstart</b></a>
+  <a href="#-local-engineering-setup"><b>Setup Runbook</b></a>
 </p>
 
 </div>
@@ -67,6 +73,32 @@ In Tier-1 universities with thousands of concurrent students, course registratio
 
 ---
 
+## 👶 What is This Project? (For Complete Beginners)
+
+If you have never built a software application before, here is what this project is in plain, simple English:
+
+### The Analogy
+Imagine a massive university with **1,159 engineering students** and **426 professors**. 
+Every semester, students have to register for their classes and choose which professor they want to learn from.
+
+In the old days, universities gave students printed sheets of paper or massive Excel files with tens of thousands of rows. 
+- Students got confused and picked the wrong classes.
+- Students picked classes that clashed with their lab times.
+- 100 students would try to join a classroom that only had 30 seats.
+- Professors were given schedules that made no sense.
+
+### What This Software Does
+This software is a **smart digital website and registration portal** that does all the thinking and checking automatically:
+
+1. **Who Are You?**: When a student enters their 10-digit ID card number and date of birth, the system instantly recognizes who they are, what batch they belong to, their cluster, and whether they are placed or not placed in a company.
+2. **Smart Filters**: The software hides everything the student is *not* allowed to choose. If a student is studying Artificial Intelligence, they will *only* see AI subjects and the exact professors assigned to teach AI sections. They can never accidentally click on an invalid class!
+3. **Choosing Teachers (Rank 1, 2, 3)**: For every subject, the student picks their 1st choice teacher, 2nd choice teacher, and 3rd choice teacher.
+4. **Mandatory Rules Pop-up**: Just like signing an agreement before an exam, students are shown 7 important university rules on their screen every time they sign in. They must check a box saying *"I understand"* before they can proceed.
+5. **Instant PDF**: When finished, the student clicks one button, and the browser automatically builds a clean, official PDF confirmation document that they can download and print.
+6. **Admin Command Center**: University administrators have a secure dashboard where they can see live graphs of how many students have registered, search any teacher, and reset student passwords if someone forgets theirs.
+
+---
+
 ## 💡 The Problem This Portal Solves
 
 ### What Happened Before This Portal?
@@ -84,19 +116,200 @@ In Tier-1 universities with thousands of concurrent students, course registratio
 
 ---
 
-## ⚙️ Engineering & Systems Matrix
+## 🔬 Repository Forensics & Codebase Census
 
-| Architecture Dimension | Technical Specification | Operational SLA / Characteristic |
+Here is an exact, pin-to-pin forensic count of the repository's source code, computed directly from the repository filesystem:
+
+### 1. High-Level Inventory Metrics
+| Metric Name | Absolute Count | Description & Scope |
 | :--- | :--- | :--- |
-| **System Paradigm** | Full-Stack Modern Web Platform | Unified Next.js 16 App Router architecture |
-| **Runtime Environment** | Node.js 22 LTS / 24 LTS | Native ESM + built-in C++ SQLite bindings (`node:sqlite`) |
-| **Frontend Framework** | React 19.3.1 + React Router 8.5 | Concurrent rendering, Suspense-driven streaming, zero layout thrash |
-| **Compiler & Bundler** | Next.js Turbopack (`16.4.6`) | Sub-50ms HMR; optimized tree-shaken production bundles |
-| **Persistence Engine** | SQLite 3 (`.data/academic_portal.sqlite`) | ACID compliant, WAL journaling, sub-2ms local query resolution |
-| **Styling & UI System** | Tailwind CSS v4.0 + Custom Design Tokens | Hardware-accelerated CSS variables, KLEF Navy identity |
-| **Data Scope** | 1,159 Students & 426 Faculty | 100% data reconciliation with official Option Sheets |
-| **Security Architecture** | Cryptographic Timing-Safe Auth + Zero Hardcoded Secrets | Timing-attack resistant comparisons; env-driven credentials |
-| **Sole Author & Architect** | **Bhaanu G (Bhaanu Gali)** | End-to-end design, data modeling, backend & frontend architecture |
+| **Total Directories** | **30 Folders** | Unique folder paths inside the repository (excluding `node_modules`, `.git`, `.next`, `.data`) |
+| **Total Files** | **107 Files** | Distinct files tracked and managed in the project |
+| **Total Lines of Text** | **52,276 Lines** | Cumulative newline-delimited rows of code, markup, JSON, and stylesheets |
+| **Total Words** | **320,249 Words** | Regex word-token matches (`\b\w+\b`) across all files |
+| **Total Characters** | **2,356,082 Characters** | UTF-8 string character count across the entire repository |
+| **Alphabetical Letters** | **901,936 Letters** | Upper and lower case ASCII characters (`[a-zA-Z]`) |
+| **Numeric Digits** | **121,012 Digits** | Numbers and digits (`[0-9]`) |
+| **Punctuation & Symbols** | **910,449 Symbols** | Brackets, commas, semicolons, quotes, operators, and special symbols |
+| **Whitespace Characters** | **422,685 Whitespaces** | Spaces, tabs, and carriage returns |
+
+### 2. Breakdown by File Extension
+| File Extension | File Count | Description |
+| :--- | :--- | :--- |
+| `.jsx` | **37 Files** | React 19 UI component templates, modal overlays, and views |
+| `.js` | **21 Files** | Backend API route handlers, database drivers, services, and engines |
+| `.css` | **21 Files** | Dedicated modular stylesheets and design token definitions |
+| `.json` | **9 Files** | Configuration manifests, option sheet rules, and package trees |
+| `(no ext)` | **9 Files** | Executable shell scripts, Figma tooling helpers, and container runners |
+| `.png` | **2 Files** | University logo image assets and favicons |
+| `.mjs` | **2 Files** | Next.js configuration and PostCSS modern ES module configs |
+| `.sql` | **2 Files** | Relational schema definitions and database audit scripts |
+| `.ico` | **1 File** | Browser tab icon |
+| `.md` | **1 File** | Master architectural documentation |
+| `.example` | **1 File** | Template environment variables configuration |
+| `.local` | **1 File** | Local runtime environment settings |
+
+---
+
+## 📂 Folder & File Manifest: What Every Single File Does
+
+Here is an exhaustive, pin-to-pin catalog of all 30 directories and 107 files in this repository:
+
+### Root Level Files
+1. `.env.example`: Safe template file demonstrating required environment variables (`ADMIN_ID`, `ADMIN_PASSWORD`, `PORT`) without revealing sensitive secrets.
+2. `.env.local`: Local runtime configuration holding active environment variables for local testing (strictly ignored by Git).
+3. `.gitattributes`: Git configuration specifying file formatting, line endings (LF vs CRLF), and binary asset definitions.
+4. `.gitignore`: Protects sensitive files, node dependencies (`node_modules`), build output (`.next`), and database files (`.data`) from being committed to Git.
+5. `README.md`: The complete, master architectural documentation and user guide for the entire project.
+6. `jsconfig.json`: JavaScript compiler configuration enabling absolute path aliases (e.g. `@/lib/...`, `@/portal/...`).
+7. `next.config.mjs`: Next.js 16 core configuration enabling Turbopack, standalone server output, and environment origins.
+8. `package.json`: Primary project manifest declaring application scripts, metadata, and dependencies (`next`, `react`, `react-router`, `xlsx`, `jspdf`, `tailwindcss`).
+9. `package-lock.json`: Cryptographic lockfile pinning the exact tree of all 136 npm packages.
+10. `postcss.config.mjs`: PostCSS configuration module loading `@tailwindcss/postcss`.
+
+---
+
+### Folder: `.figma/make/` (11 Files)
+Development and containerization bridge utilities:
+1. `analyze-routes`: Shell script to inspect active routes.
+2. `deploy`: Deployment execution script.
+3. `deploy-preview`: Preview environment build trigger.
+4. `deploy.json`: Deployment target configuration.
+5. `dev`: Local development process launcher.
+6. `dev.json`: Local dev server settings and port allocations.
+7. `format`: Code formatter trigger (`oxfmt`).
+8. `install`: Dependency installation bootstrap.
+9. `langserver`: Language server integration script.
+10. `site.json`: Metadata container for site identity.
+11. `template-transition.json`: Template migration manifest.
+
+---
+
+### Folder: `public/` & `public/assets/` (3 Files)
+Static media assets served directly to the browser:
+1. `public/assets/klef-logo.png`: High-resolution official logo of Koneru Lakshmaiah Education Foundation.
+2. `public/favicon.ico`: Browser tab icon.
+3. `public/favicon.png`: PNG format browser icon.
+
+---
+
+### Folder: `scripts/` (1 File)
+1. `scripts/data_dump.json`: Institutional JSON data dump containing raw reference records of students and faculty.
+
+---
+
+### Folder: `src/app/(frontend)/` (Next.js App Router Structure)
+The modern entry points for Next.js 16:
+1. `layout.jsx`: Root HTML layout wrapping all pages with global fonts, CSS imports, and metadata.
+2. `page.jsx`: Base home page route redirecting users to the login or portal shell.
+3. `not-found.jsx`: Clean 404 error page displayed when a non-existent URL is visited.
+4. `PortalMount.jsx`: Mount coordinator connecting React Router to the Next.js document tree.
+5. `[...slug]/page.jsx`: Catch-all dynamic Next.js route delegating client paths to React Router.
+6. `.figma/make/[asset]/route.js`: Internal asset streaming endpoint.
+
+---
+
+### Folder: `src/app/(frontend)/portal-api/` (Edge REST Handlers)
+1. `auth/route.js`: Handles student & administrator login and logout. Contains timing-safe string comparison (`safeCompare`) and issues 8-hour signed session tokens.
+2. `[resource]/route.js`: Dynamic REST API gateway handling endpoints like `/portal-api/student-profile`, `/portal-api/student-subjects`, `/portal-api/student-faculty-directory`, `/portal-api/stats`, `/portal-api/courses`, and administrative password resets.
+
+---
+
+### Folder: `src/app/(frontend)/styles/` (21 CSS Style Files)
+Dedicated, modular stylesheets providing high-performance styling without layout thrashing:
+1. `academic-overview.css`: Styles for the student dashboard, cohort badge cards, and 25-credit meter.
+2. `admin-dashboard.css`: Styles for the executive KPI counters, cards, and distribution bars.
+3. `admin-faculty-buckets.css`: Styles for bucket allocation controls.
+4. `admin-profile.css`: Styles for the administrator profile card and account settings.
+5. `admin-reset-password.css`: Layout for the student password reset tool.
+6. `admin-shell.css`: Navigation sidebar and header container for the administrative command center.
+7. `admin-students.css`: Table layout and filtering widgets for the 1,159 student roster.
+8. `clean-popup-modal.css`: Positioning and drop-shadows for popup dialogs.
+9. `cluster-selection.css`: Visual styling for Cluster 1 vs Cluster 2 cards.
+10. `developer-page.css`: Styles for the system architect attribution page.
+11. `faculty-directory.css`: 7-column tabular view styles for the student faculty directory.
+12. `faculty-preferences.css`: Styles for the Rank 1, Rank 2, and Rank 3 teacher selection dropdowns.
+13. `guidelines-modal.css`: Golden alert styling and checklist container for the mandatory registration guidelines modal.
+14. `modal-positioning.css`: Responsive z-index and backdrop blur utilities.
+15. `motion-interactions.css`: Smooth CSS transitions and hover animations.
+16. `my-preferences.css`: Styles for the finalized student summary docket.
+17. `platform-responsive.css`: Mobile and tablet viewport adaptation rules.
+18. `portal-shell.css`: Student portal top navigation bar, logo styling, and footer.
+19. `student-profile.css`: Profile card styles showing student ID, email, and counselor.
+20. `subject-selection.css`: Styles for the C0-C8 curriculum bucket accordion and course checkboxes.
+21. `styles.css`: Root global stylesheet containing Tailwind imports and theme variables.
+
+---
+
+### Folder: `src/lib/` & `src/lib/db/` (Core Engines & Database)
+1. `portal-auth.js`: Cryptographic session token generation and verification using Node.js `crypto` HMAC signatures.
+2. `make-custom-code.jsx` & `make-site-settings.js`: Platform helpers and preview settings.
+3. `src/lib/db/client.js`: Database singleton. Connects to SQLite using `node:sqlite` (`DatabaseSync`), executes schema migrations, and seeds default institutional tables.
+4. `src/lib/db/schema.sql`: Full DDL database schema defining 16 relational tables and high-speed B-Tree indexes.
+5. `src/lib/db/audit_schema.sql`: Audit table definitions for logging preference modifications.
+6. `src/lib/db/queries.js`: Prepared SQLite statements for fetching students, faculty, allocations, and administrative records.
+7. `src/lib/db/eligibilityEngine.js`: **The intellectual core of the portal.** Enforces all 5-dimensional cohort rules, section boundaries, and faculty allocation filtering.
+8. `src/lib/db/optionSheetRules.json`: Machine-readable master matrix parsed from official KLEF Excel registration guidelines.
+
+---
+
+### Folder: `src/portal/` (React Client Application)
+
+#### `src/portal/app/`
+1. `App.jsx`: Main React application component wrapping the app with authentication context.
+2. `routes.jsx`: React Router 8 route map defining all student and admin page paths.
+
+#### `src/portal/components/` (Reusable UI Widgets)
+1. `PreferenceSelect.jsx`: Dropdown widget for selecting faculty Rank 1, 2, and 3.
+2. `RegistrationGuidelinesModal.jsx`: The mandatory pop-up modal showing the 7 university rules.
+3. `Brand.jsx`: Official KLEF branding and logo lockup.
+4. `DatePicker.jsx`: Interactive calendar dropdown for selecting birthdates during login.
+5. `OverlayPortal.jsx`: Accessible DOM portal for rendering modals above all other elements.
+6. `PageHeading.jsx`: Consistent header title and subtitle widget for pages.
+7. `PasswordInput.jsx`: Secure input field with show/hide password toggle button.
+8. `PortalFooter.jsx`: Universal footer with university copyright and contact info.
+9. `PortalShell.jsx`: Main wrapper with navigation links, student name badge, and sign-out button.
+
+#### `src/portal/context/` & `src/portal/hooks/`
+1. `AuthContext.jsx`: Global React context managing user authentication state across all pages.
+2. `useAuth.js`: Custom hook for accessing user profile, role, and logout actions.
+3. `useFaculty.js`: Custom hook for fetching faculty options.
+4. `useSubjects.js`: Custom hook for fetching student course buckets and selections.
+
+#### `src/portal/pages/` (Student Views)
+1. `Login.jsx`: Split login view allowing students to authenticate via Student ID + Date of Birth.
+2. `AcademicOverview.jsx`: First dashboard screen for students showing cohort stamps and credit meter.
+3. `SubjectSelection.jsx`: Bucket selection view (C0 to C8) for choosing academic courses.
+4. `FacultyPreferences.jsx`: Renders the faculty preference matrix (Rank 1, 2, 3) strictly scoped to the student's authorized sections.
+5. `FacultyDirectory.jsx`: 7-column student faculty directory table with search, component filters, and the client-side PDF export button.
+6. `MyPreferences.jsx`: Read-only receipt of all student selections.
+7. `MyProfile.jsx`: Comprehensive view of student identity, Aadhaar/APAAR numbers, and assigned counselor.
+8. `ClusterSelection.jsx`: Information view explaining Cluster 1 and Cluster 2 differences.
+9. `ResetPassword.jsx`: Student-facing view for updating passwords.
+10. `Developer.jsx`: Dedicated attribution page honoring the architect **Bhaanu G (Bhaanu Gali)**.
+11. `Admin.jsx`: Redirect wrapper routing administrators to `/admin/dashboard`.
+
+#### `src/portal/pages/admin/` (Administrative Views)
+1. `DashboardPage.jsx`: Real-time executive KPIs and cluster distribution charts.
+2. `FacultyPage.jsx`: Strictly formatted 8-column live faculty allocation table.
+3. `StudentsPage.jsx`: Filterable directory of all 1,159 students.
+4. `BucketsPage.jsx`: Curriculum bucket management and credit limits.
+5. `CoursesPage.jsx`: Course catalog inspection and course addition tool.
+6. `ResetPasswordPage.jsx`: Administrative interface for clearing student passwords back to DOB.
+7. `AdminProfilePage.jsx`: Administrator account credentials and contact details management.
+8. `RecordModal.jsx`: Generic popup modal for adding or editing database records.
+9. `adminConfig.js`: Administrative sidebar navigation items and icon mappings.
+
+#### `src/portal/services/` & `src/portal/utils/`
+1. `academicData.js`: Master embedded fallback institutional dataset containing complete pre-compiled records.
+2. `api.js`: Unified client-side HTTP request wrapper for communicating with `/portal-api/`.
+3. `authService.js`: Authentication state manager handling `sessionStorage` guidelines tracking and cookies.
+4. `facultyService.js`: Faculty lookup utilities.
+5. `preferenceService.js`: Saves and loads student course and teacher selections.
+6. `studentService.js`: Retrieves student profile records.
+7. `subjectService.js`: Subject selection helpers.
+8. `routes.js`: URL path constants.
+9. `validation.js`: Client-side input validators and Excel parser helpers.
 
 ---
 
@@ -164,7 +377,9 @@ The portal was built and verified against the complete institutional datasets fo
  Total Pre-Assigned Student Buckets    : 11,227 (Individualized enrollment rows)
  Specialization Streams Covered        : 29     (Full Department of CSE spectrum)
  Discrepancies vs Master Excel Sheets  : 0      (Zero data loss / 100% parity verified)
- Lines of Source Code                  : 50,205 (Across 105 verified project files)
+ Lines of Source Code                  : 52,276 (Across 107 verified project files)
+ Words in Codebase                     : 320,249
+ Characters in Codebase                : 2,356,082
 ========================================================================================
 ```
 
@@ -312,42 +527,7 @@ erDiagram
 
 ---
 
-## 🔍 Pin-to-Pin Source Code & File Inventory
-
-Here is the exact responsibility of every file in the architecture:
-
-### 1. Database & Core Engine (`src/lib/db/`)
-- `client.js`: Database connection singleton. Opens `.data/academic_portal.sqlite` using Node.js's native `node:sqlite` module (`DatabaseSync`). Contains automated table seeding logic for buckets, courses, faculty, students, and administrators.
-- `eligibilityEngine.js`: **The heart of the portal.** Contains `getStudentAcademicSubjects()`, `getOptionSheetSectionRange()`, and `getStudentFacultyDirectory()`. Implements all 5-dimensional cohort rules.
-- `optionSheetRules.json`: The machine-readable master knowledge base parsed from the university's official Option Form Excel sheet.
-- `queries.js`: Clean repository of prepared SQL statements for student lookups, administrator password updates, and preference saves.
-- `schema.sql`: Full DDL script defining all 16 tables and optimized B-Tree indexes.
-
-### 2. Edge API Layer (`src/app/(frontend)/portal-api/`)
-- `auth/route.js`: Handles student & admin authentication. Uses `crypto.timingSafeEqual` to prevent timing attacks. Issues signed session cookies.
-- `[resource]/route.js`: Dynamic REST handler serving `/portal-api/student-profile`, `/portal-api/student-subjects`, `/portal-api/student-faculty-directory`, `/portal-api/stats`, `/portal-api/courses`, and administrative mutations.
-
-### 3. Student Portal Pages (`src/portal/pages/`)
-- `Login.jsx`: Split login view allowing students to authenticate via Student ID + Date of Birth. Includes institutional help modal and counselor directory.
-- `AcademicOverview.jsx`: First dashboard screen for students. Shows cohort stamps, cluster allocations, and 25-credit progress gauge.
-- `SubjectSelection.jsx`: Bucket selection view (C0 to C8). Handles elective radio selections, mandatory course locking, and reset buttons.
-- `FacultyPreferences.jsx`: Renders the faculty preference matrix (Rank 1, Rank 2, Rank 3) strictly scoped to the student's authorized sections.
-- `FacultyDirectory.jsx`: Renders the 7-column student faculty directory table with search, component filters, and the client-side PDF export button.
-- `MyPreferences.jsx`: Read-only receipt of all student selections.
-- `MyProfile.jsx`: Comprehensive view of student identity, Aadhaar/APAAR numbers, residency, and assigned faculty counselor.
-
-### 4. Admin Portal Pages (`src/portal/pages/admin/`)
-- `DashboardPage.jsx`: Real-time executive KPIs and cluster distribution charts.
-- `FacultyPage.jsx`: Strictly formatted 8-column live faculty allocation table with search, filter, and pagination.
-- `StudentsPage.jsx`: Filterable directory of all 1,159 students.
-- `BucketsPage.jsx` & `CoursesPage.jsx`: Curriculum bucket management and course catalog controls.
-- `ResetPasswordPage.jsx`: Administrative interface for clearing student passwords back to their registered Date of Birth.
-
----
-
-## 📖 Complete Step-by-Step User Journeys (For Beginners)
-
-If you are new to this codebase or an administrative staff member reviewing how students use this system, here is the exact pin-to-pin journey:
+## 📖 Complete Step-by-Step User Journeys
 
 ### 🎓 Journey A: A Student Registering for Semester 8
 
