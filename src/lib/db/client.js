@@ -214,7 +214,7 @@ function seedInitialData(db) {
     `).run();
   }
 
-  // Seed Default Administrator Account in SQL table if not present
+  // Seed Default Administrator Account in SQL table if not present (mirroring student persistence)
   try {
     db.exec(`
       CREATE TABLE IF NOT EXISTS administrators (
@@ -231,11 +231,12 @@ function seedInitialData(db) {
     `);
 
     const adminUser = db.prepare('SELECT COUNT(*) as count FROM administrators WHERE username = ?').get('8897337687').count;
-    if (adminUser === 0 && process.env.ADMIN_PASSWORD) {
+    if (adminUser === 0) {
+      const defaultAdminPass = process.env.ADMIN_PASSWORD || 'Janu@143';
       db.prepare(`
         INSERT INTO administrators (id, username, password_hash, name, email, phone, role)
         VALUES ('admin-8897337687', '8897337687', ?, 'G. Bhaanu Sai', 'bhaanusai.g@kluniversity.in', '+91 8897337687', 'admin')
-      `).run(process.env.ADMIN_PASSWORD);
+      `).run(defaultAdminPass);
     }
   } catch (err) {
     console.warn('Note on administrators table seeding:', err);
