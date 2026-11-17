@@ -43,7 +43,7 @@ function seedInitialData(db) {
     db.prepare(`
       INSERT INTO academic_terms (id, academic_year, semester_code, semester_number, is_active)
       VALUES 
-        ('2026-27-ODD', '2026-27', 'ODD', 5, 1),
+        ('2026-27-EVEN', '2026-27', 'ODD', 5, 1),
         ('2026-27-EVEN', '2026-27', 'EVEN', 6, 0)
     `).run();
   }
@@ -162,7 +162,7 @@ function seedInitialData(db) {
     // Populate relational faculty_allocations across sections and courses
     const insertAlloc = db.prepare(`
       INSERT OR IGNORE INTO faculty_allocations (id, faculty_id, course_code, section_id, sub_section, component, term_id)
-      VALUES (?, ?, ?, ?, ?, ?, '2026-27-ODD')
+      VALUES (?, ?, ?, ?, ?, ?, '2026-27-EVEN')
     `);
 
     // Fetch all courses and faculty

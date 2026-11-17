@@ -1,11 +1,11 @@
 -- ============================================================================
 -- Academic Registration Portal — Comprehensive Academic Schema (C0 - C8)
--- Fully reconciled with KLEF R23 2026-27 Odd Semester Institutional Data
+-- Fully reconciled with KLEF R23 2026-27 Even Semester Institutional Data
 -- ============================================================================
 
 -- 1. Academic Terms
 CREATE TABLE IF NOT EXISTS academic_terms (
-  id TEXT PRIMARY KEY,                       -- e.g. '2026-27-ODD', '2026-27-EVEN'
+  id TEXT PRIMARY KEY,                       -- e.g. '2026-27-EVEN', '2026-27-EVEN'
   academic_year TEXT NOT NULL,               -- '2026-27'
   semester_code TEXT NOT NULL,               -- 'ODD', 'EVEN'
   semester_number INTEGER NOT NULL,          -- 5, 6
@@ -105,7 +105,7 @@ CREATE TABLE IF NOT EXISTS faculty_allocations (
   section_id TEXT NOT NULL REFERENCES sections(id) ON DELETE CASCADE,
   sub_section TEXT,
   component TEXT NOT NULL CHECK(component IN ('L', 'T', 'P', 'S')),
-  term_id TEXT REFERENCES academic_terms(id) DEFAULT '2026-27-ODD',
+  term_id TEXT REFERENCES academic_terms(id) DEFAULT '2026-27-EVEN',
   created_at TEXT DEFAULT CURRENT_TIMESTAMP,
   updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT unique_fac_section_comp UNIQUE(course_code, section_id, component, sub_section, faculty_id)
@@ -154,7 +154,7 @@ CREATE TABLE IF NOT EXISTS student_assigned_buckets (
   prac_section TEXT,
   skill_section TEXT,
   is_mandatory INTEGER NOT NULL DEFAULT 1,
-  term_id TEXT REFERENCES academic_terms(id) DEFAULT '2026-27-ODD',
+  term_id TEXT REFERENCES academic_terms(id) DEFAULT '2026-27-EVEN',
   created_at TEXT DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT unique_student_assigned_bucket_course UNIQUE(student_id, bucket_id, default_course_code, term_id)
 );
@@ -165,7 +165,7 @@ CREATE TABLE IF NOT EXISTS student_subject_selections (
   student_id TEXT NOT NULL REFERENCES students(student_id) ON DELETE CASCADE,
   bucket_id TEXT NOT NULL REFERENCES buckets(id) ON DELETE RESTRICT,
   course_code TEXT NOT NULL REFERENCES courses(code) ON DELETE RESTRICT,
-  term_id TEXT REFERENCES academic_terms(id) DEFAULT '2026-27-ODD',
+  term_id TEXT REFERENCES academic_terms(id) DEFAULT '2026-27-EVEN',
   created_at TEXT DEFAULT CURRENT_TIMESTAMP,
   updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT unique_student_bucket_term UNIQUE(student_id, bucket_id, term_id)
@@ -177,7 +177,7 @@ CREATE TABLE IF NOT EXISTS student_faculty_preferences (
   student_id TEXT NOT NULL REFERENCES students(student_id) ON DELETE CASCADE,
   preference_key TEXT NOT NULL,
   preference_value TEXT NOT NULL,
-  term_id TEXT REFERENCES academic_terms(id) DEFAULT '2026-27-ODD',
+  term_id TEXT REFERENCES academic_terms(id) DEFAULT '2026-27-EVEN',
   created_at TEXT DEFAULT CURRENT_TIMESTAMP,
   updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT unique_student_pref_key_term UNIQUE(student_id, preference_key, term_id)
@@ -192,7 +192,7 @@ CREATE TABLE IF NOT EXISTS student_section_selections (
   selected_section TEXT NOT NULL,
   component TEXT NOT NULL,
   status TEXT NOT NULL DEFAULT 'STUDENT_SELECTION_SUBMITTED',
-  term_id TEXT REFERENCES academic_terms(id) DEFAULT '2026-27-ODD',
+  term_id TEXT REFERENCES academic_terms(id) DEFAULT '2026-27-EVEN',
   created_at TEXT DEFAULT CURRENT_TIMESTAMP,
   updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT unique_student_course_comp_section UNIQUE(student_id, course_code, component, term_id)
@@ -205,7 +205,7 @@ CREATE TABLE IF NOT EXISTS student_preference_finalizations (
   status TEXT NOT NULL DEFAULT 'FINALIZED', -- 'FINALIZED', 'EDITABLE', 'REOPENED'
   finalized_at TEXT DEFAULT CURRENT_TIMESTAMP,
   reopened_at TEXT,
-  term_id TEXT REFERENCES academic_terms(id) DEFAULT '2026-27-ODD',
+  term_id TEXT REFERENCES academic_terms(id) DEFAULT '2026-27-EVEN',
   created_at TEXT DEFAULT CURRENT_TIMESTAMP,
   updated_at TEXT DEFAULT CURRENT_TIMESTAMP
 );

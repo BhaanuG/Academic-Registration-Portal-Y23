@@ -61,7 +61,7 @@
 
 ## 📋 Executive Architectural Abstract
 
-**Academic Registration Portal (Y23)** is a mission-critical, enterprise-grade academic lifecycle platform engineered for **Koneru Lakshmaiah Education Foundation (KLEF Deemed-to-be University)** for the **Y23 Batch (2026–27 ODD Semester / Semester 8)**.
+**Academic Registration Portal (Y23)** is a mission-critical, enterprise-grade academic lifecycle platform engineered for **Koneru Lakshmaiah Education Foundation (KLEF Deemed-to-be University)** for the **Y23 Batch (2026–27 EVEN Semester / Semester 8)**.
 
 In Tier-1 universities with thousands of concurrent students, course registration routinely fails due to server saturation, schedule conflicts, manual human allocation errors, and cross-cohort timetable bleeding. The platform completely mitigates these risks through:
 
@@ -470,6 +470,44 @@ Registration rules at KLEF are strictly governed by cohort dimensions. The `elig
                         +------------------+------------------+
 ```
 
+### 🎓 Master Directory of All 29 Engineering Specialization Streams (KLEF Y23)
+
+Every student enrolled in Semester 8 belongs to one of the 29 official engineering disciplines. The cohort engine locks their curriculum sections to ensure 100% adherence to institutional timetables:
+
+| # | Specialization Stream Name | Academic Cluster | Capstone Project-1 Range | Professional Elective 4 (PE4) | Professional Elective 5 (PE5) |
+| :-: | :--- | :---: | :---: | :--- | :--- |
+| 1 | **INDUSTRIAL BIOTECHNOLOGY** | Cluster-1 | Section S1 | 23IBT3406 (S1) | 23IBT3507 (S1) |
+| 2 | **CLOUD AND EDGE COMPUTING** | Cluster-1 | Section S2-S3 | 23CEC3406 (S4) | 23CEC3510 (S2-S4) |
+| 3 | **CLOUD INFRASTRUCTURE DESIGN AND ENGINEERING** | Cluster-1 | Section S4-S5 | 23CID3405 (S5) | 23CID3508 (S5-S7) |
+| 4 | **CLOUD NATIVE SOFTWARE ENGINEERING** | Cluster-1 | Section S6-S8 | 23CNE3405 (S6) | 23CNE3508 (S8-S11) |
+| 5 | **CYBER SECURITY AND BLOCKCHAIN TECHNOLOGY** | Cluster-1 | Section S9-S15 | 23CSB3406 (S8) | 23CSB3510 (S12-S21) |
+| 6 | **DISTRIBUTED LEDGER ANALYTICS** | Cluster-1 | Section S18 | 23DLA3406 (S10) | 23DLA3507 (S22-S23) |
+| 7 | **BLOCKCHAIN ENGINEERING FOR WEB3** | Cluster-1 | Section S20 | 23BEW3405 (S3) | 23BEW3509 (S24) |
+| 8 | **DATA ENGINEERING FOR AI** | Cluster-1 | Section S21-S25 | 23DEA3404 (S9) | 23DEA3505 (S25-S30) |
+| 9 | **DATA SCIENCE AND BIG DATA ANALYTICS** | Cluster-1 | Section S26-S29 | 23DSB3404 (S10) | 23DSB3511 (S31-S34) |
+| 10 | **SOCIAL AND DIGITAL MEDIA ANALYTICS** | Cluster-1 | Section S30-S31 | 23SDM3405 (S13) | 23SDM3507 (S35-S36) |
+| 11 | **CROSS PLATFORM DEVELOPMENT FRAME WORKS** | Cluster-1 | Section S39 | 23CPD3406 (S7) | 23CPD3507 (S37) |
+| 12 | **GAME DEVELOPMENT AND UX DESIGN** | Cluster-1 | Section S32 | 23GDU3404 (S12) | 23GDU3506 (S38-S39) |
+| 13 | **MEDICAL BIOTECHNOLOGY** | Cluster-1 | Section S33 | 23MBT3405 (S2) | 23MBT3508 (S45) |
+| 14 | **SOFTWARE MODELLING AND DEVOPS** | Cluster-1 | Section S34-S37 | 23SMD3404 (S14) | 23SMD3506 (S40-S44) |
+| 15 | **AI FOR COMPUTATIONAL INTELLIGENCE** | Cluster-2 | Section S51-S58 | 23ACI3404 (S61) | 23ACI3507 (S67-S76) |
+| 16 | **AI-DRIVEN LANGUAGE TECHNOLOGIES** | Cluster-2 | Section S61-S66 | 23ALT3404 (S64) | 23ALT3507 (S91-S98) |
+| 17 | **AI SYSTEMS FOR VISUAL INTELLIGENCE** | Cluster-2 | Section S67-S72 | 23AVI3405 (S62) | 23AVI3509 (S77-S85) |
+| 18 | **AI-DRIVEN EDGE ARCHITECTURES AND APPLICATIONS** | Cluster-2 | Section S74 | 23ADE3404 (S63) | 23ADE3508 (S86-S87) |
+| 19 | **NANOTECHNOLOGY AND OPTOELECTRONICS** | Cluster-2 | Section S76 | 23NTO3408 (S56) | 23NTO3509 (S60) |
+| 20 | **5G/6G WIRELESS TECHNOLOGIES** | Cluster-2 | Section S75 | 23WLT3404 (S52) | 23WLT3505 (S52) |
+| 21 | **EMBEDDED SYSTEMS** | Cluster-2 | Section S77 | 23EDS3404 (S53) | 23EDS3505 (S53-S55) |
+| 22 | **Gen AI and ML** | Cluster-2 | Section S80 | 23GAM3404 (S55) | 23GAM3505 (S59) |
+| 23 | **GREEN ENERGY TECHNOLOGIES** | Cluster-2 | Section S81 | 23GET3405 (S57) | 23GET3507 (S61) |
+| 24 | **ROBOTICS AND AUTOMATION** | Cluster-2 | Section S82 | 23RAN3406 (S65) | 23RAN3507 (S58) |
+| 25 | **SMART MANUFACTURING** | Cluster-2 | Section S83 | 23SMF3405 (S59) | 23SMF3508 (S63) |
+| 26 | **ENERGY & CFD** | Cluster-2 | Section S84 | 23ECF3405 (S58) | 23ECF3507 (S62) |
+| 27 | **AI AND AUTONOMOUS SYSTEMS** | Cluster-2 | Section S85-S86 | 23AAS3410 (S60) | 23AAS3511 (S64-S66) |
+| 28 | **STRUCTURAL ENGINEERING AND CONSTRUCTION TECHNOLOGY** | Cluster-2 | Section S87 | 23STE3405 (S1) | 23STE3508 (S1) |
+| 29 | **VLSI** | Cluster-2 | Section S88-S90 | 23VLS3404 (S53-S57) | 23VLS3505 (S53-S57) |
+
+---
+
 ### 📊 Exhaustive Cohort Allocation Rules Matrix
 
 | Academic Course & Bucket | Cohort Dimension Criteria | Prescribed Section Allocation / Range | Faculty Selection Pool Scope |
@@ -559,6 +597,20 @@ erDiagram
         string components
     }
 ```
+
+### 📜 Institutional Registration Guidelines (Mandatory Student Agreement)
+
+Upon authenticating to the portal during the **2026–27 EVEN Semester / Semester 8**, every student must acknowledge and accept seven university course registration directives within the modal interface before selecting courses or ranking faculty:
+
+1. **Tuition & Institutional Fee Norms**: The student must have zero pending academic or examination dues as verified against the university accounts registry.
+2. **Mandatory Faculty Counselor Oversight**: Course selection and faculty ranking must be performed under the active supervision of the assigned university counselor via Microsoft Teams.
+3. **Cluster & Cohort Exclusivity**: Students assigned to Cluster-1 (Sections S1 – S50) or Cluster-2 (Sections S51 – S100) must select all elective courses and faculty allocations strictly within their assigned cluster.
+4. **Specialization Section Integrity**: Students cannot enroll in sections reserved for another engineering stream (e.g. Cyber Security students cannot enroll in Visual Intelligence sections).
+5. **Component Allocation**: Faculty ranking applies to all active teaching components (Lecture, Tutorial, Practical, Skilling) prescribed for the course.
+6. **ERP Mirroring**: The Academic Registration Portal serves as the primary intelligence guide; choices must be saved on the university ERP platform as the final step.
+7. **Irrevocable Submission**: Once finalized, preference locks can only be re-opened through verified institutional administrative override.
+
+---
 
 ### Table Specifications:
 1. `students`: Stores all 1,159 student profiles with university emails, personal contact details, demographic attributes, assigned cluster, academic track, placement status, and faculty counselor assignments.

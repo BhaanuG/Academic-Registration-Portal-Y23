@@ -4,7 +4,7 @@ import optionSheetRules from './optionSheetRules.json' with { type: 'json' };
 /**
  * Multi-Dimensional Academic Eligibility Engine
  * Evaluates student options based on:
- * - Academic Year & Semester (2026-27 ODD)
+ * - Academic Year & Semester (2026-27 EVEN)
  * - Program & Specialization
  * - Cluster (Cluster-1 / Cluster-2)
  * - Student Type (CRT / NonCRT / NonCRT-PS / etc.)
