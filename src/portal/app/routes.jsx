@@ -140,7 +140,7 @@ function PortalRoute() {
       studentId={studentId}
       onLogout={() => {
         signOut();
-        navigate("/");
+        window.location.href = "/";
       }}
     >
       {showGuidelines && (

@@ -418,8 +418,15 @@ export default function Admin() {
   };
 
   const logout = async () => {
+    try {
+      await fetch("/portal-api/auth", { method: "DELETE" }).catch(() => {});
+    } catch {}
     sessionStorage.clear();
-    navigate("/");
+    localStorage.removeItem("klef-active-browser-student");
+    localStorage.removeItem("klef-active-browser-role");
+    localStorage.removeItem("klef-last-activity-time");
+    setAdmin(null);
+    window.location.href = "/";
   };
 
   if (!admin) return <main className="admin-loading">Verifying administrator access…</main>;

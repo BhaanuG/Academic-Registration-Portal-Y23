@@ -66,13 +66,20 @@ export function createSession(identifier, role = "student") {
 
 export function clearSession() {
   if (typeof window === "undefined") return;
-  sessionStorage.removeItem(SESSION_KEY);
-  sessionStorage.removeItem("klef-portal-role");
-  sessionStorage.removeItem(LAST_ACTIVITY_KEY);
+  try {
+    sessionStorage.removeItem(SESSION_KEY);
+    sessionStorage.removeItem("klef-portal-role");
+    sessionStorage.removeItem(LAST_ACTIVITY_KEY);
 
-  localStorage.removeItem(ACTIVE_STUDENT_KEY);
-  localStorage.removeItem("klef-active-browser-role");
-  localStorage.removeItem(LAST_ACTIVITY_KEY);
+    localStorage.removeItem(ACTIVE_STUDENT_KEY);
+    localStorage.removeItem("klef-active-browser-role");
+    localStorage.removeItem(LAST_ACTIVITY_KEY);
+
+    // Call backend auth API to clear signed HTTP cookie
+    fetch("/portal-api/auth", { method: "DELETE" }).catch(() => {});
+  } catch (err) {
+    console.error("Error clearing session:", err);
+  }
 }
 
 /**
