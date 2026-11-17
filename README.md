@@ -18,6 +18,7 @@
 
 <p align="center">
   <a href="#-system-architecture--technical-topology"><img src="https://img.shields.io/badge/Architecture-Deterministic%20Eligibility%20Engine-blueviolet?style=for-the-badge" alt="Architecture" /></a>
+  <a href="#-technology-stack--runtime-specifications"><img src="https://img.shields.io/badge/Java-Enterprise%20Core%20Engine-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white" alt="Java Engine" /></a>
   <a href="#-technology-stack--runtime-specifications"><img src="https://img.shields.io/badge/Next.js-16.4.6%20(Turbopack)-black?style=for-the-badge&logo=next.js&logoColor=white" alt="Next.js 16" /></a>
   <a href="#-technology-stack--runtime-specifications"><img src="https://img.shields.io/badge/React-19.3.1-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React 19" /></a>
   <a href="#-technology-stack--runtime-specifications"><img src="https://img.shields.io/badge/React%20Router-8.5.1-CA4245?style=for-the-badge&logo=reactrouter&logoColor=white" alt="React Router 8" /></a>
