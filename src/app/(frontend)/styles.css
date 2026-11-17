@@ -161,14 +161,22 @@
 .login-context .brand {
   color: var(--subject-text);
 }
-.login-context .brand-logo,
-.topbar .brand-logo {
+.login-context .brand-logo {
   height: 63px;
   max-width: 215px;
   padding: 4px 8px;
   background: #ffffff;
   border-radius: 8px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.16);
+  opacity: 1;
+}
+.topbar .brand-logo {
+  height: 42px;
+  max-width: 145px;
+  padding: 3px 5px;
+  background: #ffffff;
+  border-radius: 6px;
+  box-shadow: 0 1.5px 3.5px rgba(0, 0, 0, 0.13);
   opacity: 1;
 }
 .login-context .brand span {
@@ -3238,8 +3246,8 @@ dd {
   }
   .topbar .brand-logo {
     width: auto;
-    height: 52px;
-    max-width: 168px;
+    height: 35px;
+    max-width: 115px;
   }
   .portal-title {
     text-align: left;
