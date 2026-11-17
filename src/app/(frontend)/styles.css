@@ -81,8 +81,8 @@
 }
 .brand-logo {
   width: auto;
-  height: 48px;
-  max-width: 160px;
+  height: 44px;
+  max-width: 150px;
   border-radius: 6px;
   object-fit: contain;
   background: transparent;
@@ -163,12 +163,12 @@
 }
 .login-context .brand-logo,
 .topbar .brand-logo {
-  height: 46px;
-  max-width: 155px;
-  padding: 3px 6px;
+  height: 42px;
+  max-width: 145px;
+  padding: 3px 5px;
   background: #ffffff;
-  border-radius: 6px;
-  box-shadow: 0 1.5px 4px rgba(0, 0, 0, 0.14);
+  border-radius: 5px;
+  box-shadow: 0 1.5px 3.5px rgba(0, 0, 0, 0.13);
   opacity: 1;
 }
 .login-context .brand span {
@@ -3238,8 +3238,8 @@ dd {
   }
   .topbar .brand-logo {
     width: auto;
-    height: 38px;
-    max-width: 120px;
+    height: 35px;
+    max-width: 112px;
   }
   .portal-title {
     text-align: left;
