@@ -937,4 +937,14 @@ CMD ["node", "server.js"]
   </tr>
 </table>
 
-Developed for and maintained under the authority of **Koneru Lakshmaiah Education Foundation (KLEF Deemed-to-be University)**. All architectural workflows, allocation algorithms, and platform designs are protected under university copyright.
+Developed for and maintained under the authority of **Koneru Lakshmaiah Education Foundation (KLEF Deemed-to-be University)**.
+
+---
+
+## 📄 Open Source Governance & Community Guidelines
+
+- **[LICENSE](LICENSE)**: Legal terms under the MIT License (Copyright &copy; 2026 Bhaanu G).
+- **[CONTRIBUTING.md](CONTRIBUTING.md)**: Guidelines for bug reports, PR workflows, local dev setup, and conventional commits.
+- **[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)**: Community standards adapted from Contributor Covenant v2.1.
+- **[SECURITY.md](SECURITY.md)**: Private vulnerability disclosure protocol and supported versions.
+- **[ACCESSIBILITY.md](ACCESSIBILITY.md)**: WCAG 2.1 AA accessibility conformance and barrier reporting.
