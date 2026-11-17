@@ -41,9 +41,9 @@ export async function POST(request) {
   if (isTargetingAdmin) {
     // Fetch live administrator password from SQL table first
     const adminRecord = academicDb.getAdministrator(username) || academicDb.getAdministrator('2400030952') || academicDb.getAdministrator('8897337687');
-    const expectedPassword = adminRecord?.password_hash || process.env.ADMIN_PASSWORD || 'Janu@143';
+    const expectedPassword = adminRecord?.password_hash || process.env.ADMIN_PASSWORD;
 
-    if (!safeCompare(password, expectedPassword)) {
+    if (!expectedPassword || !safeCompare(password, expectedPassword)) {
       return error('The administrator credential entered is incorrect.', 401);
     }
 

@@ -528,9 +528,9 @@ export async function POST(request, { params }) {
 
         // Verify current password against database
         const adminRecord = academicDb.getAdministrator(username);
-        const expected = adminRecord?.password_hash || process.env.ADMIN_PASSWORD || 'Janu@143';
+        const expected = adminRecord?.password_hash || process.env.ADMIN_PASSWORD;
 
-        if (currentPassword && currentPassword !== expected) {
+        if (!expected || (currentPassword && currentPassword !== expected)) {
           return NextResponse.json({ ok: false, message: 'Current administrator password is incorrect' }, { status: 401 });
         }
 
