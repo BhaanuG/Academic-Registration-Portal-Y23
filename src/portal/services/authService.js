@@ -55,6 +55,9 @@ export function createSession(identifier, role = "student") {
   sessionStorage.setItem(SESSION_KEY, identifier);
   sessionStorage.setItem("klef-portal-role", role);
 
+  // Clear any existing session-level agreement so guidelines always pop up on each sign in
+  sessionStorage.removeItem(`guidelines_session_agreed_${identifier}`);
+
   // Enforce per-browser single student account login and cross-tab sharing
   localStorage.setItem(ACTIVE_STUDENT_KEY, identifier);
   localStorage.setItem("klef-active-browser-role", role);

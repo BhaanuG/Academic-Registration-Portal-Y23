@@ -31,23 +31,28 @@ function PortalRoute() {
   const [dataVersion, setDataVersion] = useState(0);
   const [showGuidelines, setShowGuidelines] = useState(false);
 
-  // Check if student has agreed to registration guidelines
+  // Check if student has agreed to registration guidelines for this sign in session
   useEffect(() => {
-    if (!studentId) return;
+    if (!studentId) {
+      setShowGuidelines(false);
+      return;
+    }
     try {
-      const agreedKey = `guidelines_agreed_${studentId}`;
-      const hasAgreed = localStorage.getItem(agreedKey);
+      const agreedKey = `guidelines_session_agreed_${studentId}`;
+      const hasAgreed = sessionStorage.getItem(agreedKey);
       if (!hasAgreed) {
         setShowGuidelines(true);
+      } else {
+        setShowGuidelines(false);
       }
     } catch {
-      // In case localStorage is disabled
+      setShowGuidelines(true);
     }
   }, [studentId]);
 
   const handleAgreeGuidelines = () => {
     try {
-      localStorage.setItem(`guidelines_agreed_${studentId}`, 'true');
+      sessionStorage.setItem(`guidelines_session_agreed_${studentId}`, 'true');
     } catch {}
     setShowGuidelines(false);
     setPage("overview");
