@@ -627,6 +627,25 @@ Upon authenticating to the portal during the **2026–27 EVEN Semester / Semeste
 
 ---
 
+## 🎨 The Design-to-Code Philosophy: From Idea to Figma to Production
+
+The inception of the Academic Registration Portal followed a disciplined design-first workflow:
+
+1. **The Core Ideation**:
+   - Before writing any code, the entire user flow was conceptualized to solve the real friction students face: overlapping lecture schedules, confusion over lab/tutorial components, and accidental cross-specialization enrollments.
+   - Every user decision point—from the mandatory guidelines modal to the 3-tier faculty preference ranking—was architected as an intuitive cognitive journey.
+
+2. **Crafting with Figma Design System**:
+   - Once the idea and interactions were defined, **Figma** served as the foundational workbench to craft the complete UI/UX design system.
+   - Designed comprehensive atomic components, typography hierarchies, mobile-responsive grids, and dark/light color tokens (Presidential Navy `#1e3a8a`, Academic Gold `#d97706`, and Emerald `#059669`).
+   - Every screen was fully prototyped in Figma—testing button click targets, modal focus trapping, and table readability for 7-column student faculty schedules and 8-column administrator grids.
+
+3. **Deterministic Translation into Code**:
+   - The crafted Figma design tokens were directly translated into Tailwind CSS v4 variables and modular CSS files, ensuring 100% pixel-perfect fidelity between the initial design and the production React 19 application.
+   - This design-first methodology guarantees that the live website offers an enterprise-grade, polished experience with zero layout shift and instantaneous response times.
+
+---
+
 ## 🎨 Figma UI/UX Design System & Experience Architecture
 
 The Academic Registration Portal's frontend interface was crafted with an atomic **Figma Design System**, prioritizing clarity, cognitive ease, and responsive consistency across desktop and mobile screens:
