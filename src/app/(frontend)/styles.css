@@ -77,13 +77,13 @@
 .brand {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
 }
 .brand-logo {
   width: auto;
-  height: 60px;
-  max-width: 200px;
-  border-radius: 8px;
+  height: 48px;
+  max-width: 160px;
+  border-radius: 6px;
   object-fit: contain;
   background: transparent;
   padding: 0;
@@ -95,15 +95,15 @@
   display: block;
 }
 .brand strong {
-  max-width: 250px;
-  font-size: 14px;
+  max-width: 240px;
+  font-size: 13.5px;
   font-weight: 700;
   letter-spacing: -0.01em;
   line-height: 1.25;
 }
 .brand span {
-  margin-top: 2px;
-  font-size: 11.5px;
+  margin-top: 1px;
+  font-size: 11px;
   color: var(--muted);
 }
 .eyebrow {
@@ -163,12 +163,12 @@
 }
 .login-context .brand-logo,
 .topbar .brand-logo {
-  height: 56px;
-  max-width: 190px;
-  padding: 4px 8px;
+  height: 46px;
+  max-width: 155px;
+  padding: 3px 6px;
   background: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.16);
+  border-radius: 6px;
+  box-shadow: 0 1.5px 4px rgba(0, 0, 0, 0.14);
   opacity: 1;
 }
 .login-context .brand span {
@@ -3238,8 +3238,8 @@ dd {
   }
   .topbar .brand-logo {
     width: auto;
-    height: 48px;
-    max-width: 140px;
+    height: 38px;
+    max-width: 120px;
   }
   .portal-title {
     text-align: left;
