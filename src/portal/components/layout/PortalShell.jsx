@@ -104,7 +104,7 @@ export default function PortalShell({ page, setPage, onLogout, studentId, childr
 
           <div className="portal-title">
             <strong>Academic Registration Portal</strong>
-            <span>CSE-2 · Academic Semester {semester}</span>
+            <span>CSE-2 · Academic Semester {semester} · {currentNav.label}</span>
           </div>
 
           <div className="account-menu">
@@ -148,15 +148,6 @@ export default function PortalShell({ page, setPage, onLogout, studentId, childr
           })}
         </div>
       </nav>
-
-      {/* Active Breadcrumb Ribbon */}
-      <div className="portal-breadcrumb-ribbon">
-        <div className="breadcrumb-inner">
-          <span className="breadcrumb-root">Student Portal</span>
-          <ChevronRight size={13} className="text-slate-400" />
-          <span className="breadcrumb-current">{currentNav.label}</span>
-        </div>
-      </div>
 
       {/* Main Page Workspace */}
       <main className={`content page-${page}`}>

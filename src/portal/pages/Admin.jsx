@@ -450,7 +450,7 @@ export default function Admin() {
 
           <div className="portal-title">
             <strong>Academic Registration Portal</strong>
-            <span>Central Administration · Administrator Console</span>
+            <span>Central Administration · {adminNavigation.find(([k]) => k === active)?.[1] || active}</span>
           </div>
 
           <div className="account-menu">
@@ -494,17 +494,6 @@ export default function Admin() {
           })}
         </div>
       </nav>
-
-      {/* Active Breadcrumb Ribbon matching Student Portal */}
-      <div className="portal-breadcrumb-ribbon">
-        <div className="breadcrumb-inner">
-          <span className="breadcrumb-root">Admin Portal</span>
-          <ChevronRight size={13} className="text-slate-400" />
-          <span className="breadcrumb-current">
-            {adminNavigation.find(([k]) => k === active)?.[1] || active}
-          </span>
-        </div>
-      </div>
 
       <main className="content admin-content-workspace">
         <div className="page-transition" key={active}>
