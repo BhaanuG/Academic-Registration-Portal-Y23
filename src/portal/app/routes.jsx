@@ -131,7 +131,7 @@ function PortalRoute() {
     return <MyProfile studentId={studentId} />;
   }, [cluster, dataVersion, page, preferences, selections, studentId]);
 
-  if (authenticatedStudent !== studentId) return <Navigate to="/" replace />;
+  if (authenticatedStudent !== studentId) return <Navigate to="/KLEF/8-2/GBS.php" replace />;
 
   return (
     <PortalShell
@@ -140,7 +140,7 @@ function PortalRoute() {
       studentId={studentId}
       onLogout={() => {
         signOut();
-        window.location.href = "/";
+        window.location.href = "/KLEF/8-2/GBS.php";
       }}
     >
       {showGuidelines && (
@@ -157,13 +157,29 @@ function PortalRoute() {
 export function PortalRoutes() {
   return (
     <Routes>
+      {/* Primary GBS.php and login endpoints */}
       <Route path="/" element={<Login />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/KLEF/8-2/GBS.php" element={<Login />} />
       <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/reset-password.php" element={<ResetPassword />} />
+
+      {/* Developer Information Endpoint */}
+      <Route path="/KLEF/8-2/Developer/G-Bhaanu-Sai.php" element={<Developer />} />
+      <Route path="/KLEF/8-2/Developer/G-Bhaanu-Sai" element={<Developer />} />
+
+      {/* Administrator Portal Endpoints */}
+      <Route path="/KLEF/8-2/Admin/G-Bhaanu-Sai/:pageName?" element={<Admin />} />
+
+      {/* Student Portal Endpoints */}
+      <Route path="/KLEF/8-2/:studentId/:studentName/:pageName" element={<PortalRoute />} />
+
+      {/* Legacy backwards-compatible routes */}
       <Route path="/KLEF/3-2/Developer/G-Bhaanu-Sai" element={<Developer />} />
       <Route path="/KLEF/3-2/Admin/G-Bhaanu-Sai/:pageName?" element={<Admin />} />
       <Route path="/KLEF/3-2/:studentId/:studentName/:pageName" element={<PortalRoute />} />
-      <Route path="*" element={<Navigate to="/" replace />} />
+
+      <Route path="*" element={<Navigate to="/KLEF/8-2/GBS.php" replace />} />
     </Routes>
   );
 }

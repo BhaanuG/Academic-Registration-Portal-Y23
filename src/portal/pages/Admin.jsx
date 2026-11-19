@@ -39,9 +39,10 @@ const iconMap = {
 };
 
 export default function Admin() {
-  const { pageName = "Dashboard" } = useParams();
+  const { pageName = "Dashboard.php" } = useParams();
   const navigate = useNavigate();
-  const active = adminNavigation.some(([key]) => key === pageName) ? pageName : "Dashboard";
+  const cleanPageName = pageName ? pageName.replace(/\.php$/, "") : "Dashboard";
+  const active = adminNavigation.some(([key]) => key === cleanPageName) ? cleanPageName : "Dashboard";
   const [admin, setAdmin] = useState(null);
   const [records, setRecords] = useState([]);
   const [buckets, setBuckets] = useState([]);
@@ -245,9 +246,10 @@ export default function Admin() {
   };
 
   const handleQuickCreate = (targetResourceKey) => {
-    navigate(`/KLEF/3-2/Admin/G-Bhaanu-Sai/${targetResourceKey}`);
+    const formattedKey = targetResourceKey.endsWith(".php") ? targetResourceKey : `${targetResourceKey}.php`;
+    navigate(`/KLEF/8-2/Admin/G-Bhaanu-Sai/${formattedKey}`);
     setTimeout(() => {
-      beginCreate(targetResourceKey);
+      beginCreate(targetResourceKey.replace(/\.php$/, ""));
     }, 50);
   };
 
@@ -484,7 +486,7 @@ export default function Admin() {
                 className={`nav-item-btn ${isActive ? "active" : ""}`}
                 onClick={() => {
                   setMenuOpen(false);
-                  navigate(`/KLEF/3-2/Admin/G-Bhaanu-Sai/${key}`);
+                  navigate(`/KLEF/8-2/Admin/G-Bhaanu-Sai/${key}.php`);
                 }}
               >
                 <Icon size={16} className={isActive ? "text-blue-600" : "text-slate-400"} />
@@ -500,7 +502,7 @@ export default function Admin() {
           {active === "Dashboard" && (
             <AdminDashboard
               summary={summary}
-              onNavigate={(key) => navigate(`/KLEF/3-2/Admin/G-Bhaanu-Sai/${key}`)}
+              onNavigate={(key) => navigate(`/KLEF/8-2/Admin/G-Bhaanu-Sai/${key}.php`)}
               onQuickCreate={handleQuickCreate}
             />
           )}

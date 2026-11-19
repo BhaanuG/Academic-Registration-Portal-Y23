@@ -51,7 +51,7 @@ export default function Login() {
     const activeStudent = getAuthenticatedStudent();
     if (activeStudent) {
       if (activeStudent === "8897337687") {
-        navigate("/KLEF/3-2/Admin/G-Bhaanu-Sai/Dashboard");
+        navigate("/KLEF/8-2/Admin/G-Bhaanu-Sai/Dashboard.php");
       } else {
         fetch(`/portal-api/student-profile?studentId=${activeStudent}`)
           .then((r) => r.json())
@@ -96,7 +96,7 @@ export default function Login() {
         }
         createSession(studentId, "admin");
         signIn(studentId);
-        navigate("/KLEF/3-2/Admin/G-Bhaanu-Sai/Dashboard");
+        navigate("/KLEF/8-2/Admin/G-Bhaanu-Sai/Dashboard.php");
         return;
       } catch {
         return setError("Authentication service unavailable. Please retry.");

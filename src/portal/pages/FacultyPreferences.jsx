@@ -286,7 +286,7 @@ export default function Preferences({ studentId, selections, prefs, setPrefs, cl
                 You selected “None of the above” for this bucket. Return to Course Selection and
                 choose a course before entering faculty preferences.
               </p>
-              <Link to="/KLEF/3-2/Course-Bucket-Selection">Back to Course Selection</Link>
+              <Link to="/KLEF/8-2/Course-Bucket-Selection.php">Back to Course Selection</Link>
             </div>
           ) : (
             <>
