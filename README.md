@@ -332,7 +332,9 @@ This compiles optimized server bundles and client bundles through Turbopack.
   </tr>
 </table>
 
-Developed for and maintained under the academic governance of **Koneru Lakshmaiah Education Foundation (KLEF Deemed-to-be University)**.
+<p align="center">
+  Developed for and maintained under the academic governance of <b>Koneru Lakshmaiah Education Foundation (KLEF Deemed-to-be University)</b>.
+</p>
 
 ---
 
