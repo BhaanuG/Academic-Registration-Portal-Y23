@@ -125,7 +125,7 @@ export default function Preferences({ selections, prefs, setPrefs, cluster }) {
                   <strong>{item?.name || "No subject selected"}</strong>
                   {item ? (
                     <small>
-                      {item.code} · {item.credits} credits · L-T-P-S: {item.ltps ? item.ltps.join("-") : "3-0-2-0"}
+                      {item.code} · {item.credits} credits
                     </small>
                   ) : (
                     <small>Select a subject in {bucket.id} to continue</small>
@@ -147,21 +147,24 @@ export default function Preferences({ selections, prefs, setPrefs, cluster }) {
           {!subject ? (
             <div className="preference-empty">
               <span>{activeEntry.bucket.id}</span>
-              <h2>Subject option not selected</h2>
+              <h2>Course option not selected</h2>
               <p>
-                You selected “None of the above” for this bucket. Return to Subject Selection and
+                You selected “None of the above” for this bucket. Return to Course Selection and
                 choose a course before entering faculty preferences.
               </p>
-              <Link to="/KLEF/3-2/Course-Bucket-Selection">Back to Subject Selection</Link>
+              <Link to="/KLEF/3-2/Course-Bucket-Selection">Back to Course Selection</Link>
             </div>
           ) : (
             <>
               <header className="preference-subject-head">
                 <div>
-                  <span className="eyebrow">{activeEntry.bucket.title} ({activeEntry.bucket.id})</span>
-                  <h2>{subject.name}</h2>
-                  <p>
-                    {subject.code} · {subject.credits} credits · L-T-P-S: {subject.ltps ? subject.ltps.join("-") : "3-0-2-0"} · Components:{" "}
+                  <div className="bucket-header-meta">
+                    <span className="bucket-code-pill">{activeEntry.bucket.id}</span>
+                    <span className="bucket-type-tag">{activeEntry.bucket.short}</span>
+                  </div>
+                  <h2>{activeEntry.bucket.title}</h2>
+                  <p className="bucket-desc">
+                    {subject.code} · {subject.credits} credits · Components:{" "}
                     {subject.components.map((c) => componentNames[c] || c).join(", ")}
                   </p>
                 </div>
@@ -173,12 +176,36 @@ export default function Preferences({ selections, prefs, setPrefs, cluster }) {
                     title={`Reset faculty rankings for ${subject.code} only`}
                   >
                     <RotateCcw size={12} />
-                    <span>Reset {activeEntry.bucket.id} Preferences</span>
+                    <span>Reset {activeEntry.bucket.id}</span>
                   </button>
 
                   <div className="cohort-chip">
-                    <span>Assigned cohort</span>
-                    <strong>{cluster || "Cluster 2"}</strong>
+                    <div className="cohort-chip-top">
+                      <span className="cohort-label">Assigned Cluster:</span>
+                      <strong className="cohort-val">
+                        {cluster === "Cluster 1" || cluster === "C 1" || cluster === "C1"
+                          ? "C 1"
+                          : cluster === "Cluster 2" || cluster === "C 2" || cluster === "C2"
+                          ? "C 2"
+                          : cluster?.replace(/Cluster\s*/i, "C ") || "C 2"}
+                      </strong>
+                    </div>
+                    {subject?.ltps && (
+                      <div className="cohort-ltps-grid-table" title="Lecture | Tutorial | Practical | Skill Credit Weight">
+                        <div className="grid-row grid-head">
+                          <span>L</span>
+                          <span>T</span>
+                          <span>P</span>
+                          <span>S</span>
+                        </div>
+                        <div className="grid-row grid-body">
+                          <span>{subject.ltps[0]}</span>
+                          <span>{subject.ltps[1]}</span>
+                          <span>{subject.ltps[2]}</span>
+                          <span>{subject.ltps[3]}</span>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </header>
@@ -402,7 +429,7 @@ export default function Preferences({ selections, prefs, setPrefs, cluster }) {
                 <AlertTriangle size={24} className="text-amber-600" />
               </div>
               <div>
-                <h2>Reset {activeEntry.bucket.id} Preferences</h2>
+                <h2>Reset {activeEntry.bucket.id}</h2>
                 <p>Clear faculty rankings for {subject.name}?</p>
               </div>
             </div>
