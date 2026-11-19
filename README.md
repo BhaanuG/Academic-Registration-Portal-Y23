@@ -307,7 +307,6 @@ npm install
 ```bash
 npm run dev
 ```
-Open [http://localhost:3000](http://localhost:3000) in your browser. The app will automatically redirect to the primary sign-in route: `/KLEF/8-2/GBS.php`.
 
 ### 4. Build for Production
 ```bash
