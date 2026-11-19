@@ -77,13 +77,13 @@
 .brand {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
 }
 .brand-logo {
   width: auto;
-  height: 63px;
-  max-width: 215px;
-  border-radius: 8px;
+  height: 42px;
+  max-width: 140px;
+  border-radius: 0;
   object-fit: contain;
   background: transparent;
   padding: 0;
@@ -95,11 +95,9 @@
   display: block;
 }
 .brand strong {
-  max-width: 240px;
-  font-size: 13.5px;
-  font-weight: 700;
+  max-width: 230px;
+  font-size: 13px;
   letter-spacing: -0.01em;
-  line-height: 1.25;
 }
 .brand span {
   margin-top: 1px;
@@ -125,23 +123,22 @@
   flex-direction: column;
 }
 .login-page {
-  background: var(--wash);
+  background: var(--institution-navy);
 }
 .login-shell {
   min-height: calc(100vh - 55px);
   flex: 1;
   display: grid;
   grid-template-columns: minmax(0, 1.15fr) minmax(430px, 0.85fr);
-  background: var(--wash);
+  background: var(--paper);
 }
 .login-context {
   min-height: calc(100vh - 55px);
   padding: 48px clamp(48px, 8vw, 132px);
   display: flex;
   flex-direction: column;
-  color: var(--subject-text);
-  background: #fefce8;
-  border-right: 1.5px solid #ebdcc5;
+  color: #f5f7f5;
+  background: var(--institution-navy);
   position: relative;
   overflow: hidden;
 }
@@ -152,35 +149,25 @@
   height: 460px;
   right: -120px;
   bottom: -180px;
-  border: 1px solid rgba(234, 179, 8, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.11);
   border-radius: 50%;
   box-shadow:
-    0 0 0 70px rgba(254, 240, 138, 0.25),
-    0 0 0 140px rgba(254, 240, 138, 0.15);
+    0 0 0 70px rgba(255, 255, 255, 0.025),
+    0 0 0 140px rgba(255, 255, 255, 0.018);
 }
 .login-context .brand {
-  color: var(--subject-text);
+  color: white;
 }
-.login-context .brand-logo {
-  height: 63px;
-  max-width: 215px;
-  padding: 4px 8px;
-  background: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.16);
-  opacity: 1;
-}
+.login-context .brand-logo,
 .topbar .brand-logo {
-  height: 42px;
-  max-width: 145px;
-  padding: 3px 5px;
+  padding: 4px 6px;
   background: #ffffff;
-  border-radius: 6px;
-  box-shadow: 0 1.5px 3.5px rgba(0, 0, 0, 0.13);
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
   opacity: 1;
 }
 .login-context .brand span {
-  color: #78716c;
+  color: #b9c6db;
 }
 .login-intro {
   margin: auto 0;
@@ -189,10 +176,7 @@
   z-index: 1;
 }
 .login-intro .eyebrow {
-  color: #a16207;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
+  color: #c5d2e6;
 }
 .login-intro h1 {
   max-width: 620px;
@@ -202,18 +186,17 @@
   font-weight: 600;
   line-height: 0.98;
   letter-spacing: -0.045em;
-  color: #1c1917;
 }
 .login-intro > p:last-child {
   max-width: 590px;
-  color: #57534e;
+  color: #c8d3e4;
   font-size: 17px;
   line-height: 1.7;
 }
 .term-note {
   width: fit-content;
   padding: 13px 0 0;
-  border-top: 1px solid #e7d8be;
+  border-top: 1px solid rgba(255, 255, 255, 0.25);
   display: flex;
   flex-direction: column;
   gap: 3px;
@@ -221,20 +204,19 @@
   z-index: 1;
 }
 .term-note span {
-  color: #78716c;
+  color: #9fb0ca;
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.09em;
 }
 .term-note strong {
   font-size: 13px;
-  color: #1c1917;
 }
 .login-panel {
   display: grid;
   place-items: center;
   padding: 48px;
-  background: var(--wash);
+  background: var(--paper);
 }
 .login-form-wrap {
   width: min(100%, 410px);
@@ -856,14 +838,14 @@ select:focus-visible {
   flex: 1;
 }
 footer {
-  padding: 16px 36px;
+  padding: 22px 36px;
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid var(--line);
   background: white;
   color: var(--muted);
-  font-size: 11px;
+  font-size: 10px;
 }
 footer span:last-child {
   justify-self: end;
@@ -3245,9 +3227,8 @@ dd {
     display: none;
   }
   .topbar .brand-logo {
-    width: auto;
-    height: 35px;
-    max-width: 115px;
+    width: 76px;
+    height: 34px;
   }
   .portal-title {
     text-align: left;
@@ -3603,7 +3584,16 @@ body { font-family: var(--font-sans); }
   border-color: #356ae6;
   color: #356ae6;
 }
-/* Overridden by modular styles/developer-page.css */
+.developer-reference .developer-story {
+  max-width: none;
+  padding: clamp(32px, 6vw, 68px);
+  border-top: 1px solid #e2e7ee;
+  background: #fbfcfe;
+}
+.developer-reference .developer-quote {
+  font-family: var(--font-cormorant), Georgia, serif;
+  font-size: clamp(36px, 5.5vw, 58px);
+}
 
 /* Preference section-family guidance */
 .preference-section-hint {
@@ -4357,7 +4347,6 @@ select:focus {
 @import "./styles/portal-shell.css";
 @import "./styles/academic-overview.css";
 @import "./styles/cluster-selection.css";
-@import "./styles/guidelines-modal.css";
 @import "./styles/subject-selection.css";
 @import "./styles/faculty-preferences.css";
 @import "./styles/faculty-directory.css";
@@ -4370,7 +4359,3 @@ select:focus {
 @import "./styles/admin-reset-password.css";
 @import "./styles/admin-profile.css";
 @import "./styles/motion-interactions.css";
-@import "./styles/modal-positioning.css";
-@import "./styles/developer-page.css";
-@import "./styles/clean-popup-modal.css";
-@import "./styles/platform-responsive.css";

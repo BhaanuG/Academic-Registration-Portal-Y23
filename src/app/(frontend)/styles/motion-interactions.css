@@ -28,7 +28,6 @@
     opacity: 0;
     transform: translateY(6px);
   }
-
   100% {
     opacity: 1;
     transform: translateY(0);
@@ -40,7 +39,6 @@
     opacity: 0;
     transform: translateY(4px);
   }
-
   100% {
     opacity: 1;
     transform: translateY(0);
@@ -51,7 +49,6 @@
   0% {
     opacity: 0;
   }
-
   100% {
     opacity: 1;
   }
@@ -62,7 +59,6 @@
     opacity: 0;
     transform: translateY(10px) scale(0.985);
   }
-
   100% {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -73,7 +69,6 @@
   0% {
     transform: translateX(100%);
   }
-
   100% {
     transform: translateX(0);
   }
@@ -84,7 +79,6 @@
     opacity: 0;
     transform: translateY(-4px) scale(0.98);
   }
-
   100% {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -95,11 +89,9 @@
   0% {
     transform: scale(0.9);
   }
-
   60% {
     transform: scale(1.05);
   }
-
   100% {
     transform: scale(1);
   }
@@ -136,10 +128,10 @@ button,
 .faculty-download-icon-btn,
 .admin-action-btn {
   transition: transform var(--motion-instant) var(--motion-ease),
-    background-color var(--motion-fast) var(--motion-ease),
-    border-color var(--motion-fast) var(--motion-ease),
-    color var(--motion-fast) var(--motion-ease),
-    box-shadow var(--motion-fast) var(--motion-ease) !important;
+              background-color var(--motion-fast) var(--motion-ease),
+              border-color var(--motion-fast) var(--motion-ease),
+              color var(--motion-fast) var(--motion-ease),
+              box-shadow var(--motion-fast) var(--motion-ease) !important;
   backface-visibility: hidden;
   -webkit-font-smoothing: subpixel-antialiased;
 }
@@ -168,8 +160,8 @@ button:disabled,
 .nav-item-btn {
   position: relative;
   transition: color var(--motion-fast) var(--motion-ease),
-    border-color var(--motion-fast) var(--motion-ease),
-    background-color var(--motion-fast) var(--motion-ease) !important;
+              border-color var(--motion-fast) var(--motion-ease),
+              background-color var(--motion-fast) var(--motion-ease) !important;
 }
 
 .nav-item-btn:hover {
@@ -178,12 +170,12 @@ button:disabled,
 
 .nav-item-btn.active svg {
   transition: color var(--motion-fast) var(--motion-ease),
-    transform var(--motion-fast) var(--motion-ease) !important;
+              transform var(--motion-fast) var(--motion-ease) !important;
 }
 
 .nav-item-badge {
   transition: background-color var(--motion-fast) var(--motion-ease),
-    color var(--motion-fast) var(--motion-ease) !important;
+              color var(--motion-fast) var(--motion-ease) !important;
 }
 
 /* --------------------------------------------------------------------------
@@ -198,9 +190,9 @@ button:disabled,
 .metric-chip,
 .pref-cell-filled {
   transition: border-color var(--motion-fast) var(--motion-ease),
-    box-shadow var(--motion-fast) var(--motion-ease),
-    transform var(--motion-fast) var(--motion-ease),
-    background-color var(--motion-fast) var(--motion-ease) !important;
+              box-shadow var(--motion-fast) var(--motion-ease),
+              transform var(--motion-fast) var(--motion-ease),
+              background-color var(--motion-fast) var(--motion-ease) !important;
   will-change: transform, box-shadow;
 }
 
@@ -236,8 +228,8 @@ textarea,
 .pref-native-select,
 .admin-filter-select {
   transition: border-color var(--motion-fast) var(--motion-ease),
-    box-shadow var(--motion-fast) var(--motion-ease),
-    background-color var(--motion-fast) var(--motion-ease) !important;
+              box-shadow var(--motion-fast) var(--motion-ease),
+              background-color var(--motion-fast) var(--motion-ease) !important;
 }
 
 input:focus,
@@ -247,14 +239,14 @@ textarea:focus,
 .pref-native-select:focus,
 .admin-filter-select:focus {
   transition: border-color var(--motion-fast) var(--motion-ease),
-    box-shadow var(--motion-fast) var(--motion-ease) !important;
+              box-shadow var(--motion-fast) var(--motion-ease) !important;
 }
 
 /* DatePicker Trigger smoothness */
 .date-trigger {
   transition: border-color var(--motion-fast) var(--motion-ease),
-    box-shadow var(--motion-fast) var(--motion-ease),
-    background-color var(--motion-fast) var(--motion-ease) !important;
+              box-shadow var(--motion-fast) var(--motion-ease),
+              background-color var(--motion-fast) var(--motion-ease) !important;
 }
 
 .date-trigger:active {
@@ -287,8 +279,7 @@ textarea:focus,
 }
 
 .student-detail-drawer {
-  animation: modal-enter var(--motion-standard) var(--motion-ease) both !important;
-  transform-origin: center center;
+  animation: drawer-slide-in var(--motion-notice) var(--motion-ease) both !important;
 }
 
 /* --------------------------------------------------------------------------
@@ -299,7 +290,7 @@ textarea:focus,
 .admin-data-table tbody tr,
 .admin-table-wrap tbody tr {
   transition: background-color var(--motion-fast) var(--motion-ease),
-    border-color var(--motion-fast) var(--motion-ease) !important;
+              border-color var(--motion-fast) var(--motion-ease) !important;
 }
 
 /* --------------------------------------------------------------------------
@@ -307,7 +298,6 @@ textarea:focus,
    -------------------------------------------------------------------------- */
 
 @media (prefers-reduced-motion: reduce) {
-
   *,
   *::before,
   *::after {
@@ -316,23 +306,4 @@ textarea:focus,
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
-}
-
-/* --------------------------------------------------------------------------
-   10. UNIVERSAL CAPITALIZATION (FIRST LETTER UPPERCASE, SUBSEQUENT LOWERCASE)
-   -------------------------------------------------------------------------- */
-.capitalize-words,
-.admin-cell-user strong,
-.admin-cell-course strong,
-.brand strong,
-.portal-title strong,
-.drawer-title-group h2,
-.ranked-faculty-card strong,
-.sub-ranked-chip strong,
-.summary-subject-name strong,
-.pref-details strong,
-.overview-main-col strong,
-.cluster-card strong,
-.faculty-directory-page .admin-data-table td strong {
-  text-transform: capitalize;
 }
