@@ -21,6 +21,10 @@ const nextConfig = {
     root: path.resolve(dirname),
   },
   output: 'standalone',
+  images: {
+    loader: 'custom',
+    loaderFile: './figma-image-loader.js',
+  },
   typescript: {
     ignoreBuildErrors: true,
   },
