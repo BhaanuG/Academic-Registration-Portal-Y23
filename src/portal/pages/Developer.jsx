@@ -1,4 +1,5 @@
-import { ArrowLeft, BriefcaseBusiness, Code2, ExternalLink, Github, Linkedin, Mail, Sparkles, Trophy } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ArrowDown, ArrowLeft, BriefcaseBusiness, Code2, ExternalLink, Github, Linkedin, Mail, Sparkles, Trophy } from "lucide-react";
 import { Link, useLocation } from "react-router";
 import Brand from "../components/common/Brand";
 import PortalFooter from "../components/layout/PortalFooter";
@@ -18,6 +19,28 @@ export default function Developer() {
   const location = useLocation();
   const { studentId } = useAuth();
   const returnTo = location.state?.from || (studentId ? getLastRoute() : "/") || "/";
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 40) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const handleScrollToExplore = () => {
+    const storySection = document.querySelector(".developer-story");
+    if (storySection) {
+      storySection.scrollIntoView({ behavior: "smooth" });
+    } else {
+      window.scrollBy({ top: 400, behavior: "smooth" });
+    }
+  };
 
   return (
     <div className="developer-shell developer-reference">
@@ -86,6 +109,41 @@ export default function Developer() {
             </div>
           </section>
         </article>
+
+        {/* Right-Side Vertical Scroll Indicator Button */}
+        <aside
+          className={`developer-scroll-indicator ${isScrolled ? "is-hidden" : ""}`}
+          aria-hidden={isScrolled ? "true" : undefined}
+        >
+          <button
+            type="button"
+            className="scroll-track-button"
+            onClick={handleScrollToExplore}
+            title="Scroll down to read personal story"
+            aria-label="Scroll to explore personal story"
+          >
+            <span className="scroll-char">S</span>
+            <span className="scroll-char">C</span>
+            <span className="scroll-char">R</span>
+            <span className="scroll-char">O</span>
+            <span className="scroll-char">L</span>
+            <span className="scroll-char">L</span>
+            <span className="scroll-word-gap" />
+            <span className="scroll-char">T</span>
+            <span className="scroll-char">O</span>
+            <span className="scroll-word-gap" />
+            <span className="scroll-char">E</span>
+            <span className="scroll-char">X</span>
+            <span className="scroll-char">P</span>
+            <span className="scroll-char">L</span>
+            <span className="scroll-char">O</span>
+            <span className="scroll-char">R</span>
+            <span className="scroll-char">E</span>
+            <div className="scroll-cue-arrow">
+              <ArrowDown size={13} />
+            </div>
+          </button>
+        </aside>
       </main>
       <PortalFooter returnTo={returnTo} />
     </div>
