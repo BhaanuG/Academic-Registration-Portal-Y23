@@ -16,6 +16,13 @@
   min-height: 0 !important;
 }
 
+.page-shell-overview .content > .page-transition {
+  flex: 1 1 0% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 0 !important;
+}
+
 .overview-container {
   max-width: 1240px;
   width: 100%;
