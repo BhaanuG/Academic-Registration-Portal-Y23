@@ -161,7 +161,7 @@ export default function Preferences({ selections, prefs, setPrefs, cluster }) {
                   <span className="eyebrow">{activeEntry.bucket.title} ({activeEntry.bucket.id})</span>
                   <h2>{subject.name}</h2>
                   <p>
-                    {subject.code} · {subject.credits} credits · L-T-P-S: {subject.ltps ? subject.ltps.join("-") : "3-0-2-0"} · Components:{" "}
+                    {subject.code} · {subject.credits} credits · Components:{" "}
                     {subject.components.map((c) => componentNames[c] || c).join(", ")}
                   </p>
                 </div>
@@ -186,9 +186,20 @@ export default function Preferences({ selections, prefs, setPrefs, cluster }) {
                         : cluster?.replace(/Cluster\s*/i, "C ") || "C 2"}
                     </strong>
                     {subject?.ltps && (
-                      <small className="cohort-ltps-sub">
-                        L-T-P-S: {subject.ltps.join("-")}
-                      </small>
+                      <div className="cohort-ltps-matrix" title="Lecture - Tutorial - Practical - Skill Hours">
+                        <div className="ltps-matrix-labels">
+                          <span>L</span>
+                          <span>T</span>
+                          <span>P</span>
+                          <span>S</span>
+                        </div>
+                        <div className="ltps-matrix-values">
+                          <span>{subject.ltps[0]}</span>
+                          <span>{subject.ltps[1]}</span>
+                          <span>{subject.ltps[2]}</span>
+                          <span>{subject.ltps[3]}</span>
+                        </div>
+                      </div>
                     )}
                   </div>
                 </div>
