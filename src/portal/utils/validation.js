@@ -83,41 +83,6 @@ export async function extractTextFromFile(file) {
   if (!file) return "";
   const name = file.name.toLowerCase();
 
-  // 1. Excel Spreadsheets (.xlsx, .xls, .csv, .ods)
-  if (name.endsWith(".xlsx") || name.endsWith(".xls") || name.endsWith(".ods")) {
-    const XLSX = await import("xlsx");
-    const arrayBuffer = await file.arrayBuffer();
-    const workbook = XLSX.read(arrayBuffer, { type: "array", cellDates: true, dateNF: "YYYY-MM-DD" });
-    const firstSheetName = workbook.SheetNames[0];
-    const worksheet = workbook.Sheets[firstSheetName];
-    // Convert worksheet directly to CSV format with formatted dates
-    return XLSX.utils.sheet_to_csv(worksheet, { FS: "\t", rawNumbers: false });
-  }
-
-  // 2. PDF Documents (.pdf)
-  if (name.endsWith(".pdf")) {
-    try {
-      // Dynamic require check in case pdfjs-dist is installed in runtime
-      const pdfjs = await import(/* webpackIgnore: true */ "pdfjs-dist");
-      if (!pdfjs.GlobalWorkerOptions.workerSrc) {
-        pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
-      }
-      const arrayBuffer = await file.arrayBuffer();
-      const pdf = await pdfjs.getDocument({ data: arrayBuffer }).promise;
-      let fullText = "";
-
-      for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-        const page = await pdf.getPage(pageNum);
-        const textContent = await page.getTextContent();
-        const pageItems = textContent.items.map((item) => item.str);
-        fullText += pageItems.join(" ") + "\n";
-      }
-      return fullText;
-    } catch {
-      return await file.text();
-    }
-  }
-
-  // 3. Plain Text / CSV / TSV
+  // 1. Plain Text / CSV / TSV
   return await file.text();
 }
