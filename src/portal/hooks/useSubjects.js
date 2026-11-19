@@ -9,6 +9,10 @@ export function useSubjects(studentId) {
   );
 
   useEffect(() => {
+    setSelections(readLocalRecord(storageKey, initialSelections));
+  }, [storageKey]);
+
+  useEffect(() => {
     writeLocalRecord(storageKey, selections);
   }, [selections, storageKey]);
 
