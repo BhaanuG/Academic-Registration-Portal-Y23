@@ -92,23 +92,22 @@
 .signout-button {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  width: 34px;
-  height: 34px;
-  padding: 0;
+  gap: 6px;
+  padding: 6px 12px;
   border-radius: var(--radius-md);
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   color: #e2e8f0;
+  font-size: 12px;
+  font-weight: 600;
   cursor: pointer;
   transition: all var(--motion-fast);
 }
 
 .signout-button:hover {
-  background: rgba(239, 68, 68, 0.2);
-  border-color: rgba(239, 68, 68, 0.4);
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.3);
   color: #fca5a5;
-  transform: translateY(-1px);
 }
 
 .nav-item-btn {

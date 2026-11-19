@@ -460,23 +460,23 @@
 
 /* Subject Option Cards Grid */
 .subject-selection-page .subject-cards-grid {
-  padding: 24px 28px;
+  padding: 16px 22px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 10px;
   flex: 1;
 }
 
 .subject-selection-page .subject-card {
-  padding: 20px 24px;
+  padding: 14px 18px;
   border: 1.5px solid #cbd5e1;
-  border-radius: 12px;
+  border-radius: 10px;
   background: #ffffff;
   cursor: pointer;
   transition: all 0.16s ease;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
