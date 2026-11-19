@@ -20,7 +20,7 @@ import {
 const navItems = [
   { key: "overview", label: "Academic Overview", icon: LayoutDashboard, badge: null },
   { key: "cluster", label: "Cluster Selection", icon: Layers, badge: null },
-  { key: "subjects", label: "Subject Selection", icon: BookOpen, badge: null },
+  { key: "subjects", label: "Course Selection", icon: BookOpen, badge: null },
   { key: "preferences", label: "Faculty Preferences", icon: UserCheck, badge: null },
   { key: "directory", label: "Faculty Directory", icon: FolderSearch, badge: null },
   { key: "my-preference", label: "My Preference", icon: BookmarkCheck, badge: null },
