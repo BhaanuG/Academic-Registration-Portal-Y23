@@ -3,19 +3,30 @@ import DatePicker from "../components/common/DatePicker";
 import PageHeading from "../components/common/PageHeading";
 import PasswordInput from "../components/common/PasswordInput";
 import { passwordsMatch } from "../utils/validation";
-import {
-  hasCustomPassword,
-  getCustomPassword,
-  setCustomPassword,
-  getRememberedDateOfBirth,
-} from "../services/authService";
-import { Check, CheckCircle2, Lock, Shield, User, KeyRound, AlertCircle } from "lucide-react";
+import { Check, CheckCircle2, Lock, Shield, User, KeyRound, AlertCircle, Edit3 } from "lucide-react";
 
 export default function Profile({ studentId }) {
-  const [profile, setProfile] = useState(null);
-  const [email] = useState(studentId ? `${studentId}@kluniversity.in` : "");
-  const [personalEmail, setPersonalEmail] = useState("");
-  const [mobile, setMobile] = useState("");
+  const [editing, setEditing] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [profile, setProfile] = useState({
+    name: "Anirudh Varma",
+    rollNumber: studentId || "2400030952",
+    department: "Computer Science & Engineering",
+    specialization: "Generative AI & Multi-modal Intelligence",
+    batch: "2024-2028",
+    term: "Third Year · Semester 5",
+    gender: "Male",
+    dateOfBirth: "2005-04-18",
+    aadhaarNumber: "1234 5678 9012",
+    apaarNumber: "APAAR-9876-5432",
+    residencyStatus: "Hosteler",
+    parentName: "K. R. Varma",
+    parentPhoneNumber: "+91 98765 00000",
+  });
+  const [email] = useState(`${studentId}@kluniversity.in`);
+  const [personalEmail, setPersonalEmail] = useState("anirudh.varma@gmail.com");
+  const [mobile, setMobile] = useState("+91 98765 43210");
   const [passwordMessage, setPasswordMessage] = useState("");
   const [passwordStatus, setPasswordStatus] = useState("");
   const [currentPassword, setCurrentPassword] = useState("");
@@ -23,90 +34,15 @@ export default function Profile({ studentId }) {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const [hasCustomPwd, setHasCustomPwd] = useState(() => hasCustomPassword(studentId));
-
-  // Keep hasCustomPwd in sync whenever studentId changes or after an update
-  useEffect(() => {
-    setHasCustomPwd(hasCustomPassword(studentId));
-  }, [studentId]);
-
-  useEffect(() => {
-    if (!studentId) return;
-    fetch(`/portal-api/student-profile?studentId=${studentId}`)
-      .then((r) => r.json())
-      .then((res) => {
-        if (res.ok && res.data) {
-          const s = res.data;
-          setProfile({
-            name: s.name,
-            rollNumber: s.student_id,
-            department: `${s.program || 'CSE'} · Computer Science & Engineering`,
-            specialization: s.specialization || "Not verified",
-            batch: "2023–2027",
-            term: "Fourth Year · Semester 8 (2026–27 EVEN)",
-            gender: s.gender || "—",
-            dateOfBirth: s.date_of_birth || "—",
-            aadhaarNumber: s.aadhaar_number || "—",
-            apaarNumber: s.apaar_number || s.aapaar_number || s.apaarNumber || s.aapaarNumber || "—",
-            residencyStatus: s.residency_status || "—",
-            parentName: s.parent_name || "—",
-            parentPhoneNumber: s.parent_phone_number || "—",
-          });
-          setPersonalEmail(s.personal_email || `${s.student_id}@kluniversity.in`);
-          setMobile(s.mobile_number || "—");
-        }
-      })
-      .catch((err) => console.error("Error loading student profile in MyProfile:", err));
-  }, [studentId]);
-
-  const handlePasswordSubmit = async (e) => {
-    e.preventDefault();
-
-    // Verify current credential
-    if (hasCustomPwd) {
-      const activePwd = getCustomPassword(studentId);
-      if (activePwd && currentPassword !== activePwd) {
-        setPasswordStatus("error");
-        setPasswordMessage("Current password entered is incorrect.");
-        return;
-      }
-    } else {
-      const registeredDob = profile?.dateOfBirth || getRememberedDateOfBirth(studentId) || "2005-01-01";
-      if (!currentDob) {
-        setPasswordStatus("error");
-        setPasswordMessage("Please select your current registered Date of Birth.");
-        return;
-      }
-      // Allow verification against either the student's registered DOB or the universal default 2005-01-01
-      if (currentDob !== registeredDob && currentDob !== "2005-01-01") {
-        setPasswordStatus("error");
-        setPasswordMessage("Current Date of Birth does not match your official record or default credential (01 Jan 2005).");
-        return;
-      }
-    }
-
-    if (!newPassword || newPassword.length < 8) {
-      setPasswordStatus("error");
-      setPasswordMessage("New password must be at least 8 characters long.");
-      return;
-    }
-
-    if (!passwordsMatch(newPassword, confirmPassword)) {
-      setPasswordStatus("error");
-      setPasswordMessage("New passwords do not match.");
-      return;
-    }
-
-    // Save custom password
-    setCustomPassword(studentId, newPassword);
-    setHasCustomPwd(true);
-
-    setCurrentPassword("");
-    setCurrentDob("");
-    setNewPassword("");
-    setConfirmPassword("");
-    setPasswordStatus("success");
-    setPasswordMessage("Password updated successfully. Your new password is now active and can be used immediately.");
+  const save = async () => {
+    setLoading(true);
+    // Pure frontend state update for demonstration
+    setTimeout(() => {
+      setLoading(false);
+      setEditing(false);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    }, 200);
   };
 
   return (
@@ -128,68 +64,94 @@ export default function Profile({ studentId }) {
                 <h2>Student Information</h2>
               </div>
             </div>
+
+            {editing ? (
+              <div className="profile-actions-row">
+                <button
+                  type="button"
+                  className="secondary-btn"
+                  onClick={() => setEditing(false)}
+                  disabled={loading}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  className="primary-btn"
+                  onClick={save}
+                  disabled={loading}
+                >
+                  {loading ? "Saving…" : "Save Changes"}
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                className="secondary-btn edit-toggle-btn"
+                onClick={() => setEditing(true)}
+              >
+                <Edit3 size={15} />
+                <span>Edit Contact Details</span>
+              </button>
+            )}
           </div>
 
           <div className="profile-fields-grid">
             <div className="field-block">
-              <span className="field-label">Student Name</span>
-              <input disabled value={profile?.name || "—"} readOnly className="field-input readonly" />
+              <span className="field-label">Full Name</span>
+              <input disabled value={profile?.name || "Student"} readOnly className="field-input readonly" />
             </div>
 
             <div className="field-block">
-              <span className="field-label">Roll Number</span>
-              <input disabled value={profile?.rollNumber || "—"} readOnly className="field-input readonly" />
-            </div>
-
-            <div className="field-block">
-              <span className="field-label">Department</span>
-              <input disabled value={profile?.department || "—"} readOnly className="field-input readonly" />
-            </div>
-
-            <div className="field-block">
-              <span className="field-label">Specialization</span>
-              <input disabled value={profile?.specialization || "—"} readOnly className="field-input readonly" />
-            </div>
-
-            <div className="field-block">
-              <span className="field-label">Batch</span>
-              <input disabled value={profile?.batch || "—"} readOnly className="field-input readonly" />
-            </div>
-
-            <div className="field-block">
-              <span className="field-label">Current Term</span>
-              <input disabled value={profile?.term || "—"} readOnly className="field-input readonly" />
-            </div>
-
-            <div className="field-block">
-              <span className="field-label">University Email</span>
-              <input disabled value={email} readOnly className="field-input readonly" />
+              <span className="field-label">Student ID</span>
+              <input disabled value={studentId} readOnly className="field-input readonly" />
             </div>
 
             <div className="field-block">
               <span className="field-label">Date of Birth</span>
-              <input disabled value={profile?.dateOfBirth || "—"} readOnly className="field-input readonly" />
-            </div>
-
-            <div className="field-block">
-              <span className="field-label">Personal Email</span>
               <input
                 disabled
-                type="email"
-                value={personalEmail}
+                value={
+                  profile?.dateOfBirth
+                    ? new Date(profile.dateOfBirth).toLocaleDateString("en-GB", {
+                        day: "2-digit",
+                        month: "long",
+                        year: "numeric",
+                      })
+                    : "—"
+                }
                 readOnly
                 className="field-input readonly"
               />
+              <small className="field-help-text">Managed by Central Academic Office</small>
             </div>
 
             <div className="field-block">
+              <span className="field-label">University Email</span>
+              <input disabled value={profile?.universityEmail || email} readOnly className="field-input readonly" />
+            </div>
+
+            <div className={`field-block ${editing ? "editable-highlight" : ""}`}>
+              <span className="field-label">Personal Email</span>
+              <input
+                disabled={!editing}
+                type="email"
+                value={personalEmail}
+                onChange={(e) => setPersonalEmail(e.target.value)}
+                placeholder="Enter personal email"
+                className="field-input"
+              />
+            </div>
+
+            <div className={`field-block ${editing ? "editable-highlight" : ""}`}>
               <span className="field-label">Mobile Number</span>
               <input
-                disabled
+                disabled={!editing}
                 type="tel"
                 value={mobile}
-                readOnly
-                className="field-input readonly"
+                onChange={(e) => setMobile(e.target.value)}
+                placeholder="+91 XXXXX XXXXX"
+                className="field-input"
               />
             </div>
 
@@ -205,7 +167,7 @@ export default function Profile({ studentId }) {
 
             <div className="field-block">
               <span className="field-label">APAAR Number</span>
-              <input disabled value={profile?.apaarNumber || profile?.aapaarNumber || "—"} readOnly className="field-input readonly" />
+              <input disabled value={profile?.aapaarNumber || "—"} readOnly className="field-input readonly" />
             </div>
 
             <div className="field-block">
@@ -242,31 +204,35 @@ export default function Profile({ studentId }) {
               Ensure your account is protected with a secure password containing at least 8 characters.
             </p>
 
-            <form className="security-form" onSubmit={handlePasswordSubmit}>
-              {hasCustomPwd ? (
-                <div className="field-block">
-                  <span className="field-label">Current Password</span>
-                  <PasswordInput
-                    value={currentPassword}
-                    onChange={(event) => setCurrentPassword(event.target.value)}
-                    autoComplete="current-password"
-                    placeholder="Enter current password"
-                    required
-                  />
-                </div>
-              ) : (
-                <div className="field-block">
-                  <span className="field-label">Current Credential (Date of Birth)</span>
-                  <DatePicker
-                    label="Current Registered DOB"
-                    value={currentDob}
-                    onChange={setCurrentDob}
-                  />
-                  <small className="field-help-text">
-                    Verify your current default credential using the calendar
-                  </small>
-                </div>
-              )}
+            <form
+              className="security-form"
+              onSubmit={async (e) => {
+                e.preventDefault();
+                if (!passwordsMatch(newPassword, confirmPassword)) {
+                  setPasswordStatus("error");
+                  setPasswordMessage("New passwords do not match.");
+                  return;
+                }
+                setCurrentPassword("");
+                setCurrentDob("");
+                setNewPassword("");
+                setConfirmPassword("");
+                setPasswordStatus("success");
+                setPasswordMessage(
+                  "Demonstration mode: Password change simulated. (Real password changes require institutional directory service integration).",
+                );
+              }}
+            >
+              <div className="field-block">
+                <span className="field-label">Current Password</span>
+                <PasswordInput
+                  value={currentPassword}
+                  onChange={(event) => setCurrentPassword(event.target.value)}
+                  autoComplete="current-password"
+                  placeholder="Enter current credential"
+                  required
+                />
+              </div>
 
               <div className="field-block">
                 <span className="field-label">New Password</span>
@@ -275,7 +241,6 @@ export default function Profile({ studentId }) {
                   value={newPassword}
                   onChange={(event) => setNewPassword(event.target.value)}
                   autoComplete="new-password"
-                  placeholder="Minimum 8 characters"
                   required
                 />
               </div>
@@ -287,7 +252,6 @@ export default function Profile({ studentId }) {
                   value={confirmPassword}
                   onChange={(event) => setConfirmPassword(event.target.value)}
                   autoComplete="new-password"
-                  placeholder="Re-enter new password"
                   required
                 />
               </div>
