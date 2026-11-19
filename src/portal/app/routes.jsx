@@ -49,6 +49,7 @@ function PortalRoute() {
     if (page === "cluster")
       return (
         <ClusterSelection
+          studentId={studentId}
           cluster={cluster}
           setCluster={(nextCluster) => {
             setCluster(nextCluster);

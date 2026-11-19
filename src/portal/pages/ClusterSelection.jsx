@@ -1,9 +1,12 @@
 import { useState } from "react";
 import PageHeading from "../components/common/PageHeading";
 import { ArrowLeft, Check, Info } from "lucide-react";
+import { getStudentRosterInfo } from "../services/studentService";
 
-export default function ClusterSelection({ cluster, setCluster, goTo }) {
-  const [pending, setPending] = useState(cluster || "Cluster 2");
+export default function ClusterSelection({ studentId, cluster, setCluster, goTo }) {
+  const studentInfo = getStudentRosterInfo(studentId);
+  const autoAssignedCluster = studentInfo.cluster || cluster || "Cluster 2";
+  const specializationName = studentInfo.specialization || "Generative AI for Agentic and Multi-Modal Intelligence";
 
   const clusters = [
     {
@@ -11,14 +14,14 @@ export default function ClusterSelection({ cluster, setCluster, goTo }) {
       name: "Cluster 1",
       range: "S1 — S50",
       description: "Section range 1 through 50 for primary cohort registrations.",
-      recommended: false,
+      isAssigned: autoAssignedCluster === "Cluster 1",
     },
     {
       id: "Cluster 2",
       name: "Cluster 2",
       range: "S51 — S100",
       description: "Section range 51 through 100 aligned with your specialization cohort.",
-      recommended: true,
+      isAssigned: autoAssignedCluster === "Cluster 2",
     },
   ];
 
@@ -30,7 +33,7 @@ export default function ClusterSelection({ cluster, setCluster, goTo }) {
         aside={
           <div className="status-stamp">
             <span>SELECTED COHORT</span>
-            <strong>{pending}</strong>
+            <strong>{autoAssignedCluster}</strong>
           </div>
         }
       />
@@ -39,34 +42,31 @@ export default function ClusterSelection({ cluster, setCluster, goTo }) {
         <span className="specialization-tag">
           Your Specialization
         </span>
-        <strong>Generative AI for Agentic and Multi-Modal Intelligence</strong>
+        <strong>{specializationName}</strong>
       </section>
 
       <div className="cluster-grid">
         {clusters.map((item) => {
-          const selected = pending === item.name;
+          const selected = item.isAssigned;
           return (
             <div
               key={item.id}
               role="button"
               tabIndex={0}
               className={`cluster-card ${selected ? "selected" : ""}`}
-              onClick={() => setPending(item.name)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault();
-                  setPending(item.name);
-                }
+              style={{
+                cursor: selected ? "default" : "not-allowed",
+                opacity: selected ? 1 : 0.6,
               }}
             >
               <div className="cluster-card-header">
-                {item.recommended ? (
+                {item.isAssigned ? (
                   <span className="cluster-badge">
-                    Recommended
+                    Assigned Cohort
                   </span>
                 ) : (
                   <span className="cluster-badge cluster-badge-neutral">
-                    Alternative
+                    Locked to Other Cohort
                   </span>
                 )}
                 <span className={`cluster-radio-indicator ${selected ? "is-selected" : ""}`}>
@@ -112,11 +112,11 @@ export default function ClusterSelection({ cluster, setCluster, goTo }) {
           type="button"
           className="primary-btn"
           onClick={() => {
-            setCluster(pending);
+            setCluster(autoAssignedCluster);
             goTo("subjects");
           }}
         >
-          <span>Confirm {pending}</span>
+          <span>Confirm {autoAssignedCluster}</span>
           <Check size={16} />
         </button>
       </div>
