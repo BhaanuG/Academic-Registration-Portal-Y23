@@ -44,8 +44,8 @@ export default function Subjects({ selections, setSelections, goTo }) {
   return (
     <div className="subject-selection-page">
       <PageHeading
-        title="Bucket-Wise Subject Selection"
-        description="Choose one subject from each academic bucket. Review credits, teaching components, and syllabus outlines. Your selections save automatically."
+        title="Bucket-Wise Course Selection"
+        description="Choose one course from each academic bucket. Review credits, teaching components, and syllabus outlines. Your selections save automatically."
         aside={
           <div className="subject-aside-meter-row">
             <div className="credit-meter">

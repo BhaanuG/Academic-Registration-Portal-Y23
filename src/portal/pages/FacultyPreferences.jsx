@@ -147,20 +147,23 @@ export default function Preferences({ selections, prefs, setPrefs, cluster }) {
           {!subject ? (
             <div className="preference-empty">
               <span>{activeEntry.bucket.id}</span>
-              <h2>Subject option not selected</h2>
+              <h2>Course option not selected</h2>
               <p>
-                You selected “None of the above” for this bucket. Return to Subject Selection and
+                You selected “None of the above” for this bucket. Return to Course Selection and
                 choose a course before entering faculty preferences.
               </p>
-              <Link to="/KLEF/3-2/Course-Bucket-Selection">Back to Subject Selection</Link>
+              <Link to="/KLEF/3-2/Course-Bucket-Selection">Back to Course Selection</Link>
             </div>
           ) : (
             <>
               <header className="preference-subject-head">
                 <div>
-                  <span className="eyebrow">{activeEntry.bucket.title} ({activeEntry.bucket.id})</span>
-                  <h2>{subject.name}</h2>
-                  <p>
+                  <div className="bucket-header-meta">
+                    <span className="bucket-code-pill">{activeEntry.bucket.id}</span>
+                    <span className="bucket-type-tag">{activeEntry.bucket.short}</span>
+                  </div>
+                  <h2>{activeEntry.bucket.title}</h2>
+                  <p className="bucket-desc">
                     {subject.code} · {subject.credits} credits · Components:{" "}
                     {subject.components.map((c) => componentNames[c] || c).join(", ")}
                   </p>
