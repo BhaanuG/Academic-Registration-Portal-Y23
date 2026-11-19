@@ -177,23 +177,25 @@ export default function Preferences({ selections, prefs, setPrefs, cluster }) {
                   </button>
 
                   <div className="cohort-chip">
-                    <span>Assigned cohort</span>
-                    <strong>
-                      {cluster === "Cluster 1" || cluster === "C 1" || cluster === "C1"
-                        ? "C 1"
-                        : cluster === "Cluster 2" || cluster === "C 2" || cluster === "C2"
-                        ? "C 2"
-                        : cluster?.replace(/Cluster\s*/i, "C ") || "C 2"}
-                    </strong>
+                    <div className="cohort-chip-top">
+                      <span className="cohort-label">Assigned Cluster:</span>
+                      <strong className="cohort-val">
+                        {cluster === "Cluster 1" || cluster === "C 1" || cluster === "C1"
+                          ? "C 1"
+                          : cluster === "Cluster 2" || cluster === "C 2" || cluster === "C2"
+                          ? "C 2"
+                          : cluster?.replace(/Cluster\s*/i, "C ") || "C 2"}
+                      </strong>
+                    </div>
                     {subject?.ltps && (
-                      <div className="cohort-ltps-matrix" title="Lecture - Tutorial - Practical - Skill Hours">
-                        <div className="ltps-matrix-labels">
+                      <div className="cohort-ltps-grid-table" title="Lecture | Tutorial | Practical | Skill Credit Weight">
+                        <div className="grid-row grid-head">
                           <span>L</span>
                           <span>T</span>
                           <span>P</span>
                           <span>S</span>
                         </div>
-                        <div className="ltps-matrix-values">
+                        <div className="grid-row grid-body">
                           <span>{subject.ltps[0]}</span>
                           <span>{subject.ltps[1]}</span>
                           <span>{subject.ltps[2]}</span>
