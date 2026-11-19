@@ -230,14 +230,15 @@ Academic-Registration-Portal-Y23/
 │       ├── components/                # Reusable UI cards, headers, inputs
 │       ├── pages/                     # The visual screens (Overview, Faculty, Admin, etc.)
 │       └── services/                  # Auto-save handlers and local database records
+├── docs/                              # Project governance & open-source documentation
+│   ├── ACCESSIBILITY.md               # Accessibility practices (WCAG 2.1 AA)
+│   ├── CODE_OF_CONDUCT.md             # Community standards & reporting guidelines
+│   ├── CONTRIBUTING.md                # Guidelines for contributing & workflow
+│   ├── LICENSE                        # MIT Open Source License
+│   └── SECURITY.md                    # Security report instructions
 ├── next.config.mjs                    # Production web server configuration
 ├── package.json                       # Dependencies list
-├── tsconfig.json                      # TypeScript settings
-├── LICENSE                            # MIT License
-├── CONTRIBUTING.md                    # Guidelines for contributing
-├── CODE_OF_CONDUCT.md                # Community standards
-├── SECURITY.md                        # Security report instructions
-└── ACCESSIBILITY.md                   # Accessibility practices (WCAG 2.1 AA)
+└── tsconfig.json                      # TypeScript settings
 ```
 
 ---
@@ -298,8 +299,8 @@ npm run build
 
 ## Project Documentation & Guidelines
 
-- **[LICENSE](LICENSE)**: Legal terms under the MIT Open Source License.
-- **[CONTRIBUTING.md](CONTRIBUTING.md)**: Rules and workflow for contributing to this repository.
-- **[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)**: Community standards and reporting guidelines.
-- **[SECURITY.md](SECURITY.md)**: How to privately report security concerns.
-- **[ACCESSIBILITY.md](ACCESSIBILITY.md)**: Our commitment to WCAG 2.1 AA accessibility standards for all users.
+- **[docs/LICENSE](docs/LICENSE)**: Legal terms under the MIT Open Source License.
+- **[docs/CONTRIBUTING.md](docs/CONTRIBUTING.md)**: Rules and workflow for contributing to this repository.
+- **[docs/CODE_OF_CONDUCT.md](docs/CODE_OF_CONDUCT.md)**: Community standards and reporting guidelines.
+- **[docs/SECURITY.md](docs/SECURITY.md)**: How to privately report security concerns.
+- **[docs/ACCESSIBILITY.md](docs/ACCESSIBILITY.md)**: Our commitment to WCAG 2.1 AA accessibility standards for all users.
