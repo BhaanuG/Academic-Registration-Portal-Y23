@@ -192,22 +192,22 @@
 }
 
 /* Editorial Story Section: Wide padded canvas with optimal reading measure */
-.developer-story {
-  padding: clamp(36px, 4vw, 56px) clamp(32px, 5vw, 64px);
-  background: #ffffff;
+.developer-reference-card .developer-story {
+  padding: 28px clamp(32px, 5vw, 64px) 44px !important;
+  background: #ffffff !important;
 }
 
-.developer-quote {
-  font-family: var(--font-cormorant), Georgia, serif;
-  font-size: clamp(16px, 1.8vw, 19px);
-  line-height: 1.4;
-  color: #1e293b;
-  font-style: italic;
-  font-weight: 600;
-  border-left: 2.5px solid #2563eb;
-  padding-left: 14px;
-  margin: 0 0 22px 0;
-  max-width: 980px;
+.developer-reference-card .developer-quote {
+  font-family: var(--font-cormorant), Georgia, serif !important;
+  font-size: clamp(19px, 2.2vw, 24px) !important;
+  line-height: 1.35 !important;
+  color: #1e293b !important;
+  font-style: italic !important;
+  font-weight: 600 !important;
+  border-left: 3px solid #2563eb !important;
+  padding-left: 18px !important;
+  margin: 0 0 24px 0 !important;
+  max-width: 980px !important;
 }
 
 /* Maintain comfortable editorial reading width (approx. 780px-840px) to prevent overstretched lines */
@@ -221,6 +221,14 @@
   color: #334155;
   margin: 0 0 18px 0;
   letter-spacing: -0.002em;
+}
+
+.developer-story-body p:first-child:first-letter {
+  float: none !important;
+  font-size: inherit !important;
+  line-height: inherit !important;
+  padding: 0 !important;
+  color: inherit !important;
 }
 
 .developer-story-body .story-emphasis {

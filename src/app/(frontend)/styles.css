@@ -3584,16 +3584,7 @@ body { font-family: var(--font-sans); }
   border-color: #356ae6;
   color: #356ae6;
 }
-.developer-reference .developer-story {
-  max-width: none;
-  padding: clamp(32px, 6vw, 68px);
-  border-top: 1px solid #e2e7ee;
-  background: #fbfcfe;
-}
-.developer-reference .developer-quote {
-  font-family: var(--font-cormorant), Georgia, serif;
-  font-size: clamp(36px, 5.5vw, 58px);
-}
+/* Overridden by modular styles/developer-page.css */
 
 /* Preference section-family guidance */
 .preference-section-hint {
