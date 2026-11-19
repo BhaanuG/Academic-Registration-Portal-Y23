@@ -1,24 +1,40 @@
 /* ==========================================================================
-   ACADEMIC OVERVIEW DASHBOARD STYLES (FIT VIEWPORT PRECISELY WITHOUT SCROLL)
+   ACADEMIC OVERVIEW DASHBOARD STYLES (EXPAND BOX LENGTH TO FOOTER, PERFECT FIT)
    ========================================================================== */
 
+.page-shell-overview {
+  min-height: 100vh;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
 .page-shell-overview .content {
+  flex: 1 1 0% !important;
+  display: flex !important;
+  flex-direction: column !important;
   padding: 16px 36px 16px !important;
+  min-height: 0 !important;
 }
 
 .overview-container {
   max-width: 1240px;
+  width: 100%;
   margin: 0 auto;
+  flex: 1 1 0% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 0 !important;
 }
 
 .overview-container .page-heading {
-  margin-bottom: 14px !important;
-  padding-bottom: 10px !important;
+  flex: 0 0 auto !important;
+  margin-bottom: 12px !important;
+  padding-bottom: 8px !important;
   border-bottom: 1px solid #ebdcc5 !important;
 }
 
 .overview-container .page-heading h1 {
-  font-size: 23px !important;
+  font-size: 22px !important;
   font-weight: 700 !important;
   margin: 0 0 2px !important;
   color: #1c1917 !important;
@@ -28,28 +44,42 @@
 .overview-container .page-heading .heading-description {
   font-size: 13px !important;
   color: #78716c !important;
-  line-height: 1.4 !important;
+  line-height: 1.35 !important;
 }
 
 .overview-grid {
+  flex: 1 1 0% !important;
   display: grid !important;
   grid-template-columns: minmax(0, 1.45fr) minmax(330px, 0.95fr) !important;
   gap: 20px !important;
   align-items: stretch !important;
-  margin-top: 4px !important;
+  margin-top: 2px !important;
+  min-height: 0 !important;
+}
+
+.overview-main-col {
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
 }
 
 .plain-section.academic-section,
 .counselor-panel {
-  padding: 18px 24px !important;
+  height: 100% !important;
+  padding: 22px 28px !important;
   border: 1.5px solid #ebdcc5 !important;
   border-radius: 12px !important;
   background: #ffffff !important;
   box-shadow: 0 1px 4px rgba(15, 23, 42, 0.04) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  box-sizing: border-box !important;
 }
 
 .academic-section .section-title {
-  padding-bottom: 10px !important;
+  flex: 0 0 auto !important;
+  padding-bottom: 12px !important;
   border-bottom: 1px solid #f3eedf !important;
   margin-bottom: 4px !important;
   display: flex !important;
@@ -59,37 +89,47 @@
 
 .academic-section .section-title h2,
 .counselor-panel h2 {
-  font-size: 17.5px !important;
+  font-size: 18px !important;
   font-weight: 700 !important;
   color: #1c1917 !important;
   margin: 0 !important;
   letter-spacing: -0.015em !important;
 }
 
+.counselor-panel .eyebrow {
+  flex: 0 0 auto !important;
+}
+
 .counselor-panel h2 {
+  flex: 0 0 auto !important;
   margin-bottom: 4px !important;
 }
 
 .academic-grid {
+  flex: 1 1 auto !important;
   display: grid !important;
   grid-template-columns: repeat(2, 1fr) !important;
   gap: 0 24px !important;
+  align-content: space-between !important;
 }
 
 .academic-grid > div {
   min-height: auto !important;
-  padding: 9.5px 0 !important;
+  padding: 10px 0 !important;
   border-bottom: 1px solid #f5ede1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
 }
 
 .academic-grid dt,
 .counselor-panel dt {
-  font-size: 10px !important;
+  font-size: 10.5px !important;
   text-transform: uppercase !important;
   letter-spacing: 0.06em !important;
   color: #78716c !important;
   font-weight: 700 !important;
-  margin-bottom: 2px !important;
+  margin-bottom: 3px !important;
 }
 
 .academic-grid dd,
@@ -101,9 +141,20 @@
   line-height: 1.35 !important;
 }
 
+.counselor-panel dl {
+  flex: 1 1 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  margin: 0 !important;
+}
+
 .counselor-panel dl > div {
-  padding: 9.5px 0 !important;
+  padding: 10px 0 !important;
   border-bottom: 1px solid #f5ede1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
 }
 
 .counselor-badge {
