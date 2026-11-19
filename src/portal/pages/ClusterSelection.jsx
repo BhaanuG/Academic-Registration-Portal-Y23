@@ -1,123 +1,172 @@
-import { useState } from "react";
-import PageHeading from "../components/common/PageHeading";
-import { ArrowLeft, Check, Info } from "lucide-react";
-import { getStudentRosterInfo } from "../services/studentService";
+import { useState, useEffect } from "react";
+import { CheckCircle2, ShieldAlert } from "lucide-react";
 
 export default function ClusterSelection({ studentId, cluster, setCluster, goTo }) {
-  const studentInfo = getStudentRosterInfo(studentId);
-  const autoAssignedCluster = studentInfo.cluster || cluster || "Cluster 2";
-  const specializationName = studentInfo.specialization || "Generative AI for Agentic and Multi-Modal Intelligence";
+  const [student, setStudent] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [assignedCluster, setAssignedCluster] = useState(null);
+  const [isUnverified, setIsUnverified] = useState(false);
 
-  const clusters = [
+  useEffect(() => {
+    if (!studentId) return;
+    setLoading(true);
+    fetch(`/portal-api/student-profile?studentId=${studentId}`)
+      .then((r) => r.json())
+      .then((res) => {
+        if (res.ok && res.data) {
+          const s = res.data;
+          setStudent(s);
+          if (s.cluster_id === "Cluster-1") {
+            setAssignedCluster("Cluster 1");
+            setCluster("Cluster 1");
+          } else if (s.cluster_id === "Cluster-2") {
+            setAssignedCluster("Cluster 2");
+            setCluster("Cluster 2");
+          } else {
+            setIsUnverified(true);
+            setAssignedCluster(null);
+          }
+        }
+      })
+      .catch((err) => {
+        console.error("Error loading student profile in ClusterSelection:", err);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, [studentId, setCluster]);
+
+  const clusterCards = [
     {
       id: "Cluster 1",
       name: "Cluster 1",
       range: "S1 — S50",
       description: "Section range 1 through 50 for primary cohort registrations.",
-      isAssigned: autoAssignedCluster === "Cluster 1",
     },
     {
       id: "Cluster 2",
       name: "Cluster 2",
       range: "S51 — S100",
       description: "Section range 51 through 100 aligned with your specialization cohort.",
-      isAssigned: autoAssignedCluster === "Cluster 2",
     },
   ];
 
+  const currentClusterName = assignedCluster || (cluster === "Cluster 1" || cluster === "Cluster 2" ? cluster : "Cluster 2");
+
+  // Determine display specialization (matches student record or falls back accurately)
+  const displaySpecialization = student?.specialization
+    ? student.specialization
+    : "Cloud Infrastructure Design And Engineering";
+
   return (
-    <div className="cluster-selection-workspace">
-      <PageHeading
-        title="Cluster Selection"
-        description="Confirm the section cluster assigned to your specialization before choosing semester subjects."
-        aside={
-          <div className="status-stamp">
-            <span>SELECTED COHORT</span>
-            <strong>{autoAssignedCluster}</strong>
-          </div>
-        }
-      />
+    <div className="cluster-selection-screen-fit">
+      {/* Title & Top Badge Bar */}
+      <div className="cluster-fit-header">
+        <div className="cluster-fit-title-wrap">
+          <h1>Cluster Selection</h1>
+          <p>Confirm the section cluster assigned to your specialization before choosing semester subjects.</p>
+        </div>
+        <div className="cluster-fit-cohort-pill">
+          <span className="pill-kicker">SELECTED COHORT</span>
+          <strong>{currentClusterName}</strong>
+        </div>
+      </div>
 
-      <section className="specialization-banner">
-        <span className="specialization-tag">
-          Your Specialization
-        </span>
-        <strong>{specializationName}</strong>
-      </section>
+      {/* Specialization Banner Box: "Your Specialization" up, name down */}
+      <div className="cluster-fit-spec-card">
+        <span className="spec-tag">Your Specialization</span>
+        <strong className="spec-name">{displaySpecialization}</strong>
+      </div>
 
-      <div className="cluster-grid">
-        {clusters.map((item) => {
-          const selected = item.isAssigned;
+      {/* Unverified Warning if applicable */}
+      {isUnverified && (
+        <div className="p-3 rounded-lg border border-amber-500/40 bg-amber-50 text-amber-900 flex items-center gap-2">
+          <ShieldAlert size={18} className="text-amber-600 flex-shrink-0" />
+          <span className="text-xs font-medium">Cluster Assignment Pending Verification with Academic Administration.</span>
+        </div>
+      )}
+
+      {/* 2-Column Minimal Cards with clean layout, NO 'recommended' or 'alternative' words */}
+      <div className="cluster-fit-grid">
+        {clusterCards.map((item) => {
+          const isSelected = currentClusterName === item.name;
+
           return (
             <div
               key={item.id}
-              role="button"
-              tabIndex={0}
-              className={`cluster-card ${selected ? "selected" : ""}`}
+              role="radio"
+              aria-checked={isSelected}
+              aria-disabled={!isSelected}
+              tabIndex={isSelected ? 0 : -1}
+              className={`cluster-fit-card ${isSelected ? "is-selected" : "is-disabled-cohort"}`}
               style={{
-                cursor: selected ? "default" : "not-allowed",
-                opacity: selected ? 1 : 0.6,
+                cursor: isSelected ? "default" : "not-allowed",
+                opacity: isSelected ? 1 : 0.58,
+                pointerEvents: isSelected ? "auto" : "none",
               }}
             >
-              <div className="cluster-card-header">
-                {item.isAssigned ? (
-                  <span className="cluster-badge">
-                    Assigned Cohort
-                  </span>
-                ) : (
-                  <span className="cluster-badge cluster-badge-neutral">
-                    Locked to Other Cohort
-                  </span>
-                )}
-                <span className={`cluster-radio-indicator ${selected ? "is-selected" : ""}`}>
-                  {selected && <Check size={14} strokeWidth={3} />}
+              <div className="card-top-row">
+                <span className="status-badge-placeholder">
+                  {isSelected ? (
+                    <span className="text-xs font-semibold px-2 py-0.5 rounded bg-orange-100 text-orange-800 border border-orange-200">
+                      Assigned Cohort
+                    </span>
+                  ) : (
+                    <span className="text-xs font-medium px-2 py-0.5 rounded bg-slate-100 text-slate-500 border border-slate-200">
+                      Locked to Other Cohort
+                    </span>
+                  )}
                 </span>
+                <div className={`check-circle ${isSelected ? "selected" : ""}`}>
+                  {isSelected && <CheckCircle2 size={18} className="text-white fill-current" />}
+                </div>
               </div>
 
-              <div className="cluster-body">
-                <div className="cluster-title-row">
-                  <strong>{item.name}</strong>
-                  <div className="cluster-range-pill">
-                    <span>Range</span>
-                    <em>{item.range}</em>
-                  </div>
+              <div className="card-center-row">
+                <strong className="cluster-name">{item.name}</strong>
+                <div className="range-badge">
+                  <span className="range-lbl">RANGE</span>
+                  <span className="range-num">{item.range}</span>
                 </div>
-                <p className="cluster-desc">{item.description}</p>
               </div>
+
+              <p className="card-desc">{item.description}</p>
             </div>
           );
         })}
       </div>
 
-      <div className="cluster-notice">
-        <div className="notice-icon-wrap">
-          <Info size={16} className="text-amber-600" />
-        </div>
-        <span>
-          Your cluster is based on your specialization cohort. All course buckets will display faculty
-          and section allocations from this cluster only.
-        </span>
+      {/* Bottom Information Notice Bar */}
+      <div className="cluster-fit-alert">
+        <span className="alert-info-icon">ⓘ</span>
+        <p>
+          Your cluster is based on your specialization cohort. All course buckets will display faculty and section allocations from this cluster only.
+        </p>
       </div>
 
-      <div className="cluster-actions">
+      {/* Bottom Action Buttons */}
+      <div className="cluster-fit-actions">
         <button
           type="button"
-          className="secondary-btn"
+          className="cluster-fit-back-btn"
           onClick={() => goTo("overview")}
         >
-          <ArrowLeft size={15} />
-          <span>Back to Overview</span>
+          <span>← Back to Overview</span>
         </button>
+
         <button
           type="button"
-          className="primary-btn"
+          disabled={isUnverified}
+          className={`cluster-fit-confirm-btn ${isUnverified ? "disabled" : ""}`}
           onClick={() => {
-            setCluster(autoAssignedCluster);
-            goTo("subjects");
+            if (!isUnverified) {
+              setCluster(currentClusterName);
+              goTo("subjects");
+            }
           }}
         >
-          <span>Confirm {autoAssignedCluster}</span>
-          <Check size={16} />
+          <span>Confirm {currentClusterName}</span>
+          <CheckCircle2 size={16} />
         </button>
       </div>
     </div>

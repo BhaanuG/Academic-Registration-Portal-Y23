@@ -1,6 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Brand from "../common/Brand";
 import PortalFooter from "./PortalFooter";
+import {
+  recordStudentActivity,
+  isStudentTimedOut,
+} from "../../services/authService";
 import {
   LayoutDashboard,
   Layers,
@@ -30,7 +34,54 @@ const navItems = [
 export default function PortalShell({ page, setPage, onLogout, studentId, children }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const now = new Date();
-  const semester = now.getMonth() === 11 || (now.getMonth() === 10 && now.getDate() >= 30) ? 6 : 5;
+  const semester = 8;
+
+  // Single Account Per Browser & 300-Minute Inactivity Tracker (Student Portal Only)
+  useEffect(() => {
+    if (!studentId) return;
+
+    // Record initial activity
+    recordStudentActivity();
+
+    // Activity listeners to refresh the 300-minute inactivity timer
+    const handleUserActivity = () => {
+      recordStudentActivity();
+    };
+
+    const events = ["mousedown", "keydown", "scroll", "touchstart"];
+    events.forEach((evt) => {
+      window.addEventListener(evt, handleUserActivity, { passive: true });
+    });
+
+    // Check every 30 seconds for 300-minute inactivity timeout
+    const inactivityInterval = setInterval(() => {
+      if (isStudentTimedOut()) {
+        console.warn("Session expired: 300 minutes of student inactivity exceeded.");
+        alert("Your session has timed out due to 300 minutes (5 hours) of inactivity. Please log in again.");
+        onLogout();
+      }
+    }, 30000);
+
+    // Cross-tab single student account enforcement
+    const handleStorageChange = (e) => {
+      if (e.key === "klef-active-browser-student") {
+        if (e.newValue && e.newValue !== studentId) {
+          // Another student logged in on this browser in a different tab/window
+          alert("Another student account has logged in on this browser. Logging out current session.");
+          onLogout();
+        }
+      }
+    };
+    window.addEventListener("storage", handleStorageChange);
+
+    return () => {
+      events.forEach((evt) => {
+        window.removeEventListener(evt, handleUserActivity);
+      });
+      clearInterval(inactivityInterval);
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, [studentId, onLogout]);
 
   const currentNav = navItems.find((item) => item.key === page) || navItems[0];
 
@@ -53,7 +104,7 @@ export default function PortalShell({ page, setPage, onLogout, studentId, childr
 
           <div className="portal-title">
             <strong>Academic Registration Portal</strong>
-            <span>CSE-2 · Academic Semester {semester}</span>
+            <span>CSE-2 · Academic Semester {semester} · {currentNav.label}</span>
           </div>
 
           <div className="account-menu">
@@ -62,14 +113,13 @@ export default function PortalShell({ page, setPage, onLogout, studentId, childr
                 <GraduationCap size={15} />
               </div>
               <div className="account-info-text">
-                <span className="account-role-label">Enrolled Student</span>
+                <span className="account-role-label">Registration No</span>
                 <strong className="account-id-label">{studentId}</strong>
               </div>
             </div>
 
-            <button type="button" className="signout-button" onClick={onLogout} title="Sign out of student portal">
-              <LogOut size={15} />
-              <span>Sign out</span>
+            <button type="button" className="signout-button" onClick={onLogout} title="Sign out of student portal" aria-label="Sign out">
+              <LogOut size={16} />
             </button>
           </div>
         </div>
@@ -98,15 +148,6 @@ export default function PortalShell({ page, setPage, onLogout, studentId, childr
           })}
         </div>
       </nav>
-
-      {/* Active Breadcrumb Ribbon */}
-      <div className="portal-breadcrumb-ribbon">
-        <div className="breadcrumb-inner">
-          <span className="breadcrumb-root">Student Portal</span>
-          <ChevronRight size={13} className="text-slate-400" />
-          <span className="breadcrumb-current">{currentNav.label}</span>
-        </div>
-      </div>
 
       {/* Main Page Workspace */}
       <main className={`content page-${page}`}>

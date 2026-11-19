@@ -1,46 +1,107 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import PageHeading from "../components/common/PageHeading";
-import { useFaculty } from "../hooks/useFaculty";
-import { buckets, componentNames, sectionFor } from "../services/academicData";
+import { allocations, buckets, componentNames } from "../services/academicData";
 import { Search, UserRound, ArrowUpDown, Filter, BookOpen, Layers, X, Download } from "lucide-react";
 
-export default function FacultyDirectory({ cluster }) {
+export default function FacultyDirectory({ cluster, studentId, selections }) {
   const [query, setQuery] = useState("");
   const [courseCode, setCourseCode] = useState("All courses");
   const [component, setComponent] = useState("All components");
   const [facultyOrder, setFacultyOrder] = useState("asc");
   const [isExporting, setIsExporting] = useState(false);
+  const [rawDirectoryRows, setRawDirectoryRows] = useState(null);
 
-  const facultyList = useFaculty(facultyOrder);
-  const courses = useMemo(() => {
-    return buckets
-      .flatMap((bucket) => bucket.subjects)
-      .sort((a, b) => a.name.localeCompare(b.name));
+  // Normalize active student cohort cluster (Cluster-1 or Cluster-2)
+  const normalizedCluster = useMemo(() => {
+    if (!cluster) return "Cluster-1";
+    if (cluster === "Cluster 1" || cluster === "C1" || cluster === "Cluster-1") return "Cluster-1";
+    if (cluster === "Cluster 2" || cluster === "C2" || cluster === "Cluster-2") return "Cluster-2";
+    return cluster;
+  }, [cluster]);
+
+  // Fetch this student's specific academic faculty directory from live DB
+  useEffect(() => {
+    if (!studentId) return;
+    fetch(`/portal-api/faculty?studentId=${studentId}`)
+      .then((r) => r.json())
+      .then((res) => {
+        if (res.ok && Array.isArray(res.data) && res.data.length > 0) {
+          setRawDirectoryRows(res.data);
+        }
+      })
+      .catch(() => {});
+  }, [studentId]);
+
+  const allCatalogCourses = useMemo(() => {
+    return buckets.flatMap((bucket) => bucket.subjects);
   }, []);
 
   const directoryRows = useMemo(() => {
-    return facultyList
-      .flatMap((person) =>
-        person.subjects.flatMap((subjectName) => {
-          const subject = courses.find((item) => item.name === subjectName);
-          return person.components.map((teachingComponent) => ({
-            person,
-            subjectName,
-            subject,
-            teachingComponent,
-          }));
-        }),
-      )
-      .filter(({ person, subjectName, subject, teachingComponent }) => {
-        const text =
-          `${person.name} ${person.id} ${subject?.code || ""} ${subjectName} ${teachingComponent} ${componentNames[teachingComponent]}`.toLowerCase();
-        return (
-          text.includes(query.toLowerCase()) &&
-          (courseCode === "All courses" || subject?.code === courseCode) &&
-          (component === "All components" || teachingComponent === component)
-        );
+    // If student-specific directory rows were fetched from live backend
+    let baseRows = [];
+    if (rawDirectoryRows && rawDirectoryRows.length > 0) {
+      baseRows = rawDirectoryRows;
+    } else {
+      // Fallback to cluster allocations
+      const clusterAllocations = allocations.filter((a) => a.cluster_id === normalizedCluster);
+      const codeToBucket = {};
+      buckets.forEach((b) => {
+        b.subjects.forEach((s) => {
+          codeToBucket[s.code] = b.id;
+        });
       });
-  }, [facultyList, courses, query, courseCode, component]);
+
+      baseRows = clusterAllocations.map((alloc) => {
+        const subject = allCatalogCourses.find((item) => item.code === alloc.course_code);
+        const actualCourseName = subject?.name || alloc.course_name || alloc.course_code;
+        const bucketNo = codeToBucket[alloc.course_code] || alloc.bucket_id || "C0";
+
+        return {
+          bucketNo,
+          courseCode: alloc.course_code,
+          courseName: actualCourseName,
+          sectionNumber: alloc.section_number,
+          section: alloc.section_id,
+          component: alloc.component,
+          empId: alloc.faculty_id,
+          facultyName: alloc.faculty_name || `Faculty Member (${alloc.faculty_id})`,
+        };
+      });
+    }
+
+    // Filter by user search query, course code, and component
+    const filtered = baseRows.filter(({ facultyName, empId, section, courseCode: cCode, courseName, component: comp, bucketNo }) => {
+      const text =
+        `${bucketNo} ${facultyName} ${empId} ${section} ${cCode} ${courseName} ${comp} ${componentNames[comp] || ""}`.toLowerCase();
+      return (
+        text.includes(query.toLowerCase()) &&
+        (courseCode === "All courses" || cCode === courseCode) &&
+        (component === "All components" || comp === component)
+      );
+    });
+
+    // Sort strictly on the basis of Bucket, then Section Number, then Delivery Component
+    const multiplier = facultyOrder === "desc" ? -1 : 1;
+    return filtered.sort((a, b) => {
+      return (
+        a.bucketNo.localeCompare(b.bucketNo, undefined, { numeric: true }) ||
+        (a.sectionNumber - b.sectionNumber) ||
+        a.component.localeCompare(b.component) ||
+        (multiplier * a.facultyName.localeCompare(b.facultyName))
+      );
+    });
+  }, [rawDirectoryRows, normalizedCluster, allCatalogCourses, query, courseCode, component, facultyOrder]);
+
+  const courses = useMemo(() => {
+    const map = new Map();
+    const source = rawDirectoryRows && rawDirectoryRows.length > 0 ? rawDirectoryRows : directoryRows;
+    source.forEach((r) => {
+      if (!map.has(r.courseCode)) {
+        map.set(r.courseCode, { code: r.courseCode, name: r.courseName });
+      }
+    });
+    return Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name));
+  }, [rawDirectoryRows, directoryRows]);
 
   const hasActiveFilters = query.trim() !== "" || courseCode !== "All courses" || component !== "All components";
 
@@ -71,7 +132,7 @@ export default function FacultyDirectory({ cluster }) {
       doc.setFont("helvetica", "normal");
       doc.setFontSize(9);
       doc.setTextColor(190, 205, 225);
-      doc.text("Academic Semester 5 · Faculty Allocation Directory", 14, 18);
+      doc.text("Academic Semester 8 · Faculty Allocation Directory", 14, 18);
 
       // Meta Info
       doc.setFontSize(8);
@@ -83,19 +144,20 @@ export default function FacultyDirectory({ cluster }) {
       });
       doc.text(`Generated on: ${today}  |  Assigned Cohort: ${cluster || "Cluster 2"}  |  Total Allocations: ${directoryRows.length}`, 14, 31);
 
-      // Build table rows
-      const tableRows = directoryRows.map(({ person, subjectName, subject, teachingComponent }) => [
-        person.id,
-        person.name,
-        subject ? sectionFor(person.id, cluster) : "S - 58",
-        `${teachingComponent} (${componentNames[teachingComponent] || teachingComponent})`,
-        subject?.code || "TBA",
-        subjectName,
+      // Build table rows (7 columns: BUCKET NO., COURSE CODE, NAME OF THE COURSE, SECTION NUMBER, DELIVERY COMPONENT, EMP ID, NAME OF THE FACULTY)
+      const tableRows = directoryRows.map((r) => [
+        r.bucketNo,
+        r.courseCode,
+        r.courseName,
+        r.sectionNumber,
+        r.component,
+        r.empId,
+        r.facultyName,
       ]);
 
       autoTable(doc, {
         startY: 35,
-        head: [["EMP ID", "Faculty Member", "Section", "Component", "Course Code", "Course Name"]],
+        head: [["BUCKET NO.", "COURSE CODE", "NAME OF THE COURSE", "SECTION NUMBER", "DELIVERY COMPONENT", "EMP ID", "NAME OF THE FACULTY"]],
         body: tableRows,
         theme: "striped",
         headStyles: {
@@ -114,14 +176,15 @@ export default function FacultyDirectory({ cluster }) {
           fillColor: [248, 250, 252],
         },
         columnStyles: {
-          0: { cellWidth: 22 },
-          1: { cellWidth: 46, fontStyle: "bold" },
-          2: { cellWidth: 20 },
-          3: { cellWidth: 32 },
-          4: { cellWidth: 24 },
-          5: { cellWidth: 46 },
+          0: { cellWidth: 18 },
+          1: { cellWidth: 26 },
+          2: { cellWidth: 54 },
+          3: { cellWidth: 20 },
+          4: { cellWidth: 18 },
+          5: { cellWidth: 20 },
+          6: { cellWidth: 38, fontStyle: "bold" },
         },
-        margin: { left: 14, right: 14, bottom: 16 },
+        margin: { left: 8, right: 8, bottom: 16 },
         didDrawPage: (data) => {
           // Footer Page Number
           const pageCount = doc.internal.getNumberOfPages();
@@ -257,49 +320,55 @@ export default function FacultyDirectory({ cluster }) {
         <table className="admin-data-table">
           <thead>
             <tr>
-              <th style={{ width: "14%" }}>EMP ID</th>
-              <th style={{ width: "24%" }}>Faculty Member</th>
-              <th style={{ width: "12%" }}>Section</th>
-              <th style={{ width: "14%" }}>Component</th>
-              <th style={{ width: "14%" }}>Course Code</th>
-              <th style={{ width: "22%" }}>Course Name</th>
+              <th style={{ width: "10%" }}>BUCKET NO.</th>
+              <th style={{ width: "14%" }}>COURSE CODE</th>
+              <th style={{ width: "26%" }}>NAME OF THE COURSE</th>
+              <th style={{ width: "12%" }}>SECTION NUMBER</th>
+              <th style={{ width: "10%" }}>DELIVERY COMPONENT</th>
+              <th style={{ width: "10%" }}>EMP ID</th>
+              <th style={{ width: "18%" }}>NAME OF THE FACULTY</th>
             </tr>
           </thead>
           <tbody>
-            {directoryRows.map(({ person, subjectName, subject, teachingComponent }) => (
-              <tr key={`${person.id}-${subjectName}-${teachingComponent}`} className="admin-table-row">
+            {directoryRows.map((r) => (
+              <tr key={`${r.bucketNo}-${r.courseCode}-${r.sectionNumber}-${r.component}-${r.empId}`} className="admin-table-row">
                 <td>
-                  <span className="font-mono text-xs font-semibold text-slate-700 bg-slate-100 px-2 py-0.5 rounded">
-                    {person.id}
+                  <span className="font-semibold text-xs text-slate-800 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                    {r.bucketNo}
                   </span>
                 </td>
                 <td>
-                  <strong className="text-slate-900 font-semibold text-sm">{person.name}</strong>
+                  <span className="font-mono text-xs text-blue-700 font-semibold">
+                    {r.courseCode}
+                  </span>
+                </td>
+                <td>
+                  <span className="text-xs text-slate-800 font-medium">{r.courseName}</span>
                 </td>
                 <td>
                   <span className="font-semibold text-slate-800 text-xs">
-                    {subject ? sectionFor(person.id, cluster) : "S - 58"}
+                    {r.sectionNumber} <span className="text-slate-400 font-normal">({r.section})</span>
                   </span>
                 </td>
                 <td>
-                  <span className="badge-component-tag" title={componentNames[teachingComponent]}>
-                    {teachingComponent}
+                  <span className="badge-component-tag" title={componentNames[r.component] || r.component}>
+                    {r.component}
                   </span>
                 </td>
                 <td>
-                  <span className="font-mono text-xs text-blue-700 font-medium">
-                    {subject?.code || "TBA"}
+                  <span className="font-mono text-xs font-semibold text-slate-700 bg-slate-100 px-2 py-0.5 rounded">
+                    {r.empId}
                   </span>
                 </td>
                 <td>
-                  <span className="text-xs text-slate-700 font-medium">{subjectName}</span>
+                  <strong className="text-slate-900 font-semibold text-xs">{r.facultyName}</strong>
                 </td>
               </tr>
             ))}
 
             {!directoryRows.length && (
               <tr>
-                <td colSpan={6} className="admin-table-empty">
+                <td colSpan={7} className="admin-table-empty">
                   No faculty allocations match your active search or filter criteria.
                 </td>
               </tr>

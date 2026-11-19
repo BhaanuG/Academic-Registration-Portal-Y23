@@ -398,22 +398,24 @@
 
 .subject-selection-page .bucket-code-pill {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
   color: #92400e;
   background: #fefce8;
-  border: 1px solid #fde68a;
-  padding: 2px 8px;
-  border-radius: 4px;
+  border: 1.5px solid #fde68a;
+  padding: 3px 10px;
+  border-radius: 6px;
 }
 
 .subject-selection-page .bucket-type-tag {
-  font-size: 11px;
-  font-weight: 600;
-  color: #475569;
-  background: #f1f5f9;
-  padding: 2px 8px;
-  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 750;
+  color: #1e293b;
+  background: #e2e8f0;
+  border: 1px solid #cbd5e1;
+  padding: 3px 11px;
+  border-radius: 6px;
+  letter-spacing: 0.03em;
 }
 
 .subject-selection-page .bucket-header-panel h2 {
@@ -508,14 +510,32 @@
 
 .subject-selection-page .card-top {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
+  gap: 12px;
+}
+
+.subject-selection-page .card-right-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.subject-selection-page .card-left-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
 }
 
 .subject-selection-page .card-code-group {
   display: flex;
   align-items: center;
   gap: 8px;
+  margin-bottom: 2px;
 }
 
 .subject-selection-page .card-code {
@@ -606,9 +626,17 @@
 
 .subject-selection-page .ltps-badge .ltps-matrix-labels,
 .subject-selection-page .ltps-badge .ltps-matrix-values {
-  display: grid;
-  grid-template-columns: repeat(4, 15px);
-  gap: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  text-align: center;
+}
+
+.subject-selection-page .ltps-badge .ltps-matrix-labels span,
+.subject-selection-page .ltps-badge .ltps-matrix-values span {
+  display: inline-block;
+  min-width: 14px;
   text-align: center;
 }
 

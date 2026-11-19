@@ -1,4 +1,4 @@
-import { faculty, sectionFor } from "../../services/academicData";
+import { faculty, sectionFor, getFacultyOptionsForSubject } from "../../services/academicData";
 import { Check, ChevronDown } from "lucide-react";
 
 export default function PreferenceSelect({
@@ -11,20 +11,32 @@ export default function PreferenceSelect({
   subjectCode,
   component = "L",
   cluster = "Cluster 2",
+  sectionFilter,
   placeholder = "Select faculty member...",
   sectionHint,
 }) {
-  // Determine faculty pool: use options prop if provided, else filter default faculty list
+  // Determine faculty pool:
+  // If options passed directly, use them.
+  // Otherwise, use getFacultyOptionsForSubject which orders strictly by Section Number ascending,
+  // showing Section Number, Faculty Name, and Emp ID, scoped to sectionFilter if provided.
   const facultyPool = options && Array.isArray(options)
     ? options
-    : faculty.filter((f) => {
-        const matchesComp = !component || f.components.includes(component);
-        const matchesSub = !subjectCode || f.subjects.some((s) => s === subjectCode || s);
-        return matchesComp && matchesSub;
-      });
+    : (() => {
+        let allocatedOptions = getFacultyOptionsForSubject(subjectCode, component, cluster, sectionFilter);
+        if (allocatedOptions.length === 0 && sectionFilter) {
+          allocatedOptions = getFacultyOptionsForSubject(subjectCode, component, null, sectionFilter);
+        }
+        if (allocatedOptions.length === 0) {
+          allocatedOptions = getFacultyOptionsForSubject(subjectCode, component, cluster);
+        }
+        if (allocatedOptions.length === 0) {
+          allocatedOptions = getFacultyOptionsForSubject(subjectCode, component, null);
+        }
+        return allocatedOptions;
+      })();
 
-  const selectedFaculty = value ? faculty.find((f) => f.id === value) : null;
-  const sectionText = value ? sectionFor(subjectCode, value, component, cluster) : "";
+  const selectedFaculty = value ? faculty.find((f) => f.id === value) || facultyPool.find((f) => f.id === value) : null;
+  const sectionText = value ? (selectedFaculty?.section_id || sectionFor(subjectCode, value, component, cluster)) : "";
 
   // Combine used and excludedIds
   const unavailableIds = [...(used || []), ...(excludedIds || [])];
@@ -37,7 +49,7 @@ export default function PreferenceSelect({
           {value && (
             <span className="pref-saved-pill">
               <Check size={12} />
-              <span>Locked &amp; Saved</span>
+              <span>Preference Saved</span>
             </span>
           )}
         </div>
@@ -51,15 +63,15 @@ export default function PreferenceSelect({
         >
           <option value="">{placeholder}</option>
           {facultyPool.map((person) => {
-            const sec = sectionFor(subjectCode, person.id, component, cluster);
             const isUsed = unavailableIds.includes(person.id) && person.id !== value;
+            const labelText = person.displayLabel || `${person.section_id || "Section"} • ${person.name} (Emp ID: ${person.emp_id || person.id})`;
             return (
               <option
-                key={person.id}
+                key={`${person.id}-${person.section_id || ''}`}
                 value={person.id}
                 disabled={isUsed}
               >
-                {sec} • {person.name} • {person.id}{isUsed ? " — Already chosen" : ""}
+                {labelText}{isUsed ? " — Already chosen" : ""}
               </option>
             );
           })}
@@ -71,10 +83,10 @@ export default function PreferenceSelect({
         {selectedFaculty ? (
           <div className="pref-details">
             <strong>{selectedFaculty.designation || "Faculty Member"}</strong>
-            <span>Section {sectionText}</span>
+            <span>Section {sectionText} • Emp ID: {selectedFaculty.emp_id || selectedFaculty.id}</span>
           </div>
         ) : (
-          <span className="pref-placeholder-hint">Select a faculty to lock in lecture section</span>
+          <span className="pref-placeholder-hint">Select a faculty to assign preference</span>
         )}
       </div>
 

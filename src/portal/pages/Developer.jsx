@@ -10,7 +10,8 @@ const links = [
   ["Email", "mailto:Bhaanugali@gmail.com", Mail],
   ["LinkedIn", "https://www.linkedin.com/in/bhaanu-gali/", Linkedin],
   ["GitHub", "https://github.com/BhaanuG", Github],
-  ["HackerRank", "https://www.hackerrank.com/profile/G_Bhaanu", Code2],
+  ["LeetCode", "https://leetcode.com/u/GBhaanu/", Code2],
+  ["HackerRank", "https://www.hackerrank.com/profile/G_Bhaanu", Trophy],
   ["CodeChef", "https://www.codechef.com/users/g_bhaanu_01", Trophy],
   ["Portfolio", "https://gbhaanu.netlify.app/", BriefcaseBusiness],
 ];
@@ -80,9 +81,9 @@ export default function Developer() {
             <div className="developer-reference-links" aria-label="Developer profiles">
               {links.map(([name, href, Icon]) => (
                 <a key={name} href={href} target={href.startsWith("mailto:") ? undefined : "_blank"} rel="noreferrer">
-                  <Icon size={18} aria-hidden="true" />
+                  <Icon size={15} aria-hidden="true" />
                   <span>{name}</span>
-                  <ExternalLink size={12} style={{ opacity: 0.6, marginLeft: "2px" }} />
+                  <ExternalLink size={10} style={{ opacity: 0.55, marginLeft: "1px" }} />
                 </a>
               ))}
             </div>

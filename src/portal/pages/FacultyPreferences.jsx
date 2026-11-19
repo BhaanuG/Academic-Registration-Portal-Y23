@@ -1,19 +1,127 @@
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router";
 import PageHeading from "../components/common/PageHeading";
 import PreferenceSelect from "../components/academic/PreferenceSelect";
 import { buckets, componentNames, faculty, getSubSectionFaculty, sectionBase, sectionFor } from "../services/academicData";
 import { RotateCcw, AlertTriangle, CheckCircle2, X } from "lucide-react";
+import OverlayPortal from "../components/common/OverlayPortal";
 
-export default function Preferences({ selections, prefs, setPrefs, cluster, goTo }) {
-  const entries = buckets.map((bucket) => ({
-    bucket,
-    subject: bucket.subjects.find((subject) => subject.code === selections[bucket.id]),
-  }));
-  const [activeBucket, setActiveBucket] = useState(entries[0].bucket.id);
+export default function Preferences({ studentId, selections, prefs, setPrefs, cluster }) {
+  const [studentBuckets, setStudentBuckets] = useState(null);
+  const [studentSubjects, setStudentSubjects] = useState(null);
+
+  // Fetch student personalized buckets and elective courses from live DB
+  useEffect(() => {
+    if (!studentId) return;
+    Promise.all([
+      fetch(`/portal-api/student-eligible-buckets?studentId=${studentId}`).then((r) => r.json()),
+      fetch(`/portal-api/student-subjects?studentId=${studentId}`).then((r) => r.json()),
+    ])
+      .then(([bRes, sRes]) => {
+        if (bRes.ok && Array.isArray(bRes.data) && bRes.data.length > 0) {
+          setStudentBuckets(bRes.data);
+        }
+        if (sRes.ok && Array.isArray(sRes.data) && sRes.data.length > 0) {
+          setStudentSubjects(sRes.data);
+        }
+      })
+      .catch(() => {});
+  }, [studentId]);
+
+  // Construct entries using student-specific buckets & subjects with fallback
+  const entries = useMemo(() => {
+    const activeBucketsList = studentBuckets && studentBuckets.length > 0
+      ? studentBuckets.map((sb) => {
+          const fallback = buckets.find((b) => b.id === sb.id);
+          const matchingSubjects = studentSubjects ? studentSubjects.filter((s) => s.bucket_id === sb.id) : [];
+          const customSubjects = matchingSubjects.flatMap((ms) => {
+            if (ms.is_elective && ms.eligible_courses && ms.eligible_courses.length > 0) {
+              return ms.eligible_courses.map((ec) => ({
+                code: ec.code,
+                name: ec.name,
+                credits: ec.credits ?? 3,
+                ltps: ec.ltps || (ec.lecture_hours !== undefined && ec.lecture_hours !== null ? [ec.lecture_hours, ec.tutorial_hours ?? 0, ec.practical_hours ?? 0, ec.skill_hours ?? 0] : [3, 0, 0, 0]),
+                components: ec.components || ["L"],
+                sections: ec.assignedSections || ms.sections,
+                optionSheetRange: ms.optionSheetRange,
+                description: ec.description || "",
+              }));
+            }
+            return [{
+              code: ms.course_code,
+              name: ms.course_name,
+              credits: ms.credits ?? 3,
+              ltps: ms.ltps || (ms.lecture_hours !== undefined && ms.lecture_hours !== null ? [ms.lecture_hours, ms.tutorial_hours ?? 0, ms.practical_hours ?? 0, ms.skill_hours ?? 0] : [3, 0, 0, 0]),
+              components: ms.components || ["L"],
+              sections: ms.sections,
+              optionSheetRange: ms.optionSheetRange,
+              description: "",
+            }];
+          });
+
+          // Deduplicate
+          const seen = new Set();
+          const unique = [];
+          (customSubjects.length > 0 ? customSubjects : (fallback?.subjects || [])).forEach((s) => {
+            if (!seen.has(s.code)) {
+              seen.add(s.code);
+              unique.push(s);
+            }
+          });
+
+          return {
+            id: sb.id,
+            short: sb.short_code || fallback?.short || sb.id,
+            title: sb.title || fallback?.title || sb.id,
+            subjects: unique,
+          };
+        })
+      : buckets;
+
+    return activeBucketsList.map((bucket) => {
+      const selectedCode = selections[bucket.id];
+      // Search in current bucket subjects first, then search all buckets fallback
+      let subject = bucket.subjects.find((s) => s.code === selectedCode);
+      if (!subject && selectedCode) {
+        for (const b of buckets) {
+          const found = b.subjects.find((s) => s.code === selectedCode);
+          if (found) {
+            subject = found;
+            break;
+          }
+        }
+      }
+      return {
+        bucket,
+        subject,
+      };
+    });
+  }, [studentBuckets, studentSubjects, selections]);
+
+  const [activeBucket, setActiveBucket] = useState("C0");
+
+  useEffect(() => {
+    if (entries.length > 0 && !entries.some((e) => e.bucket.id === activeBucket)) {
+      setActiveBucket(entries[0].bucket.id);
+    }
+  }, [entries, activeBucket]);
   const [showResetAllModal, setShowResetAllModal] = useState(false);
   const [showResetCurrentModal, setShowResetCurrentModal] = useState(false);
   const [resetStatus, setResetStatus] = useState("");
+
+  // Close modals on Escape key
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        setShowResetAllModal(false);
+        setShowResetCurrentModal(false);
+      }
+    };
+    if (showResetAllModal || showResetCurrentModal) {
+      window.addEventListener("keydown", handleKeyDown);
+      return () => window.removeEventListener("keydown", handleKeyDown);
+    }
+  }, [showResetAllModal, showResetCurrentModal]);
 
   const activeEntry = entries.find((entry) => entry.bucket.id === activeBucket) || entries[0];
   const subject = activeEntry.subject;
@@ -26,8 +134,8 @@ export default function Preferences({ selections, prefs, setPrefs, cluster, goTo
       const current = [...(all[key] || ["", "", ""])];
       current[rank] = value;
       next[key] = current;
-      if (component === "L") {
-        const otherComponents = subject.components.filter((c) => c !== "L");
+      if (component === primaryComponent) {
+        const otherComponents = subject.components.filter((c) => c !== primaryComponent);
         otherComponents.forEach((c) => {
           [0, 1, 2].forEach((subRank) => {
             const subKey = `${subject.code}-${c}-L${rank + 1}-R${subRank + 1}`;
@@ -76,13 +184,36 @@ export default function Preferences({ selections, prefs, setPrefs, cluster, goTo
   };
 
   const rankLabels = ["First preference", "Second preference", "Third preference"];
-  const subComponents = subject ? subject.components.filter((c) => c !== "L") : [];
+  
+  // Priority sequence: Lecture (L) -> Tutorial (T) -> Practical (P) -> Skill (S)
+  const primaryComponent = subject
+    ? (subject.components.includes("L")
+        ? "L"
+        : subject.components.includes("T")
+        ? "T"
+        : subject.components.includes("P")
+        ? "P"
+        : subject.components.includes("S")
+        ? "S"
+        : subject.components[0] || "L")
+    : "L";
+  const primaryComponentName = componentNames[primaryComponent] || (
+    primaryComponent === "L" ? "Lecture" :
+    primaryComponent === "T" ? "Tutorial" :
+    primaryComponent === "P" ? "Practical" :
+    primaryComponent === "S" ? "Skill" : primaryComponent
+  );
+  const subComponents = subject ? subject.components.filter((c) => c !== primaryComponent) : [];
 
   return (
     <>
       <PageHeading
         title="Faculty Preferences"
-        description="Rank three faculty choices for Lecture. Each selected lecture section unlocks a dedicated sub-preference table to rank sub-sections (A, B, C) for Tutorial, Practical, and Skill."
+        description={
+          subComponents.length > 0
+            ? `Rank three faculty choices for ${primaryComponentName}. Each selected section unlocks a dedicated sub-preference table to rank sub-sections (A, B, C) for remaining course components.`
+            : `Rank three faculty choices in order of preference for ${primaryComponentName}. This course has a single delivery component (${primaryComponent}).`
+        }
         aside={
           <div className="flex flex-col items-end gap-2">
             <button
@@ -111,9 +242,12 @@ export default function Preferences({ selections, prefs, setPrefs, cluster, goTo
         <aside className="selected-course-nav">
           <p className="eyebrow">Your selected subjects</p>
           {entries.map(({ bucket, subject: item }) => {
+            const itemPrimary = item
+              ? (item.components.includes("L") ? "L" : item.components[0] || "L")
+              : "L";
             const completed =
               item &&
-              (prefs[`${item.code}-L`] || []).filter(Boolean).length === 3;
+              (prefs[`${item.code}-${itemPrimary}`] || []).filter(Boolean).length === 3;
             return (
               <button
                 key={bucket.id}
@@ -152,13 +286,7 @@ export default function Preferences({ selections, prefs, setPrefs, cluster, goTo
                 You selected “None of the above” for this bucket. Return to Course Selection and
                 choose a course before entering faculty preferences.
               </p>
-              <button
-                type="button"
-                className="secondary-btn"
-                onClick={() => goTo ? goTo("subjects") : window.history.back()}
-              >
-                Back to Course Selection
-              </button>
+              <Link to="/KLEF/3-2/Course-Bucket-Selection">Back to Course Selection</Link>
             </div>
           ) : (
             <>
@@ -196,22 +324,23 @@ export default function Preferences({ selections, prefs, setPrefs, cluster, goTo
                           : cluster?.replace(/Cluster\s*/i, "C ") || "C 2"}
                       </strong>
                     </div>
-                    {subject?.ltps && (
-                      <div className="cohort-ltps-grid-table" title="Lecture | Tutorial | Practical | Skill Credit Weight">
-                        <div className="grid-row grid-head">
-                          <span>L</span>
-                          <span>T</span>
-                          <span>P</span>
-                          <span>S</span>
+                    {(() => {
+                      const labels = ["L", "T", "P", "S"];
+                      return (
+                        <div className="cohort-ltps-grid-table" title="Course Credit Weight (L | T | P | S)">
+                          <div className="grid-row grid-head">
+                            {labels.map((lbl) => (
+                              <span key={lbl}>{lbl}</span>
+                            ))}
+                          </div>
+                          <div className="grid-row grid-body">
+                            {labels.map((_, idx) => (
+                              <span key={idx}>-</span>
+                            ))}
+                          </div>
                         </div>
-                        <div className="grid-row grid-body">
-                          <span>{subject.ltps[0]}</span>
-                          <span>{subject.ltps[1]}</span>
-                          <span>{subject.ltps[2]}</span>
-                          <span>{subject.ltps[3]}</span>
-                        </div>
-                      </div>
-                    )}
+                      );
+                    })()}
                   </div>
                 </div>
               </header>
@@ -220,20 +349,27 @@ export default function Preferences({ selections, prefs, setPrefs, cluster, goTo
                 <div className="card-heading">
                   <div>
                     <span className="eyebrow">Primary allocation</span>
-                    <h3>Lecture faculty &amp; main section</h3>
+                    <h3>{primaryComponentName}</h3>
                     <p>
-                      Select three distinct faculty members in order of preference. Your choice sets
-                      the section anchor for tutorials, practicals, and skills.
+                      {subComponents.length > 0
+                        ? "Select three distinct faculty members in order of preference. Your choice sets the section anchor for tutorials, practicals, and skills."
+                        : `Select three distinct faculty members in order of preference for ${primaryComponentName}.`}
                     </p>
                   </div>
                 </div>
 
                 <div className="preference-selectors">
                   {rankLabels.map((label, rank) => {
-                    const lecturePrefs = prefs[`${subject.code}-L`] || ["", "", ""];
-                    const currentVal = lecturePrefs[rank] || "";
-                    const excluded = lecturePrefs.filter((val, i) => i !== rank && Boolean(val));
+                    const primaryPrefs = prefs[`${subject.code}-${primaryComponent}`] || ["", "", ""];
+                    const currentVal = primaryPrefs[rank] || "";
+                    const excluded = primaryPrefs.filter((val, i) => i !== rank && Boolean(val));
                     const selectedFaculty = faculty.find((f) => f.id === currentVal);
+                    // Determine assigned section range for this subject/component
+                    const assignedRange = subject.optionSheetRange || (
+                      primaryComponent === "P"
+                        ? (subject.sections?.pracSection !== "NA" ? subject.sections?.pracSection : null)
+                        : (subject.sections?.lecSection !== "NA" ? subject.sections?.lecSection : null)
+                    );
 
                     return (
                       <div key={label} className="preference-rank-field">
@@ -243,17 +379,18 @@ export default function Preferences({ selections, prefs, setPrefs, cluster, goTo
                         </label>
                         <PreferenceSelect
                           subjectCode={subject.code}
-                          component="L"
+                          component={primaryComponent}
                           cluster={cluster}
+                          sectionFilter={assignedRange}
                           value={currentVal}
-                          onChange={(val) => setPreference("L", rank, val)}
+                          onChange={(val) => setPreference(primaryComponent, rank, val)}
                           excludedIds={excluded}
                           placeholder={`Choose ${label.toLowerCase()}`}
                         />
                         {selectedFaculty && (
                           <div className="selected-faculty-chip">
                             <span className="faculty-badge">Section</span>
-                            <strong>{sectionFor(subject.code, selectedFaculty.id, "L", cluster)}</strong>
+                            <strong>{sectionFor(subject.code, selectedFaculty.id, primaryComponent, cluster)}</strong>
                             <span className="faculty-name">{selectedFaculty.name}</span>
                           </div>
                         )}
@@ -267,21 +404,21 @@ export default function Preferences({ selections, prefs, setPrefs, cluster, goTo
                 <div className="subcomponent-preferences">
                   <div className="card-heading">
                     <div>
-                      <h3>Sub-component preference matrix</h3>
+                      <h3>{subComponents.map((c) => componentNames[c] || c).join(" & ")}</h3>
                       <p>
-                        For each lecture choice, configure your preferred order for sub-sections.
+                        For each {primaryComponentName.toLowerCase()} choice, configure your preferred order for sub-sections.
                         Sub-section faculty are assigned by the department based on availability.
                       </p>
                     </div>
                   </div>
 
                   {rankLabels.map((label, lectureRank) => {
-                    const lecturePrefs = prefs[`${subject.code}-L`] || ["", "", ""];
-                    const lectureFacultyId = lecturePrefs[lectureRank];
-                    const lectureFaculty = faculty.find((f) => f.id === lectureFacultyId);
-                    const baseSec = lectureFaculty ? sectionBase(sectionFor(subject.code, lectureFaculty.id, "L", cluster)) : null;
+                    const primaryPrefs = prefs[`${subject.code}-${primaryComponent}`] || ["", "", ""];
+                    const primaryFacultyId = primaryPrefs[lectureRank];
+                    const primaryFaculty = faculty.find((f) => f.id === primaryFacultyId);
+                    const baseSec = primaryFaculty ? sectionBase(sectionFor(subject.code, primaryFaculty.id, primaryComponent, cluster)) : null;
 
-                    if (!lectureFaculty) {
+                    if (!primaryFaculty) {
                       return (
                         <div key={label} className="subcomponent-tier-locked">
                           <div className="locked-header">
@@ -289,8 +426,7 @@ export default function Preferences({ selections, prefs, setPrefs, cluster, goTo
                             <strong>{label} sub-components locked</strong>
                           </div>
                           <p>
-                            Select a faculty member for {label.toLowerCase()} above to unlock
-                            tutorial, practical, and skill section preferences.
+                            Select a faculty member for {label.toLowerCase()} above to unlock sub-section preferences.
                           </p>
                         </div>
                       );
@@ -304,7 +440,7 @@ export default function Preferences({ selections, prefs, setPrefs, cluster, goTo
                             <div>
                               <strong>{label}</strong>
                               <span>
-                                {lectureFaculty.name} · Section {sectionFor(subject.code, lectureFaculty.id, "L", cluster)}
+                                {primaryFaculty.name} · Section {sectionFor(subject.code, primaryFaculty.id, primaryComponent, cluster)}
                               </span>
                             </div>
                           </div>
@@ -421,9 +557,13 @@ export default function Preferences({ selections, prefs, setPrefs, cluster, goTo
         </section>
       </div>
 
-      {/* Confirmation Modal for Resetting Single Subject Preferences */}
+      {/* Confirmation Modal for Resetting Single Subject Preferences via OverlayPortal */}
       {showResetCurrentModal && subject && (
-        <div className="modal-backdrop-centered" onClick={() => setShowResetCurrentModal(false)}>
+        <OverlayPortal
+          isOpen={showResetCurrentModal}
+          onClose={() => setShowResetCurrentModal(false)}
+          className="modal-backdrop-centered"
+        >
           <div
             className="admin-confirm-dialog"
             onClick={(e) => e.stopPropagation()}
@@ -474,12 +614,16 @@ export default function Preferences({ selections, prefs, setPrefs, cluster, goTo
               </button>
             </div>
           </div>
-        </div>
+        </OverlayPortal>
       )}
 
-      {/* Confirmation Modal for Resetting All Faculty Preferences */}
+      {/* Confirmation Modal for Resetting All Faculty Preferences via OverlayPortal */}
       {showResetAllModal && (
-        <div className="modal-backdrop-centered" onClick={() => setShowResetAllModal(false)}>
+        <OverlayPortal
+          isOpen={showResetAllModal}
+          onClose={() => setShowResetAllModal(false)}
+          className="modal-backdrop-centered"
+        >
           <div
             className="admin-confirm-dialog"
             onClick={(e) => e.stopPropagation()}
@@ -530,7 +674,7 @@ export default function Preferences({ selections, prefs, setPrefs, cluster, goTo
               </button>
             </div>
           </div>
-        </div>
+        </OverlayPortal>
       )}
     </>
   );
