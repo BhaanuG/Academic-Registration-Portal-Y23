@@ -10,9 +10,7 @@ import {
   Search,
   AlertTriangle,
 } from "lucide-react";
-import { resetPasswordToDefaultDob, rememberDateOfBirth } from "../../services/authService";
 import DatePicker from "../../components/common/DatePicker";
-import OverlayPortal from "../../components/common/OverlayPortal";
 
 export default function AdminResetPasswordPage() {
   const [identifier, setIdentifier] = useState("");
@@ -28,18 +26,6 @@ export default function AdminResetPasswordPage() {
   const [message, setMessage] = useState(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === "Escape") {
-        setShowConfirmModal(false);
-      }
-    };
-    if (showConfirmModal) {
-      window.addEventListener("keydown", handleKeyDown);
-      return () => window.removeEventListener("keydown", handleKeyDown);
-    }
-  }, [showConfirmModal]);
-
   // Perform search / lookup when identifier changes
   useEffect(() => {
     const cleanId = identifier.trim();
@@ -54,42 +40,62 @@ export default function AdminResetPasswordPage() {
     setIsSearching(true);
     setNotFound(false);
 
-    // Look up student from live database API
-    fetch(`/portal-api/student-profile?studentId=${cleanId}`)
-      .then((r) => r.json())
-      .then((res) => {
-        if (res.ok && res.data) {
-          const s = res.data;
-          const officialDob = s.date_of_birth || "2005-01-01";
-          setMatchedAccount({
-            id: s.id || `student-${s.student_id}`,
-            type: "student",
-            identifier: s.student_id,
-            name: s.name,
-            email: s.university_email || `${s.student_id}@kluniversity.in`,
-            department: `${s.program || 'CSE'} · Computer Science & Engineering`,
-            cluster: s.cluster_id || "Pending institutional verification",
-            dateOfBirth: officialDob,
-            counselor: s.counselor_name || "Not assigned",
-          });
-          setDobPassword(officialDob);
-          setNotFound(false);
-        } else {
-          setMatchedAccount(null);
-          setNotFound(true);
-        }
-      })
-      .catch(() => {
+    // Look up student from localStorage first, then remote
+    const localStudents = JSON.parse(localStorage.getItem("klef-admin-students") || "[]");
+    let found = localStudents.find(
+      (s) => s.username === cleanId || s.universityEmail?.toLowerCase() === cleanId.toLowerCase()
+    );
+
+    if (found) {
+      setMatchedAccount({
+        id: found.id || found.username,
+        type: "student",
+        identifier: found.username,
+        name: found.name || "Student",
+        email: found.universityEmail || `${found.username}@kluniversity.in`,
+        department: "Computer Science & Engineering",
+        cluster: found.cluster || "Cluster 2",
+        dateOfBirth: found.dateOfBirth || "2005-04-18",
+        counselor: found.counselor?.name || "Dr. S. Srinivasa Rao",
+      });
+      setDobPassword(found.dateOfBirth || "2005-04-18");
+      setIsSearching(false);
+    } else {
+      // Check local storage records or default student record
+      const localStudents = JSON.parse(localStorage.getItem("klef-admin-students") || "[]");
+      const remoteStudent = localStudents.find(
+        (s) => s.username === cleanId || s.universityEmail?.toLowerCase() === cleanId.toLowerCase()
+      );
+      if (remoteStudent || cleanId === "2400030952") {
+        const studentRecord = remoteStudent || {
+          id: "student-2400030952",
+          username: "2400030952",
+          name: "Anirudh Varma",
+          universityEmail: "2400030952@kluniversity.in",
+          cluster: "Cluster 2",
+          dateOfBirth: "2005-04-18",
+        };
+        setMatchedAccount({
+          id: studentRecord.id || studentRecord.username,
+          type: "student",
+          identifier: studentRecord.username,
+          name: studentRecord.name || "Student",
+          email: studentRecord.universityEmail || `${studentRecord.username}@kluniversity.in`,
+          department: "Computer Science & Engineering",
+          cluster: studentRecord.cluster || "Cluster 2",
+          dateOfBirth: studentRecord.dateOfBirth || "2005-04-18",
+          counselor: "Dr. S. Srinivasa Rao",
+        });
+        setDobPassword(studentRecord.dateOfBirth || "2005-04-18");
+      } else {
         setMatchedAccount(null);
         setNotFound(true);
-      })
-      .finally(() => {
-        setIsSearching(false);
-      });
+      }
+      setIsSearching(false);
+    }
   }, [identifier]);
 
-  // Admin can submit with just the student ID (dobPassword defaults to their registered DOB or 2005-01-01)
-  const canSubmit = Boolean(matchedAccount);
+  const canSubmit = Boolean(matchedAccount && dobPassword);
 
   const handleInitiateSubmit = (e) => {
     e.preventDefault();
@@ -104,45 +110,25 @@ export default function AdminResetPasswordPage() {
     setMessage(null);
 
     const targetId = matchedAccount.identifier;
-    const targetDob = dobPassword || matchedAccount.dateOfBirth || "2005-01-01";
 
     try {
-      // 1. Clear any custom password set by the student, reverting to DOB
-      resetPasswordToDefaultDob(targetId);
-      rememberDateOfBirth(targetId, targetDob);
-
-      // 2. Persist update in SQLite via server API
-      try {
-        await fetch("/portal-api/student-update", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            studentId: targetId,
-            updates: { date_of_birth: targetDob },
-            reason: "Administrative password reset to official Date of Birth credential",
-          }),
-        });
-      } catch (err) {
-        console.warn("Backend student DOB sync note:", err);
-      }
-
-      // 3. Update student record's DOB in local admin list
+      // Update student record's DOB in local admin list
       const localData = JSON.parse(localStorage.getItem("klef-admin-students") || "[]");
       const updated = localData.map((s) =>
-        s.username === targetId ? { ...s, dateOfBirth: targetDob } : s
+        s.username === targetId ? { ...s, dateOfBirth: dobPassword } : s
       );
       localStorage.setItem("klef-admin-students", JSON.stringify(updated));
 
       setMessage({
         type: "success",
-        title: "Password Reset Completed",
-        text: `Password reset successful for ${matchedAccount.name} (${targetId}). Any previously set custom password has been cleared. The student can now sign in using Date of Birth (${targetDob}) or the universal default (01 Jan 2005).`,
+        title: "Demonstration Reset Completed",
+        text: `Credential updated for ${matchedAccount.name} (${targetId}) in demonstration state. (In production, password reset requires institutional backend synchronization).`,
       });
     } catch {
       setMessage({
         type: "error",
         title: "Reset Operation Failed",
-        text: "Error while resetting student credential.",
+        text: "Demonstration error while resetting student record.",
       });
     } finally {
       setIsSubmitting(false);
@@ -295,13 +281,9 @@ export default function AdminResetPasswordPage() {
         </form>
       </div>
 
-      {/* Confirmation Modal via OverlayPortal */}
+      {/* Confirmation Modal */}
       {showConfirmModal && matchedAccount && (
-        <OverlayPortal
-          isOpen={showConfirmModal}
-          onClose={() => setShowConfirmModal(false)}
-          className="student-detail-drawer-scrim"
-        >
+        <div className="student-detail-drawer-scrim" onClick={() => setShowConfirmModal(false)}>
           <div
             className="admin-confirm-dialog"
             onClick={(e) => e.stopPropagation()}
@@ -358,7 +340,7 @@ export default function AdminResetPasswordPage() {
               </button>
             </div>
           </div>
-        </OverlayPortal>
+        </div>
       )}
     </section>
   );
