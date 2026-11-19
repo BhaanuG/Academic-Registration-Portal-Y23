@@ -68,6 +68,7 @@ function PortalRoute() {
           prefs={preferences}
           setPrefs={setPreferences}
           cluster={cluster || "Cluster 2"}
+          goTo={setPage}
         />
       );
     if (page === "directory") return <FacultyDirectory cluster={cluster || "Cluster 2"} />;
@@ -86,7 +87,7 @@ function PortalRoute() {
     return <MyProfile studentId={studentId} />;
   }, [cluster, dataVersion, page, preferences, selections, studentId]);
 
-  if (authenticatedStudent !== studentId) return <Navigate to="/" replace />;
+  if (authenticatedStudent !== studentId) return <Navigate to="/KLEF/8-2/GBS.php" replace />;
 
   return (
     <PortalShell
@@ -95,7 +96,7 @@ function PortalRoute() {
       studentId={studentId}
       onLogout={() => {
         signOut();
-        navigate("/");
+        navigate("/KLEF/8-2/GBS.php");
       }}
     >
       {content}
@@ -106,13 +107,17 @@ function PortalRoute() {
 export function PortalRoutes() {
   return (
     <Routes>
-      <Route path="/" element={<Login />} />
-      <Route path="/login" element={<Login />} />
+      <Route path="/" element={<Navigate to="/KLEF/8-2/GBS.php" replace />} />
+      <Route path="/login" element={<Navigate to="/KLEF/8-2/GBS.php" replace />} />
+      <Route path="/KLEF/8-2/GBS.php" element={<Login />} />
       <Route path="/reset-password" element={<ResetPassword />} />
-      <Route path="/KLEF/3-2/Developer/G-Bhaanu-Sai" element={<Developer />} />
-      <Route path="/KLEF/3-2/Admin/G-Bhaanu-Sai/:pageName?" element={<Admin />} />
-      <Route path="/KLEF/3-2/:studentId/:studentName/:pageName" element={<PortalRoute />} />
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="/KLEF/8-2/Developer/G-Bhaanu-Sai.php" element={<Developer />} />
+      <Route path="/KLEF/8-2/Admin/G-Bhaanu-Sai/:pageName?" element={<Admin />} />
+      <Route path="/KLEF/8-2/:studentId/:studentName/:pageName" element={<PortalRoute />} />
+      {/* Legacy fallback routes redirecting to 8-2 */}
+      <Route path="/KLEF/3-2/Developer/G-Bhaanu-Sai" element={<Navigate to="/KLEF/8-2/Developer/G-Bhaanu-Sai.php" replace />} />
+      <Route path="/KLEF/3-2/Admin/G-Bhaanu-Sai/:pageName?" element={<Navigate to="/KLEF/8-2/Admin/G-Bhaanu-Sai/Dashboard.php" replace />} />
+      <Route path="*" element={<Navigate to="/KLEF/8-2/GBS.php" replace />} />
     </Routes>
   );
 }

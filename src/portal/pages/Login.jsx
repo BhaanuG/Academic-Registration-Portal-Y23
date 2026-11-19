@@ -32,7 +32,7 @@ export default function Login() {
     if (isAdmin) {
       createSession(studentId, "admin");
       signIn(studentId);
-      navigate("/KLEF/3-2/Admin/G-Bhaanu-Sai/Dashboard");
+      navigate("/KLEF/8-2/Admin/G-Bhaanu-Sai/Dashboard.php");
       return;
     }
 

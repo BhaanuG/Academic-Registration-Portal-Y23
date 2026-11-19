@@ -5,7 +5,7 @@ import PreferenceSelect from "../components/academic/PreferenceSelect";
 import { buckets, componentNames, faculty, getSubSectionFaculty, sectionBase, sectionFor } from "../services/academicData";
 import { RotateCcw, AlertTriangle, CheckCircle2, X } from "lucide-react";
 
-export default function Preferences({ selections, prefs, setPrefs, cluster }) {
+export default function Preferences({ selections, prefs, setPrefs, cluster, goTo }) {
   const entries = buckets.map((bucket) => ({
     bucket,
     subject: bucket.subjects.find((subject) => subject.code === selections[bucket.id]),
@@ -152,7 +152,13 @@ export default function Preferences({ selections, prefs, setPrefs, cluster }) {
                 You selected “None of the above” for this bucket. Return to Course Selection and
                 choose a course before entering faculty preferences.
               </p>
-              <Link to="/KLEF/3-2/Course-Bucket-Selection">Back to Course Selection</Link>
+              <button
+                type="button"
+                className="secondary-btn"
+                onClick={() => goTo ? goTo("subjects") : window.history.back()}
+              >
+                Back to Course Selection
+              </button>
             </div>
           ) : (
             <>
