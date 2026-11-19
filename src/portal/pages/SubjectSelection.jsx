@@ -47,17 +47,7 @@ export default function Subjects({ selections, setSelections, goTo }) {
         title="Bucket-Wise Subject Selection"
         description="Choose one subject from each academic bucket. Review credits, teaching components, and syllabus outlines. Your selections save automatically."
         aside={
-          <div className="flex flex-col items-end gap-3">
-            <button
-              type="button"
-              className="reset-action-pill"
-              onClick={() => setShowResetModal(true)}
-              title="Reset course selections to default"
-            >
-              <RotateCcw size={13} />
-              <span>Reset Course Selections</span>
-            </button>
-
+          <div className="subject-aside-meter-row">
             <div className="credit-meter">
               <div className="meter-header">
                 <span>Selected Credits</span>
@@ -69,12 +59,17 @@ export default function Subjects({ selections, setSelections, goTo }) {
               <div className="meter-track">
                 <i style={{ width: `${Math.min((credits / 25) * 100, 100)}%` }} />
               </div>
-              <p>
-                {complete && credits === 25
-                  ? "Requirement met (25 Credits)"
-                  : `${buckets.length - selectedSubjects.length} of ${buckets.length} buckets remaining`}
-              </p>
             </div>
+
+            <button
+              type="button"
+              className="reset-action-pill"
+              onClick={() => setShowResetModal(true)}
+              title="Reset course selections to default"
+            >
+              <RotateCcw size={13} />
+              <span>Reset Course Selections</span>
+            </button>
           </div>
         }
       />

@@ -1,6 +1,16 @@
 /* ==========================================================================
    SUBJECT SELECTION ENHANCEMENTS
    ========================================================================== */
+.subject-aside-meter-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.subject-aside-meter-row .credit-meter {
+  padding-bottom: 10px !important;
+}
+
 .bucket-header-info {
   flex: 1;
   min-width: 0;
