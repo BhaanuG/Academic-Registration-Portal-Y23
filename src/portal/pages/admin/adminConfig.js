@@ -78,28 +78,8 @@ export function readValue(record, path) {
   return path.split(".").reduce((value, key) => value?.[key], record) ?? "";
 }
 
-function autoCapitalizeWords(text) {
-  if (typeof text !== "string" || !text.trim()) return text;
-  return text.replace(/\b([a-zA-Z])([a-zA-Z]*)\b/g, (_, first, rest) => {
-    return first.toUpperCase() + rest.toLowerCase();
-  });
-}
-
 export function normalizeForm(source, section) {
   const value = {};
-  for (const [key] of fields[section] || []) {
-    let val = readValue(source, key);
-    // Auto-capitalize names, titles, departments, designations
-    if (
-      typeof val === "string" &&
-      (key.toLowerCase().includes("name") ||
-        key.toLowerCase().includes("title") ||
-        key.toLowerCase().includes("department") ||
-        key.toLowerCase().includes("designation"))
-    ) {
-      val = autoCapitalizeWords(val);
-    }
-    value[key] = val;
-  }
+  for (const [key] of fields[section] || []) value[key] = readValue(source, key);
   return value;
 }
