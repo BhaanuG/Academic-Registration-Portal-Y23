@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import { ArrowDown, ArrowLeft, BriefcaseBusiness, Code2, ExternalLink, Github, Linkedin, Mail, Sparkles, Trophy } from "lucide-react";
+import { ArrowLeft, BriefcaseBusiness, Code2, ExternalLink, Github, Linkedin, Mail, Sparkles, Trophy } from "lucide-react";
 import { Link, useLocation } from "react-router";
 import Brand from "../components/common/Brand";
 import PortalFooter from "../components/layout/PortalFooter";
@@ -10,8 +9,7 @@ const links = [
   ["Email", "mailto:Bhaanugali@gmail.com", Mail],
   ["LinkedIn", "https://www.linkedin.com/in/bhaanu-gali/", Linkedin],
   ["GitHub", "https://github.com/BhaanuG", Github],
-  ["LeetCode", "https://leetcode.com/u/GBhaanu/", Code2],
-  ["HackerRank", "https://www.hackerrank.com/profile/G_Bhaanu", Trophy],
+  ["HackerRank", "https://www.hackerrank.com/profile/G_Bhaanu", Code2],
   ["CodeChef", "https://www.codechef.com/users/g_bhaanu_01", Trophy],
   ["Portfolio", "https://gbhaanu.netlify.app/", BriefcaseBusiness],
 ];
@@ -20,28 +18,6 @@ export default function Developer() {
   const location = useLocation();
   const { studentId } = useAuth();
   const returnTo = location.state?.from || (studentId ? getLastRoute() : "/") || "/";
-  const [isScrolled, setIsScrolled] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 40) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
-    };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  const handleScrollToExplore = () => {
-    const storySection = document.querySelector(".developer-story");
-    if (storySection) {
-      storySection.scrollIntoView({ behavior: "smooth" });
-    } else {
-      window.scrollBy({ top: 400, behavior: "smooth" });
-    }
-  };
 
   return (
     <div className="developer-shell developer-reference">
@@ -68,10 +44,6 @@ export default function Developer() {
                 <dd>G. Bhaanu Sai</dd>
               </div>
               <div>
-                <dt>Registration Number</dt>
-                <dd>2400030952</dd>
-              </div>
-              <div>
                 <dt>Email</dt>
                 <dd>
                   <a href="mailto:Bhaanugali@gmail.com">Bhaanugali@gmail.com</a>
@@ -81,9 +53,9 @@ export default function Developer() {
             <div className="developer-reference-links" aria-label="Developer profiles">
               {links.map(([name, href, Icon]) => (
                 <a key={name} href={href} target={href.startsWith("mailto:") ? undefined : "_blank"} rel="noreferrer">
-                  <Icon size={15} aria-hidden="true" />
+                  <Icon size={18} aria-hidden="true" />
                   <span>{name}</span>
-                  <ExternalLink size={10} style={{ opacity: 0.55, marginLeft: "1px" }} />
+                  <ExternalLink size={12} style={{ opacity: 0.6, marginLeft: "2px" }} />
                 </a>
               ))}
             </div>
@@ -114,41 +86,6 @@ export default function Developer() {
             </div>
           </section>
         </article>
-
-        {/* Right-Side Vertical Scroll Indicator Button */}
-        <aside
-          className={`developer-scroll-indicator ${isScrolled ? "is-hidden" : ""}`}
-          aria-hidden={isScrolled ? "true" : undefined}
-        >
-          <button
-            type="button"
-            className="scroll-track-button"
-            onClick={handleScrollToExplore}
-            title="Scroll down to read personal story"
-            aria-label="Scroll to explore personal story"
-          >
-            <span className="scroll-char">S</span>
-            <span className="scroll-char">C</span>
-            <span className="scroll-char">R</span>
-            <span className="scroll-char">O</span>
-            <span className="scroll-char">L</span>
-            <span className="scroll-char">L</span>
-            <span className="scroll-word-gap" />
-            <span className="scroll-char">T</span>
-            <span className="scroll-char">O</span>
-            <span className="scroll-word-gap" />
-            <span className="scroll-char">E</span>
-            <span className="scroll-char">X</span>
-            <span className="scroll-char">P</span>
-            <span className="scroll-char">L</span>
-            <span className="scroll-char">O</span>
-            <span className="scroll-char">R</span>
-            <span className="scroll-char">E</span>
-            <div className="scroll-cue-arrow">
-              <ArrowDown size={13} />
-            </div>
-          </button>
-        </aside>
       </main>
       <PortalFooter returnTo={returnTo} />
     </div>
