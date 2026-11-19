@@ -69,11 +69,8 @@ export default function Subjects({ selections, setSelections, goTo }) {
               aria-label="Reset course selections"
             >
               <span className="vertical-text">
-                <span>R</span>
-                <span>e</span>
-                <span>s</span>
-                <span>e</span>
-                <span>t</span>
+                <span>Re</span>
+                <span>Set</span>
               </span>
               <RotateCcw size={13} className="vertical-reset-icon" />
             </button>
