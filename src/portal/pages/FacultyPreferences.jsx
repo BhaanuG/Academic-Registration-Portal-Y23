@@ -173,7 +173,7 @@ export default function Preferences({ selections, prefs, setPrefs, cluster }) {
                     title={`Reset faculty rankings for ${subject.code} only`}
                   >
                     <RotateCcw size={12} />
-                    <span>Reset {activeEntry.bucket.id} Preferences</span>
+                    <span>Reset {activeEntry.bucket.id}</span>
                   </button>
 
                   <div className="cohort-chip">
@@ -413,7 +413,7 @@ export default function Preferences({ selections, prefs, setPrefs, cluster }) {
                 <AlertTriangle size={24} className="text-amber-600" />
               </div>
               <div>
-                <h2>Reset {activeEntry.bucket.id} Preferences</h2>
+                <h2>Reset {activeEntry.bucket.id}</h2>
                 <p>Clear faculty rankings for {subject.name}?</p>
               </div>
             </div>
