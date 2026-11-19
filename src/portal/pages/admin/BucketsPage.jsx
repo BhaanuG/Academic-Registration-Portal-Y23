@@ -15,7 +15,6 @@ import {
   EyeOff,
 } from "lucide-react";
 import { buckets as defaultBuckets } from "../../services/academicData";
-import OverlayPortal from "../../components/common/OverlayPortal";
 
 export default function BucketsPage({
   records,
@@ -31,19 +30,6 @@ export default function BucketsPage({
   const [sortBy, setSortBy] = useState("sortOrder");
   const [sortOrder, setSortOrder] = useState("asc");
   const [selectedBucket, setSelectedBucket] = useState(null);
-  const [liveCourses, setLiveCourses] = useState([]);
-
-  useEffect(() => {
-    // Fetch live course catalog from database API
-    fetch("/portal-api/courses")
-      .then((r) => r.json())
-      .then((res) => {
-        if (res.ok && Array.isArray(res.data)) {
-          setLiveCourses(res.data);
-        }
-      })
-      .catch(() => {});
-  }, []);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -57,34 +43,14 @@ export default function BucketsPage({
     }
   }, [selectedBucket]);
 
-  // Map bucket code to associated curriculum courses using live DB courses with defaultBuckets fallback
+  // Map bucket code to associated curriculum courses
   const bucketCoursesMap = useMemo(() => {
     const map = {};
-    // Seed with fallback
     defaultBuckets.forEach((b) => {
       map[b.id] = b.subjects || [];
     });
-    // Overlay with live courses from DB if available
-    if (liveCourses.length > 0) {
-      const liveMap = {};
-      liveCourses.forEach((c) => {
-        const bId = c.bucket_id;
-        if (!liveMap[bId]) liveMap[bId] = [];
-        liveMap[bId].push({
-          code: c.code,
-          name: c.name,
-          credits: c.credits,
-          components: Array.isArray(c.components) ? c.components : JSON.parse(c.components || '["L"]'),
-          ltps: [c.lecture_hours || 0, c.tutorial_hours || 0, c.practical_hours || 0, c.skill_hours || 0],
-          description: c.description || "",
-        });
-      });
-      Object.keys(liveMap).forEach((bId) => {
-        map[bId] = liveMap[bId];
-      });
-    }
     return map;
-  }, [liveCourses]);
+  }, []);
 
   const filteredAndSorted = useMemo(() => {
     let result = [...records];
@@ -144,7 +110,7 @@ export default function BucketsPage({
           <span className="kicker">Academic Structure</span>
           <h1 className="admin-page-title">Curriculum Course Buckets</h1>
           <p className="admin-page-desc">
-            Define curriculum bucket categories, sequencing order, and manage student election groups for Even Semester.
+            Define curriculum bucket categories, sequencing order, and manage student election groups for Odd Semester.
           </p>
         </div>
         <button type="button" className="primary-btn" onClick={onAdd}>
@@ -216,15 +182,6 @@ export default function BucketsPage({
             <tr>
               <th
                 onClick={() => toggleSort("code")}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    toggleSort("code");
-                  }
-                }}
-                tabIndex={0}
-                role="button"
-                aria-label={`Sort by Bucket Code, currently ${sortBy === "code" ? sortOrder : "none"}`}
                 className="sortable-th"
                 style={{ width: "22%" }}
               >
@@ -235,15 +192,6 @@ export default function BucketsPage({
               </th>
               <th
                 onClick={() => toggleSort("title")}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    toggleSort("title");
-                  }
-                }}
-                tabIndex={0}
-                role="button"
-                aria-label={`Sort by Curriculum Title, currently ${sortBy === "title" ? sortOrder : "none"}`}
                 className="sortable-th"
                 style={{ width: "32%" }}
               >
@@ -254,15 +202,6 @@ export default function BucketsPage({
               </th>
               <th
                 onClick={() => toggleSort("sortOrder")}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    toggleSort("sortOrder");
-                  }
-                }}
-                tabIndex={0}
-                role="button"
-                aria-label={`Sort by Sort Order, currently ${sortBy === "sortOrder" ? sortOrder : "none"}`}
                 className="sortable-th"
                 style={{ width: "16%" }}
               >
@@ -379,17 +318,11 @@ export default function BucketsPage({
         </table>
       </div>
 
-      {/* Slide-out Bucket Detail Drawer via OverlayPortal */}
+      {/* Slide-out Bucket Detail Drawer */}
       {selectedBucket && (
-        <OverlayPortal
-          isOpen={Boolean(selectedBucket)}
-          onClose={() => setSelectedBucket(null)}
-          className="student-detail-drawer-scrim"
-        >
+        <div className="student-detail-drawer-scrim" onClick={() => setSelectedBucket(null)}>
           <aside
             className="student-detail-drawer"
-            role="dialog"
-            aria-modal="true"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="drawer-header">
@@ -426,7 +359,7 @@ export default function BucketsPage({
                   </div>
                   <div>
                     <dt>Semester Context</dt>
-                    <dd>Semester 8 (Even 2026–27)</dd>
+                    <dd>Semester 5 (Odd 2026–27)</dd>
                   </div>
                 </dl>
               </div>
@@ -471,7 +404,7 @@ export default function BucketsPage({
               </div>
             </div>
           </aside>
-        </OverlayPortal>
+        </div>
       )}
     </section>
   );
