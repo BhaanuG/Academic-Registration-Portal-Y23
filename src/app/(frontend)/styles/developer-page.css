@@ -1,6 +1,7 @@
 /* ==========================================================================
-   DEVELOPER INFORMATION PAGE - PREMIUM EDITORIAL STYLES
-   Sophisticated editorial presentation, balanced typography, and reading comfort
+   DEVELOPER INFORMATION PAGE - EXPANDED EDITORIAL LAYOUT
+   Full-width canvas with ~2cm side margins on desktop screens, aligned headers,
+   and sophisticated reading proportions without stretched paragraphs.
    ========================================================================== */
 
 .developer-shell.developer-reference {
@@ -11,22 +12,25 @@
   flex-direction: column;
 }
 
+/* Outer Main Page Container: ~2cm (approx 76px) margins on desktop */
 .developer-reference-page {
   flex: 1 0 auto;
-  max-width: 920px;
   width: 100%;
+  max-width: none;
+  box-sizing: border-box;
   margin: 0 auto;
-  padding: 32px 24px 64px;
+  padding: 32px clamp(20px, 5.5vw, 76px) 64px;
 }
 
-/* University Header */
+/* University Header aligned to the same full-width container */
 .developer-reference-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  width: 100%;
   padding-bottom: 24px;
   border-bottom: 1px solid rgba(226, 232, 240, 0.8);
-  margin-bottom: 36px;
+  margin-bottom: 32px;
 }
 
 .developer-reference-header .return-portal {
@@ -37,7 +41,7 @@
   font-weight: 600;
   color: #24344d;
   text-decoration: none;
-  padding: 8px 16px;
+  padding: 9px 18px;
   border-radius: 8px;
   background: #ffffff;
   border: 1px solid #e2e8f0;
@@ -52,19 +56,22 @@
   transform: translateX(-2px);
 }
 
-/* Card Container */
+/* Main White Card Container: Expands across the available viewport width */
 .developer-reference-card {
+  width: 100%;
+  max-width: none;
   background: #ffffff;
   border-radius: 14px;
   border: 1px solid #e8edf4;
   box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.02);
   overflow: hidden;
-  margin: 0 auto;
+  margin: 0;
+  box-sizing: border-box;
 }
 
 /* Intro Section */
 .developer-intro-card {
-  padding: 44px 48px 36px;
+  padding: clamp(36px, 4vw, 56px) clamp(32px, 5vw, 64px) 36px;
   border-bottom: 1px solid #f1f5f9;
 }
 
@@ -81,17 +88,17 @@
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  margin-bottom: 20px;
+  margin-bottom: 18px;
 }
 
 .developer-intro-card h1 {
   font-family: var(--font-cormorant), Georgia, serif;
-  font-size: clamp(30px, 4vw, 42px);
+  font-size: clamp(32px, 3.5vw, 44px);
   font-weight: 700;
-  line-height: 1.16;
+  line-height: 1.15;
   letter-spacing: -0.025em;
   color: #1e293b;
-  margin: 0 0 18px 0;
+  margin: 0 0 16px 0;
 }
 
 .developer-intro-card h1 span {
@@ -103,20 +110,21 @@
   font-size: 15.5px;
   line-height: 1.7;
   color: #475569;
-  max-width: 680px;
-  margin: 0 0 32px 0;
+  max-width: 880px;
+  margin: 0 0 28px 0;
 }
 
-/* Key Metadata Details */
+/* Key Metadata Details: Horizontal spanning row */
 .developer-details {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 20px;
-  padding: 20px 24px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 24px;
+  padding: 20px 28px;
   background: #f8fafc;
   border: 1px solid #edf2f7;
   border-radius: 10px;
   margin: 0 0 28px 0;
+  max-width: 960px;
 }
 
 .developer-details > div {
@@ -151,18 +159,19 @@
   text-decoration: underline;
 }
 
-/* Links Row */
+/* Social & Professional Links: Clean horizontal flex layout utilizing the expanded width */
 .developer-reference-links {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  align-items: center;
+  gap: 12px;
 }
 
 .developer-reference-links a {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 16px;
+  padding: 8px 18px;
   border-radius: 8px;
   border: 1px solid #e2e8f0;
   background: #ffffff;
@@ -182,26 +191,28 @@
   box-shadow: 0 3px 8px rgba(37, 99, 235, 0.08);
 }
 
-/* Editorial Story Section */
+/* Editorial Story Section: Wide padded canvas with optimal reading measure */
 .developer-story {
-  padding: 48px;
+  padding: clamp(40px, 4.5vw, 64px) clamp(32px, 5vw, 64px);
   background: #ffffff;
 }
 
 .developer-quote {
   font-family: var(--font-cormorant), Georgia, serif;
-  font-size: clamp(23px, 3.2vw, 30px);
+  font-size: clamp(23px, 2.8vw, 32px);
   line-height: 1.35;
   color: #1e293b;
   font-style: italic;
   font-weight: 600;
-  border-left: 3px solid #2563eb;
-  padding-left: 20px;
+  border-left: 3.5px solid #2563eb;
+  padding-left: 22px;
   margin: 0 0 36px 0;
+  max-width: 980px;
 }
 
+/* Maintain comfortable editorial reading width (approx. 780px-840px) to prevent overstretched lines */
 .developer-story-body {
-  max-width: 720px;
+  max-width: 840px;
 }
 
 .developer-story-body p {
@@ -243,15 +254,27 @@
   font-weight: 500;
 }
 
-@media (max-width: 640px) {
+/* Responsive Constraints */
+@media (max-width: 900px) {
+  .developer-reference-page {
+    padding: 24px 20px 48px;
+  }
   .developer-intro-card {
-    padding: 28px 20px 24px;
+    padding: 32px 24px 28px;
   }
   .developer-story {
-    padding: 32px 20px;
+    padding: 36px 24px;
   }
   .developer-details {
     grid-template-columns: 1fr;
     padding: 16px;
+  }
+}
+
+@media (max-width: 640px) {
+  .developer-reference-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
   }
 }
