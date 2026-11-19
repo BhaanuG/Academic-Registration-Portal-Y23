@@ -59,6 +59,11 @@ export default function Subjects({ selections, setSelections, goTo }) {
               <div className="meter-track">
                 <i style={{ width: `${Math.min((credits / 25) * 100, 100)}%` }} />
               </div>
+              <p>
+                {complete && credits === 25
+                  ? "Requirement met (25 Credits)"
+                  : `${buckets.length - selectedSubjects.length} of ${buckets.length} buckets remaining`}
+              </p>
             </div>
 
             <button
