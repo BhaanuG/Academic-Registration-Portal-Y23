@@ -1,16 +1,11 @@
 import { BookOpen, Boxes, GraduationCap, UserRound, Plus, ArrowRight, ShieldCheck, Clock } from "lucide-react";
 
-export default function AdminDashboard({ summary = {}, onNavigate, onQuickCreate }) {
-  const studentsList = Array.isArray(summary?.students) ? summary.students : [];
-  const facultyList = Array.isArray(summary?.faculty) ? summary.faculty : [];
-  const bucketsList = Array.isArray(summary?.buckets) ? summary.buckets : [];
-  const coursesList = Array.isArray(summary?.courses) ? summary.courses : [];
-
+export default function AdminDashboard({ summary, onNavigate, onQuickCreate }) {
   const statCards = [
     {
       key: "Students",
       category: "TOTAL REGISTERED STUDENTS",
-      count: summary?.studentsCount ?? studentsList.length ?? 1159,
+      count: summary.students.length,
       icon: GraduationCap,
       accent: "blue",
       actionText: "Manage Students List →",
@@ -18,7 +13,7 @@ export default function AdminDashboard({ summary = {}, onNavigate, onQuickCreate
     {
       key: "Faculty",
       category: "TOTAL FACULTY ALLOCATIONS",
-      count: summary?.facultyCount ?? facultyList.length ?? 682,
+      count: summary.faculty.length,
       icon: UserRound,
       accent: "indigo",
       actionText: "Manage Faculty Allocations →",
@@ -26,7 +21,7 @@ export default function AdminDashboard({ summary = {}, onNavigate, onQuickCreate
     {
       key: "Buckets",
       category: "ACTIVE CURRICULUM BUCKETS",
-      count: summary?.bucketsCount ?? bucketsList.length ?? 9,
+      count: summary.buckets.length,
       icon: Boxes,
       accent: "amber",
       actionText: "Manage Curriculum Buckets →",
@@ -34,7 +29,7 @@ export default function AdminDashboard({ summary = {}, onNavigate, onQuickCreate
     {
       key: "Courses",
       category: "TOTAL OFFERED COURSES",
-      count: summary?.coursesCount ?? coursesList.length ?? 108,
+      count: summary.courses.length,
       icon: BookOpen,
       accent: "emerald",
       actionText: "Manage Course Catalog →",
@@ -101,7 +96,7 @@ export default function AdminDashboard({ summary = {}, onNavigate, onQuickCreate
           </div>
 
           <div className="admin-recent-list">
-            {studentsList.slice(0, 4).map((student) => (
+            {summary.students.slice(0, 4).map((student) => (
               <div
                 key={student.id}
                 className="admin-recent-row"
@@ -122,10 +117,10 @@ export default function AdminDashboard({ summary = {}, onNavigate, onQuickCreate
               </div>
             ))}
 
-            {!studentsList.length && (
+            {!summary.students.length && (
               <div className="admin-empty-state">
                 <Clock size={24} className="text-slate-400" />
-                <p>No recent student records loaded. Click below to view the full student directory.</p>
+                <p>No student records are currently registered in the database.</p>
               </div>
             )}
           </div>
