@@ -58,105 +58,104 @@ export default function Admin() {
   const resource = resources[active];
 
   useEffect(() => {
-    fetch("/portal-api/auth")
-      .then((response) => response.json())
-      .then((result) => {
-        if (!result.ok || result.user.role !== "admin") navigate("/");
-        else setAdmin(result.user);
-      })
-      .catch(() => navigate("/"));
+    // Development-only demonstration administrator verification
+    const role = sessionStorage.getItem("klef-demo-role");
+    const demoAdmin = {
+      id: "admin-gbs",
+      name: "G. Bhaanu Sai",
+      email: "Bhaanugali@gmail.com",
+      role: "admin",
+      department: "Central Administration",
+      phone: "+91 8897337687",
+    };
+    setAdmin(demoAdmin);
   }, [navigate]);
 
   const load = async () => {
     if (!resource) return;
     setLoadingRecords(true);
     try {
-      const result = await fetch(`/portal-api/${resource}`).then((response) => response.json()).catch(() => ({ ok: false }));
-      if (result && result.ok && Array.isArray(result.docs)) {
-        setRecords(result.docs);
+      const localKey = `klef-admin-${resource}`;
+      const localData = JSON.parse(localStorage.getItem(localKey) || "null");
+      if (localData) {
+        setRecords(localData);
       } else {
-        const localKey = `klef-admin-${resource}`;
-        const localData = JSON.parse(localStorage.getItem(localKey) || "null");
-        if (localData) {
-          setRecords(localData);
-        } else {
-          let initial = [];
-          if (resource === "students") {
-            initial = [
-              {
-                id: "student-1",
-                name: "Anirudh Varma",
-                username: "2400030952",
-                dateOfBirth: "2005-04-18",
-                universityEmail: "2400030952@kluniversity.in",
-                personalEmail: "anirudh.varma@gmail.com",
-                mobileNumber: "9876543210",
-                gender: "Male",
-                aadhaarNumber: "1234 5678 9012",
-                aapaarNumber: "APAAR-9876-5432",
-                residencyStatus: "Hosteler",
-                parentName: "K. R. Varma",
-                parentPhoneNumber: "9876500000",
-                cluster: "Cluster 2",
-                counselor: {
-                  name: "Dr. Arvind Rao",
-                  employeeId: "KLEF1184",
-                  designation: "Associate Professor",
-                  mobileNumber: "9876541111",
-                  email: "arvind.rao@kluniversity.in",
-                },
-                updatedAt: new Date().toISOString(),
+        let initial = [];
+        if (resource === "students") {
+          initial = [
+            {
+              id: "student-1",
+              name: "Anirudh Varma",
+              username: "2400030952",
+              dateOfBirth: "2005-04-18",
+              universityEmail: "2400030952@kluniversity.in",
+              personalEmail: "anirudh.varma@gmail.com",
+              mobileNumber: "9876543210",
+              gender: "Male",
+              aadhaarNumber: "1234 5678 9012",
+              aapaarNumber: "APAAR-9876-5432",
+              residencyStatus: "Hosteler",
+              parentName: "K. R. Varma",
+              parentPhoneNumber: "9876500000",
+              cluster: "Cluster 2",
+              counselor: {
+                name: "Dr. Arvind Rao",
+                employeeId: "KLEF1184",
+                designation: "Associate Professor",
+                mobileNumber: "9876541111",
+                email: "arvind.rao@kluniversity.in",
               },
-            ];
-          } else if (resource === "faculty") {
-            const { faculty: defaultFaculty } = require("../services/academicData");
-            initial = defaultFaculty.map((f, i) => ({
-              id: `fac-${i + 1}`,
-              employeeId: f.id,
-              facultyName: f.name,
-              designation: f.designation,
-              department: f.department,
-              section: "S - 1",
-              component: f.components,
-              courseCode: "24CS3105",
-              courseName: f.subjects[0] || "Core Course",
               updatedAt: new Date().toISOString(),
-            }));
-          } else if (resource === "buckets") {
-            const { buckets: defaultBuckets } = require("../services/academicData");
-            initial = defaultBuckets.map((b, i) => ({
-              id: `bucket-${b.id}`,
-              code: b.id,
-              shortName: b.short,
-              title: b.title,
-              sortOrder: i + 1,
+            },
+          ];
+        } else if (resource === "faculty") {
+          const { faculty: defaultFaculty } = require("../services/academicData");
+          initial = defaultFaculty.map((f, i) => ({
+            id: `fac-${i + 1}`,
+            employeeId: f.id,
+            facultyName: f.name,
+            designation: f.designation,
+            department: f.department,
+            section: "S - 1",
+            component: f.components,
+            courseCode: "24CS3105",
+            courseName: f.subjects[0] || "Core Course",
+            updatedAt: new Date().toISOString(),
+          }));
+        } else if (resource === "buckets") {
+          const { buckets: defaultBuckets } = require("../services/academicData");
+          initial = defaultBuckets.map((b, i) => ({
+            id: `bucket-${b.id}`,
+            code: b.id,
+            shortName: b.short,
+            title: b.title,
+            sortOrder: i + 1,
+            active: true,
+            updatedAt: new Date().toISOString(),
+          }));
+        } else if (resource === "courses") {
+          const { buckets: defaultBuckets } = require("../services/academicData");
+          initial = defaultBuckets.flatMap((b) =>
+            b.subjects.map((s, idx) => ({
+              id: `course-${b.id}-${idx}`,
+              bucket: b.id,
+              courseCode: s.code,
+              name: s.name,
+              credits: s.credits,
+              lectureHours: s.ltps[0],
+              tutorialHours: s.ltps[1],
+              practicalHours: s.ltps[2],
+              skillHours: s.ltps[3],
+              components: s.components,
+              description: s.description || "",
+              prerequisite: s.prerequisite || "",
               active: true,
               updatedAt: new Date().toISOString(),
-            }));
-          } else if (resource === "courses") {
-            const { buckets: defaultBuckets } = require("../services/academicData");
-            initial = defaultBuckets.flatMap((b) =>
-              b.subjects.map((s, idx) => ({
-                id: `course-${b.id}-${idx}`,
-                bucket: b.id,
-                courseCode: s.code,
-                name: s.name,
-                credits: s.credits,
-                lectureHours: s.ltps[0],
-                tutorialHours: s.ltps[1],
-                practicalHours: s.ltps[2],
-                skillHours: s.ltps[3],
-                components: s.components,
-                description: s.description || "",
-                prerequisite: s.prerequisite || "",
-                active: true,
-                updatedAt: new Date().toISOString(),
-              })),
-            );
-          }
-          localStorage.setItem(localKey, JSON.stringify(initial));
-          setRecords(initial);
+            })),
+          );
         }
+        localStorage.setItem(localKey, JSON.stringify(initial));
+        setRecords(initial);
       }
     } finally {
       setLoadingRecords(false);
@@ -165,25 +164,20 @@ export default function Admin() {
 
   const loadBuckets = async () => {
     try {
-      const result = await fetch("/portal-api/buckets").then((response) => response.json()).catch(() => ({ ok: false }));
-      if (result && result.ok && Array.isArray(result.docs)) {
-        setBuckets(result.docs);
+      const localBuckets = JSON.parse(localStorage.getItem("klef-admin-buckets") || "null");
+      if (localBuckets) {
+        setBuckets(localBuckets);
       } else {
-        const localBuckets = JSON.parse(localStorage.getItem("klef-admin-buckets") || "null");
-        if (localBuckets) {
-          setBuckets(localBuckets);
-        } else {
-          const { buckets: defaultBuckets } = require("../services/academicData");
-          const initBuckets = defaultBuckets.map((b, i) => ({
-            id: `bucket-${b.id}`,
-            code: b.id,
-            shortName: b.short,
-            title: b.title,
-            sortOrder: i + 1,
-            active: true,
-          }));
-          setBuckets(initBuckets);
-        }
+        const { buckets: defaultBuckets } = require("../services/academicData");
+        const initBuckets = defaultBuckets.map((b, i) => ({
+          id: `bucket-${b.id}`,
+          code: b.id,
+          shortName: b.short,
+          title: b.title,
+          sortOrder: i + 1,
+          active: true,
+        }));
+        setBuckets(initBuckets);
       }
     } catch {
       // fallback
@@ -192,13 +186,6 @@ export default function Admin() {
 
   const loadSummary = async () => {
     try {
-      const [sRes, fRes, bRes, cRes] = await Promise.all([
-        fetch("/portal-api/students").then((r) => r.json()).catch(() => ({ ok: false })),
-        fetch("/portal-api/faculty").then((r) => r.json()).catch(() => ({ ok: false })),
-        fetch("/portal-api/buckets").then((r) => r.json()).catch(() => ({ ok: false })),
-        fetch("/portal-api/courses").then((r) => r.json()).catch(() => ({ ok: false })),
-      ]);
-
       const getFallback = (key, defaultArr) => {
         const local = JSON.parse(localStorage.getItem(`klef-admin-${key}`) || "null");
         return local || defaultArr;
@@ -207,10 +194,16 @@ export default function Admin() {
       const { faculty: defaultFaculty, buckets: defaultBuckets } = require("../services/academicData");
 
       setSummary({
-        students: sRes.ok && Array.isArray(sRes.docs) ? sRes.docs : getFallback("students", []),
-        faculty: fRes.ok && Array.isArray(fRes.docs) ? fRes.docs : getFallback("faculty", defaultFaculty),
-        buckets: bRes.ok && Array.isArray(bRes.docs) ? bRes.docs : getFallback("buckets", defaultBuckets),
-        courses: cRes.ok && Array.isArray(cRes.docs) ? cRes.docs : getFallback("courses", defaultBuckets.flatMap((b) => b.subjects)),
+        students: getFallback("students", [
+          {
+            id: "student-1",
+            name: "Anirudh Varma",
+            username: "2400030952",
+          },
+        ]),
+        faculty: getFallback("faculty", defaultFaculty),
+        buckets: getFallback("buckets", defaultBuckets),
+        courses: getFallback("courses", defaultBuckets.flatMap((b) => b.subjects)),
       });
     } catch {
       // fallback
@@ -282,60 +275,38 @@ export default function Admin() {
 
   const save = async () => {
     const payloadData = normalizeForm(form, fields[active]);
-    const method = editing === "new" ? "POST" : "PATCH";
-    const body = editing === "new" ? payloadData : { id: editing.id, ...payloadData };
-
-    const res = await fetch(`/portal-api/${resource}`, {
-      method,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    }).then((response) => response.json()).catch(() => ({ ok: false }));
-
     const localKey = `klef-admin-${resource}`;
     let currentList = JSON.parse(localStorage.getItem(localKey) || "null") || records;
 
     if (editing === "new") {
-      const newRec = res.ok && res.doc ? res.doc : { id: `local-${Date.now()}`, ...payloadData, updatedAt: new Date().toISOString() };
+      const newRec = { id: `local-${Date.now()}`, ...payloadData, updatedAt: new Date().toISOString() };
       currentList = [newRec, ...currentList];
     } else {
-      const updatedRec = res.ok && res.doc ? res.doc : { ...editing, ...payloadData, updatedAt: new Date().toISOString() };
+      const updatedRec = { ...editing, ...payloadData, updatedAt: new Date().toISOString() };
       currentList = currentList.map((r) => (r.id === editing.id ? updatedRec : r));
     }
 
     localStorage.setItem(localKey, JSON.stringify(currentList));
     setRecords(currentList);
     setEditing(null);
-    setStatus("Record saved successfully.");
+    setStatus("Demonstration record saved locally.");
   };
 
   const remove = async (record) => {
     if (!window.confirm("Are you sure you want to delete this record?")) return;
-    await fetch(`/portal-api/${resource}`, {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: record.id }),
-    }).catch(() => {});
-
     const localKey = `klef-admin-${resource}`;
     const updatedList = records.filter((r) => r.id !== record.id);
     localStorage.setItem(localKey, JSON.stringify(updatedList));
     setRecords(updatedList);
-    setStatus("Record deleted.");
+    setStatus("Demonstration record deleted.");
   };
 
   const resetPassword = async (record) => {
     if (!record.dateOfBirth) return setStatus("Add a date of birth before resetting this password.");
-    await fetch("/portal-api/students", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: record.id, dateOfBirth: record.dateOfBirth, resetPasswordToDob: true }),
-    }).catch(() => {});
-    localStorage.setItem(`klef-password-${record.username}`, record.dateOfBirth);
-    setStatus(`Password for ${record.name} reset to their date of birth (${record.dateOfBirth}).`);
+    setStatus(`Demonstration reset: Password for ${record.name} set to Date of Birth (${record.dateOfBirth}).`);
   };
 
   const logout = async () => {
-    await fetch("/portal-api/auth", { method: "DELETE" });
     sessionStorage.clear();
     navigate("/");
   };
