@@ -199,15 +199,16 @@
 
 .developer-reference-card .developer-quote {
   font-family: var(--font-cormorant), Georgia, serif !important;
-  font-size: clamp(19px, 2.2vw, 24px) !important;
+  font-size: clamp(23px, 3.2vw, 30px) !important;
   line-height: 1.35 !important;
   color: #1e293b !important;
   font-style: italic !important;
   font-weight: 600 !important;
   border-left: 3px solid #2563eb !important;
-  padding-left: 18px !important;
-  margin: 0 0 24px 0 !important;
+  padding: 0 0 0 20px !important;
+  margin: 0 0 36px 0 !important;
   max-width: 980px !important;
+  display: block !important;
 }
 
 /* Maintain comfortable editorial reading width (approx. 780px-840px) to prevent overstretched lines */
