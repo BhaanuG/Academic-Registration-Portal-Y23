@@ -155,14 +155,37 @@ export default function Subjects({ selections, setSelections, goTo }) {
         <section className="bucket-content" key={bucket.id}>
           {/* Header of Active Bucket */}
           <div className="bucket-header-panel">
-            <div className="bucket-header-meta">
-              <span className="bucket-code-pill">{bucket.id}</span>
-              <span className="bucket-type-tag">{bucket.short}</span>
+            <div className="bucket-header-left">
+              <div className="bucket-header-meta">
+                <span className="bucket-code-pill">{bucket.id}</span>
+                <span className="bucket-type-tag">{bucket.short}</span>
+              </div>
+              <h2>{bucket.title}</h2>
+              <p className="bucket-desc">
+                Select one approved course from this academic bucket. Selections directly determine your faculty preference options in the subsequent step.
+              </p>
             </div>
-            <h2>{bucket.title}</h2>
-            <p className="bucket-desc">
-              Select one approved course from this academic bucket. Selections directly determine your faculty preference options in the subsequent step.
-            </p>
+
+            <div className="bucket-header-actions">
+              <button
+                type="button"
+                className="reset-action-pill"
+                onClick={() => {
+                  setSelections((current) => {
+                    const next = { ...current };
+                    delete next[bucket.id];
+                    return next;
+                  });
+                  setResetStatus(`Selection for ${bucket.id} (${bucket.short}) has been reset.`);
+                  setTimeout(() => setResetStatus(""), 4000);
+                }}
+                disabled={!selections[bucket.id]}
+                title={`Reset selected course for ${bucket.id}`}
+              >
+                <RotateCcw size={12} />
+                <span>Reset {bucket.id}</span>
+              </button>
+            </div>
           </div>
 
           {/* Subjects Option Cards */}

@@ -369,9 +369,24 @@
 }
 
 .subject-selection-page .bucket-header-panel {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
   padding: 24px 28px;
   border-bottom: 1.5px solid #e2e8f0;
   background: #ffffff;
+}
+
+.subject-selection-page .bucket-header-left {
+  flex: 1;
+  min-width: 0;
+}
+
+.subject-selection-page .bucket-header-actions {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
 }
 
 .subject-selection-page .bucket-header-meta {
