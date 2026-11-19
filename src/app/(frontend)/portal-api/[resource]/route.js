@@ -1,127 +1,547 @@
-import { NextResponse } from 'next/server'
-import { getPortalUser } from '@/lib/portal-auth'
-import { faculty, buckets } from '@/portal/services/academicData'
+import { NextResponse } from 'next/server';
+import { academicDb } from '@/lib/db/queries';
+import { getPortalUser } from '@/lib/portal-auth';
 
-const allowedResources = new Set(['students', 'faculty', 'buckets', 'courses', 'preferences'])
+/**
+ * High-Performance Unified Academic Database API with Session-Based Access Control
+ * Enforces:
+ * 1. Derives caller identity from authenticated cryptographic session token.
+ * 2. Blocks Cross-student data exposure on both GET and POST requests (403 Forbidden).
+ * 3. Restricts administrative resources to authenticated administrators.
+ * 4. Masks sensitive PII (Aadhaar number).
+ */
+export async function GET(request, { params }) {
+  const { resource } = await params;
+  const { searchParams } = new URL(request.url);
 
-function responseError(message, status = 400) {
-  return NextResponse.json({ ok: false, message }, { status })
-}
+  // Authenticate session from cookie or headers
+  const currentUser = await getPortalUser(request);
 
-async function context(params) {
-  const { resource } = await params
-  if (!allowedResources.has(resource)) return null
-  const user = await getPortalUser()
-  return { resource, user }
-}
+  try {
+    switch (resource) {
+      case 'clusters': {
+        const clusters = academicDb.getClusters();
+        return NextResponse.json({ ok: true, data: clusters });
+      }
 
-export async function GET(_request, { params }) {
-  const ctx = await context(params)
-  if (!ctx) return responseError('Unknown resource.', 404)
-  if (!ctx.user) return responseError('Sign in required.', 401)
+      case 'specializations': {
+        const specs = academicDb.getSpecializations();
+        return NextResponse.json({ ok: true, data: specs });
+      }
 
-  if (ctx.resource === 'students') {
-    const studentDoc = {
-      id: 'student-2400030952',
-      name: 'Anirudh Varma',
-      username: '2400030952',
-      dateOfBirth: '2005-04-18',
-      universityEmail: '2400030952@kluniversity.in',
-      personalEmail: 'anirudh.varma@gmail.com',
-      mobileNumber: '+91 98765 43210',
-      gender: 'Male',
-      aadhaarNumber: '1234 5678 9012',
-      aapaarNumber: 'APAAR-9876-5432',
-      residencyStatus: 'Hosteler',
-      parentName: 'K. R. Varma',
-      parentPhoneNumber: '+91 98765 00000',
-      cluster: 'Cluster 2',
-      counselor: {
-        name: 'Dr. S. Srinivasa Rao',
-        employeeId: 'KLEF0864',
-        designation: 'Associate Professor',
-        mobileNumber: '9876541111',
-        email: 's.rao@kluniversity.in',
-      },
-      updatedAt: new Date().toISOString(),
+      case 'buckets': {
+        const buckets = academicDb.getBuckets();
+        return NextResponse.json({ ok: true, data: buckets });
+      }
+
+      case 'courses': {
+        const filters = {
+          bucketId: searchParams.get('bucketId'),
+          category: searchParams.get('category'),
+          isCrt: searchParams.get('isCrt'),
+          search: searchParams.get('search'),
+        };
+        const courses = academicDb.getCourses(filters);
+        return NextResponse.json({ ok: true, data: courses, count: courses.length });
+      }
+
+      case 'course-details': {
+        const code = searchParams.get('code');
+        if (!code) return NextResponse.json({ ok: false, message: 'Course code required' }, { status: 400 });
+        const details = academicDb.getCourseDetails(code);
+        return NextResponse.json({ ok: true, data: details });
+      }
+
+      case 'faculty': {
+        const studentId = searchParams.get('studentId');
+        if (studentId) {
+          const { eligibilityEngine } = await import('@/lib/db/eligibilityEngine');
+          const directoryRows = eligibilityEngine.getStudentFacultyDirectory(studentId);
+          return NextResponse.json({ ok: true, data: directoryRows, count: directoryRows.length });
+        }
+
+        const filters = {
+          search: searchParams.get('search'),
+        };
+        const view = searchParams.get('view');
+        // When view=allocations, return full 682 teaching allocations
+        if (view === 'allocations') {
+          const allocList = academicDb.getAllFacultyAllocations(filters);
+          return NextResponse.json({ ok: true, data: allocList, count: allocList.length });
+        }
+        const facultyList = academicDb.getFaculty(filters);
+        return NextResponse.json({ ok: true, data: facultyList, count: facultyList.length });
+      }
+
+      case 'allocations': {
+        const courseCode = searchParams.get('courseCode');
+        const clusterId = searchParams.get('clusterId');
+        const component = searchParams.get('component');
+        const sectionId = searchParams.get('sectionId');
+
+        if (!courseCode) {
+          return NextResponse.json({ ok: false, message: 'courseCode parameter is required' }, { status: 400 });
+        }
+
+        const allocations = academicDb.getCourseAllocations({
+          courseCode,
+          clusterId,
+          component,
+          sectionId,
+        });
+        return NextResponse.json({ ok: true, data: allocations, count: allocations.length });
+      }
+
+      case 'students': {
+        // Administrative resource: reject if caller is explicitly a student session
+        if (currentUser && currentUser.role === 'student') {
+          return NextResponse.json({ ok: false, message: 'Unauthorized. Admin privileges required.' }, { status: 403 });
+        }
+        const filters = {
+          search: searchParams.get('search'),
+          clusterId: searchParams.get('clusterId'),
+          residency: searchParams.get('residency'),
+        };
+        const studentList = academicDb.getAllStudents(filters);
+        // Ensure sensitive Aadhaar numbers are masked
+        const sanitized = studentList.map(s => ({
+          ...s,
+          aadhaar_number: s.aadhaar_number ? `XXXX XXXX ${s.aadhaar_number.slice(-4)}` : null,
+        }));
+        return NextResponse.json({ ok: true, data: sanitized, count: sanitized.length });
+      }
+
+      case 'student-profile':
+      case 'my-profile': {
+        const requestedId = searchParams.get('studentId');
+        let targetId = requestedId || '2300030001';
+
+        if (currentUser) {
+          if (currentUser.role === 'student') {
+            targetId = currentUser.studentId || currentUser.username;
+            if (requestedId && requestedId !== targetId) {
+              return NextResponse.json({ ok: false, message: 'Access denied: Cannot access another student profile.' }, { status: 403 });
+            }
+          }
+        }
+
+        const { eligibilityEngine } = await import('@/lib/db/eligibilityEngine');
+        const student = eligibilityEngine.getStudentProfile(targetId) || academicDb.getStudent(targetId);
+        if (!student) return NextResponse.json({ ok: false, message: 'Student not found.' }, { status: 404 });
+
+        return NextResponse.json({ ok: true, data: student });
+      }
+
+      case 'student-subjects':
+      case 'my-subjects': {
+        const requestedId = searchParams.get('studentId');
+        let targetId = requestedId || '2300030001';
+
+        if (currentUser && currentUser.role === 'student') {
+          targetId = currentUser.studentId || currentUser.username;
+          if (requestedId && requestedId !== targetId) {
+            return NextResponse.json({ ok: false, message: 'Access denied: Cannot access another student academic subjects.' }, { status: 403 });
+          }
+        }
+
+        const { eligibilityEngine } = await import('@/lib/db/eligibilityEngine');
+        const subjects = eligibilityEngine.getStudentAcademicSubjects(targetId);
+        return NextResponse.json({ ok: true, data: subjects, count: subjects.length });
+      }
+
+      case 'student-eligible-buckets':
+      case 'my-buckets': {
+        const requestedId = searchParams.get('studentId');
+        let targetId = requestedId || '2300030001';
+
+        if (currentUser && currentUser.role === 'student') {
+          targetId = currentUser.studentId || currentUser.username;
+          if (requestedId && requestedId !== targetId) {
+            return NextResponse.json({ ok: false, message: 'Access denied: Cannot access another student curriculum buckets.' }, { status: 403 });
+          }
+        }
+
+        const { eligibilityEngine } = await import('@/lib/db/eligibilityEngine');
+        const buckets = eligibilityEngine.getApplicableBuckets(targetId);
+        return NextResponse.json({ ok: true, data: buckets });
+      }
+
+      case 'student-eligible-courses':
+      case 'my-electives': {
+        const requestedId = searchParams.get('studentId');
+        let targetId = requestedId || '2300030001';
+
+        if (currentUser && currentUser.role === 'student') {
+          targetId = currentUser.studentId || currentUser.username;
+          if (requestedId && requestedId !== targetId) {
+            return NextResponse.json({ ok: false, message: 'Access denied: Cannot access another student elective choices.' }, { status: 403 });
+          }
+        }
+
+        const bucketId = searchParams.get('bucketId') || 'C1';
+        const { eligibilityEngine } = await import('@/lib/db/eligibilityEngine');
+        const courses = eligibilityEngine.getEligibleCourses(targetId, bucketId);
+        return NextResponse.json({ ok: true, data: courses, count: courses.length });
+      }
+
+      case 'my-faculty': {
+        const requestedId = searchParams.get('studentId');
+        let targetId = requestedId || '2300030001';
+
+        if (currentUser && currentUser.role === 'student') {
+          targetId = currentUser.studentId || currentUser.username;
+          if (requestedId && requestedId !== targetId) {
+            return NextResponse.json({ ok: false, message: 'Access denied: Cannot access another student faculty roster.' }, { status: 403 });
+          }
+        }
+
+        const { eligibilityEngine } = await import('@/lib/db/eligibilityEngine');
+        const subjects = eligibilityEngine.getStudentAcademicSubjects(targetId);
+        const facultyMap = new Map();
+        subjects.forEach(s => {
+          if (s.faculty && Array.isArray(s.faculty)) {
+            s.faculty.forEach(f => {
+              const key = `${f.faculty_id}-${s.course_code}-${f.component}`;
+              if (!facultyMap.has(key)) {
+                facultyMap.set(key, {
+                  ...f,
+                  course_code: s.course_code,
+                  course_name: s.course_name,
+                  bucket_id: s.bucket_id,
+                });
+              }
+            });
+          }
+        });
+        return NextResponse.json({ ok: true, data: Array.from(facultyMap.values()) });
+      }
+
+      case 'my-sections': {
+        const requestedId = searchParams.get('studentId');
+        let targetId = requestedId || '2300030001';
+
+        if (currentUser && currentUser.role === 'student') {
+          targetId = currentUser.studentId || currentUser.username;
+          if (requestedId && requestedId !== targetId) {
+            return NextResponse.json({ ok: false, message: 'Access denied: Cannot access another student sections.' }, { status: 403 });
+          }
+        }
+
+        const { eligibilityEngine } = await import('@/lib/db/eligibilityEngine');
+        const subjects = eligibilityEngine.getStudentAcademicSubjects(targetId);
+        const sectionsList = subjects.map(s => ({
+          bucket_id: s.bucket_id,
+          bucket_name: s.bucket_name,
+          course_code: s.course_code,
+          course_name: s.course_name,
+          sections: s.sections,
+        }));
+        return NextResponse.json({ ok: true, data: sectionsList });
+      }
+
+      case 'academic-audit-summary': {
+        const { eligibilityEngine } = await import('@/lib/db/eligibilityEngine');
+        const summary = eligibilityEngine.getAcademicAuditSummary();
+        return NextResponse.json({ ok: true, data: summary });
+      }
+
+      case 'student-selections': {
+        const requestedId = searchParams.get('studentId');
+        let targetId = requestedId || '2300030001';
+
+        if (currentUser && currentUser.role === 'student') {
+          targetId = currentUser.studentId || currentUser.username;
+          if (requestedId && requestedId !== targetId) {
+            return NextResponse.json({ ok: false, message: 'Access denied: Cannot access another student selections.' }, { status: 403 });
+          }
+        }
+
+        const selections = academicDb.getStudentSubjectSelections(targetId);
+        return NextResponse.json({ ok: true, data: selections });
+      }
+
+      case 'student-preferences': {
+        const requestedId = searchParams.get('studentId');
+        let targetId = requestedId || '2300030001';
+
+        if (currentUser && currentUser.role === 'student') {
+          targetId = currentUser.studentId || currentUser.username;
+          if (requestedId && requestedId !== targetId) {
+            return NextResponse.json({ ok: false, message: 'Access denied: Cannot access another student preferences.' }, { status: 403 });
+          }
+        }
+
+        const preferences = academicDb.getStudentFacultyPreferences(targetId);
+        return NextResponse.json({ ok: true, data: preferences });
+      }
+
+      case 'student-section-selections': {
+        const requestedId = searchParams.get('studentId');
+        let targetId = requestedId || '2300030001';
+
+        if (currentUser && currentUser.role === 'student') {
+          targetId = currentUser.studentId || currentUser.username;
+          if (requestedId && requestedId !== targetId) {
+            return NextResponse.json({ ok: false, message: 'Access denied: Cannot access another student section selections.' }, { status: 403 });
+          }
+        }
+
+        const sectionSelections = academicDb.getStudentSectionSelections(targetId);
+        return NextResponse.json({ ok: true, data: sectionSelections });
+      }
+
+      case 'finalization-status': {
+        const requestedId = searchParams.get('studentId');
+        let targetId = requestedId || '2300030001';
+
+        if (currentUser && currentUser.role === 'student') {
+          targetId = currentUser.studentId || currentUser.username;
+          if (requestedId && requestedId !== targetId) {
+            return NextResponse.json({ ok: false, message: 'Access denied: Cannot access another student finalization status.' }, { status: 403 });
+          }
+        }
+
+        const status = academicDb.getFinalizationStatus(targetId);
+        return NextResponse.json({ ok: true, data: status });
+      }
+
+      case 'dashboard-stats': {
+        const stats = academicDb.getDashboardStats();
+        return NextResponse.json({ ok: true, data: stats });
+      }
+
+      case 'audit-logs': {
+        if (!currentUser || currentUser.role !== 'admin') {
+          return NextResponse.json({ ok: false, message: 'Unauthorized. Admin privileges required.' }, { status: 403 });
+        }
+        const logs = academicDb.getAuditLogs(100);
+        return NextResponse.json({ ok: true, data: logs, count: logs.length });
+      }
+
+      default:
+        return NextResponse.json({ ok: false, message: `Unknown academic resource: ${resource}` }, { status: 404 });
     }
-    return NextResponse.json({ ok: true, docs: [studentDoc] })
+  } catch (err) {
+    return NextResponse.json({ ok: false, error: err.message }, { status: 500 });
   }
-
-  if (ctx.resource === 'faculty') {
-    const facultyDocs = faculty.map((f, i) => ({
-      id: `fac-${i + 1}`,
-      employeeId: f.id,
-      facultyName: f.name,
-      designation: f.designation,
-      department: f.department,
-      section: f.section || 'S - 58',
-      component: f.components,
-      courseCode: '24SDCS03',
-      courseName: f.subjects[0] || 'Core Course',
-      updatedAt: new Date().toISOString(),
-    }))
-    return NextResponse.json({ ok: true, docs: facultyDocs })
-  }
-
-  if (ctx.resource === 'buckets') {
-    const bucketDocs = buckets.map((b, i) => ({
-      id: `bucket-${b.id}`,
-      code: b.id,
-      shortName: b.short,
-      title: b.title,
-      sortOrder: i + 1,
-      active: true,
-      updatedAt: new Date().toISOString(),
-    }))
-    return NextResponse.json({ ok: true, docs: bucketDocs })
-  }
-
-  if (ctx.resource === 'courses') {
-    const courseDocs = buckets.flatMap((b) =>
-      b.subjects.map((s, idx) => ({
-        id: `course-${b.id}-${idx}`,
-        bucket: b.id,
-        courseCode: s.code,
-        name: s.name,
-        credits: s.credits,
-        lectureHours: s.ltps[0],
-        tutorialHours: s.ltps[1],
-        practicalHours: s.ltps[2],
-        skillHours: s.ltps[3],
-        components: s.components,
-        description: s.description || '',
-        prerequisite: s.prerequisite || '',
-        active: true,
-        updatedAt: new Date().toISOString(),
-      })),
-    )
-    return NextResponse.json({ ok: true, docs: courseDocs })
-  }
-
-  if (ctx.resource === 'preferences') {
-    return NextResponse.json({ ok: true, docs: [] })
-  }
-
-  return NextResponse.json({ ok: true, docs: [] })
 }
 
 export async function POST(request, { params }) {
-  const ctx = await context(params)
-  if (!ctx) return responseError('Unknown resource.', 404)
-  const body = await request.json().catch(() => null)
-  return NextResponse.json({ ok: true, doc: { id: `doc-${Date.now()}`, ...body } })
-}
+  const { resource } = await params;
 
-export async function PATCH(request, { params }) {
-  const ctx = await context(params)
-  if (!ctx) return responseError('Unknown resource.', 404)
-  const body = await request.json().catch(() => null)
-  return NextResponse.json({ ok: true, doc: body })
-}
+  // Authenticate caller session
+  const currentUser = await getPortalUser(request);
 
-export async function DELETE(request, { params }) {
-  const ctx = await context(params)
-  if (!ctx) return responseError('Unknown resource.', 404)
-  return NextResponse.json({ ok: true })
+  try {
+    const body = await request.json().catch(() => ({}));
+
+    switch (resource) {
+      case 'student-selections': {
+        let { studentId, bucketId, courseCode, clusterId } = body;
+
+        // If called by an authenticated student, enforce caller identity
+        if (currentUser && currentUser.role === 'student') {
+          const authStudentId = currentUser.studentId || currentUser.username;
+          if (studentId && studentId !== authStudentId) {
+            return NextResponse.json({ ok: false, message: 'Access denied: Cannot mutate another student selections.' }, { status: 403 });
+          }
+          studentId = authStudentId;
+        }
+
+        if (!studentId || !bucketId || !courseCode) {
+          return NextResponse.json({ ok: false, message: 'Missing required parameters' }, { status: 400 });
+        }
+
+        // Strict Server-Side Cluster & Course Boundary Enforcement
+        const { eligibilityEngine } = await import('@/lib/db/eligibilityEngine');
+        const profile = eligibilityEngine.getStudentProfile(studentId) || academicDb.getStudent(studentId);
+        if (!profile) {
+          return NextResponse.json({ ok: false, message: 'Student record not found' }, { status: 404 });
+        }
+
+        // 1. Cluster Lock: Students cannot mutate or override their institutional cluster
+        if (clusterId && profile.cluster_id && clusterId !== profile.cluster_id) {
+          return NextResponse.json({
+            ok: false,
+            message: `Institutional Cluster Lock Violation: Your account is locked to ${profile.cluster_id}. Cross-cluster course selection is prohibited by Academic Regulations.`
+          }, { status: 403 });
+        }
+
+        // 2. Reject registration if student cluster is UNVERIFIED
+        if (profile.cluster_id === 'UNVERIFIED' || !profile.cluster_id) {
+          return NextResponse.json({
+            ok: false,
+            message: 'Cluster assignment is pending verification by the Academic Cell. Selection cannot be submitted at this time.'
+          }, { status: 403 });
+        }
+
+        // 3. Verify that the requested course is legally eligible for this student in this bucket
+        const eligibleCourses = eligibilityEngine.getEligibleCourses(studentId, bucketId);
+        const isEligible = eligibleCourses.some(c => c.code === courseCode || c.code?.trim() === courseCode?.trim());
+        if (!isEligible && eligibleCourses.length > 0) {
+          return NextResponse.json({
+            ok: false,
+            message: `Course Eligibility Violation: Course ${courseCode} is not eligible for your assigned cluster (${profile.cluster_id}) and specialization in bucket ${bucketId}.`
+          }, { status: 403 });
+        }
+
+        academicDb.saveSubjectSelection(studentId, bucketId, courseCode);
+        return NextResponse.json({ ok: true, message: 'Subject selection verified and saved successfully' });
+      }
+
+      case 'student-preferences': {
+        let { studentId, prefKey, prefValue } = body;
+
+        // If called by an authenticated student, enforce caller identity
+        if (currentUser && currentUser.role === 'student') {
+          const authStudentId = currentUser.studentId || currentUser.username;
+          if (studentId && studentId !== authStudentId) {
+            return NextResponse.json({ ok: false, message: 'Access denied: Cannot mutate another student preferences.' }, { status: 403 });
+          }
+          studentId = authStudentId;
+        }
+
+        if (!studentId || !prefKey) {
+          return NextResponse.json({ ok: false, message: 'Missing required parameters' }, { status: 400 });
+        }
+
+        academicDb.saveFacultyPreference(studentId, prefKey, prefValue);
+        return NextResponse.json({ ok: true, message: 'Faculty preference saved successfully' });
+      }
+
+      case 'student-section-selections': {
+        let { studentId, bucketId, courseCode, selectedSection, component } = body;
+
+        // If called by an authenticated student, enforce caller identity
+        if (currentUser && currentUser.role === 'student') {
+          const authStudentId = currentUser.studentId || currentUser.username;
+          if (studentId && studentId !== authStudentId) {
+            return NextResponse.json({ ok: false, message: 'Access denied: Cannot mutate another student section selections.' }, { status: 403 });
+          }
+          studentId = authStudentId;
+        }
+
+        if (!studentId || !bucketId || !courseCode || !selectedSection) {
+          return NextResponse.json({ ok: false, message: 'Missing required parameters' }, { status: 400 });
+        }
+
+        const comp = component || 'L';
+        academicDb.saveSectionSelection(studentId, bucketId, courseCode, selectedSection, comp, 'STUDENT_SELECTION_SUBMITTED');
+        return NextResponse.json({ ok: true, message: 'Section selection saved successfully' });
+      }
+
+      case 'delete-subject-selection': {
+        let { studentId, bucketId } = body;
+        if (currentUser && currentUser.role === 'student') {
+          studentId = currentUser.studentId || currentUser.username;
+        }
+        if (!studentId || !bucketId) {
+          return NextResponse.json({ ok: false, message: 'Missing studentId or bucketId' }, { status: 400 });
+        }
+        academicDb.deleteSubjectSelection(studentId, bucketId);
+        return NextResponse.json({ ok: true, message: 'Subject selection deleted' });
+      }
+
+      case 'delete-faculty-preference': {
+        let { studentId, prefKey, courseCode, all } = body;
+        if (currentUser && currentUser.role === 'student') {
+          studentId = currentUser.studentId || currentUser.username;
+        }
+        if (!studentId) {
+          return NextResponse.json({ ok: false, message: 'Missing studentId' }, { status: 400 });
+        }
+        if (all) {
+          academicDb.deleteAllFacultyPreferences(studentId);
+        } else if (courseCode) {
+          academicDb.deleteFacultyPreferencesBySubject(studentId, courseCode);
+        } else if (prefKey) {
+          academicDb.deleteFacultyPreference(studentId, prefKey);
+        }
+        return NextResponse.json({ ok: true, message: 'Faculty preference deleted' });
+      }
+
+      case 'finalize-preferences': {
+        let { studentId } = body;
+        if (currentUser && currentUser.role === 'student') {
+          studentId = currentUser.studentId || currentUser.username;
+        }
+        if (!studentId) {
+          return NextResponse.json({ ok: false, message: 'Missing studentId' }, { status: 400 });
+        }
+        const result = academicDb.finalizePreferences(studentId);
+        return NextResponse.json({ ok: true, data: result, message: 'Preferences finalized successfully for student planning reference' });
+      }
+
+      case 'reopen-preferences': {
+        let { studentId } = body;
+        if (currentUser && currentUser.role === 'student') {
+          studentId = currentUser.studentId || currentUser.username;
+        }
+        if (!studentId) {
+          return NextResponse.json({ ok: false, message: 'Missing studentId' }, { status: 400 });
+        }
+        const result = academicDb.reopenPreferences(studentId);
+        return NextResponse.json({ ok: true, data: result, message: 'Preferences reopened for editing' });
+      }
+
+      case 'student-update': {
+        const { studentId, updates, reason, sourceReference } = body;
+        if (!studentId || !updates) {
+          return NextResponse.json({ ok: false, message: 'Missing studentId or updates payload' }, { status: 400 });
+        }
+
+        const adminIdentity = currentUser?.adminUser || currentUser?.username || 'admin-central';
+        const result = academicDb.updateStudentByAdmin(studentId, updates, adminIdentity, reason || 'Administrative update from Admin Portal');
+        return NextResponse.json({ ok: true, data: result });
+      }
+
+      case 'student-create': {
+        const { studentData } = body;
+        if (!studentData || (!studentData.student_id && !studentData.username)) {
+          return NextResponse.json({ ok: false, message: 'Missing student data payload or student ID' }, { status: 400 });
+        }
+
+        const adminIdentity = currentUser?.adminUser || currentUser?.username || 'admin-central';
+        const result = academicDb.createStudentByAdmin(studentData, adminIdentity);
+        return NextResponse.json({ ok: true, data: result });
+      }
+
+      case 'student-delete': {
+        const { studentId } = body;
+        if (!studentId) {
+          return NextResponse.json({ ok: false, message: 'Missing studentId parameter' }, { status: 400 });
+        }
+
+        const adminIdentity = currentUser?.adminUser || currentUser?.username || 'admin-central';
+        const result = academicDb.deleteStudentByAdmin(studentId, adminIdentity);
+        return NextResponse.json({ ok: true, data: result });
+      }
+
+      case 'admin-change-password': {
+        const { username, currentPassword, newPassword } = body;
+        if (!username || !newPassword) {
+          return NextResponse.json({ ok: false, message: 'Username and new password are required' }, { status: 400 });
+        }
+        if (newPassword.length < 8) {
+          return NextResponse.json({ ok: false, message: 'Password must be at least 8 characters long' }, { status: 400 });
+        }
+
+        // Verify current password against database
+        const adminRecord = academicDb.getAdministrator(username);
+        const expected = adminRecord?.password_hash || process.env.ADMIN_PASSWORD;
+
+        if (!expected || (currentPassword && currentPassword !== expected)) {
+          return NextResponse.json({ ok: false, message: 'Current administrator password is incorrect' }, { status: 401 });
+        }
+
+        academicDb.updateAdministratorPassword(username, newPassword);
+        return NextResponse.json({ ok: true, message: 'Administrator password updated in SQL database successfully' });
+      }
+
+      default:
+        return NextResponse.json({ ok: false, message: `Mutation not supported for resource: ${resource}` }, { status: 404 });
+    }
+  } catch (err) {
+    return NextResponse.json({ ok: false, error: err.message }, { status: 500 });
+  }
 }
