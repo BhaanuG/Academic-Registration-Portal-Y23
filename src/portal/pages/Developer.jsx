@@ -67,6 +67,10 @@ export default function Developer() {
                 <dd>G. Bhaanu Sai</dd>
               </div>
               <div>
+                <dt>Registration Number</dt>
+                <dd>2400030952</dd>
+              </div>
+              <div>
                 <dt>Email</dt>
                 <dd>
                   <a href="mailto:Bhaanugali@gmail.com">Bhaanugali@gmail.com</a>
