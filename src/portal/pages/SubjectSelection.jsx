@@ -35,9 +35,9 @@ export default function Subjects({ selections, setSelections, goTo }) {
   }, [selections]);
 
   const handleResetCourseSelections = () => {
-    setSelections(initialSelections);
+    setSelections({});
     setShowResetModal(false);
-    setResetStatus("Course selections have been reset to default curriculum subjects.");
+    setResetStatus("Course selections have been cleared. Please choose your courses.");
     setTimeout(() => setResetStatus(""), 4000);
   };
 
@@ -364,7 +364,7 @@ export default function Subjects({ selections, setSelections, goTo }) {
 
             <div className="admin-confirm-body">
               <p className="text-sm text-slate-600">
-                This will restore your subject selections back to the university default curriculum subjects across all 7 academic buckets (SDC, PCC-1, PCC-2, PCC-3, PE-1, PE-2, OE-1).
+                This will clear your course selections across all 7 academic buckets (SDC, PCC-1, PCC-2, PCC-3, PE-1, PE-2, OE-1).
               </p>
               <div className="admin-confirm-summary-box">
                 <div className="admin-confirm-row">
@@ -373,7 +373,7 @@ export default function Subjects({ selections, setSelections, goTo }) {
                 </div>
                 <div className="admin-confirm-row">
                   <span>Action:</span>
-                  <span className="text-amber-700 font-semibold">Restore Default Subjects</span>
+                  <span className="text-amber-700 font-semibold">Clear All Selections</span>
                 </div>
               </div>
             </div>

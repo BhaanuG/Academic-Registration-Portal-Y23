@@ -14,65 +14,25 @@ import MyProfile from "../pages/MyProfile";
 import ResetPassword from "../pages/ResetPassword";
 import SubjectSelection from "../pages/SubjectSelection";
 import Admin from "../pages/Admin";
-import RegistrationGuidelinesModal from "../components/academic/RegistrationGuidelinesModal";
-import { loadPreferences, savePreferences, fetchRemotePreferences } from "../services/preferenceService";
+import { loadPreferences, savePreferences } from "../services/preferenceService";
 import { buckets, faculty, initialSelections } from "../services/academicData";
 import { getStudentCluster, saveLastRoute, saveStudentCluster } from "../services/studentService";
 import { portalPath, segmentPages } from "../utils/routes";
 
 function PortalRoute() {
   const navigate = useNavigate();
-  const { studentId = "", studentName = "", pageName = "" } = useParams();
+  const { studentId = "", studentName = "Anirudh-Varma", pageName = "" } = useParams();
   const page = segmentPages[pageName] || "overview";
   const { studentId: authenticatedStudent, signOut } = useAuth();
   const { selections, setSelections } = useSubjects(studentId);
   const [preferences, setPreferences] = useState(() => loadPreferences(studentId));
   const [cluster, setCluster] = useState(() => getStudentCluster(studentId));
   const [dataVersion, setDataVersion] = useState(0);
-  const [showGuidelines, setShowGuidelines] = useState(false);
 
-  // Check if student has agreed to registration guidelines for this sign in session
-  useEffect(() => {
-    if (!studentId) {
-      setShowGuidelines(false);
-      return;
-    }
-    try {
-      const agreedKey = `guidelines_session_agreed_${studentId}`;
-      const hasAgreed = sessionStorage.getItem(agreedKey);
-      if (!hasAgreed) {
-        setShowGuidelines(true);
-      } else {
-        setShowGuidelines(false);
-      }
-    } catch {
-      setShowGuidelines(true);
-    }
-  }, [studentId]);
-
-  const handleAgreeGuidelines = () => {
-    try {
-      sessionStorage.setItem(`guidelines_session_agreed_${studentId}`, 'true');
-    } catch {}
-    setShowGuidelines(false);
-    setPage("overview");
-  };
-
-  // Synchronize preferences from local storage and remote database
+  // Pure frontend state synchronization using development data
   useEffect(() => {
     setPreferences(loadPreferences(studentId));
     setCluster(getStudentCluster(studentId));
-
-    if (studentId) {
-      fetchRemotePreferences(studentId).then((remotePrefs) => {
-        if (remotePrefs && Object.keys(remotePrefs).length > 0) {
-          setPreferences((prev) => ({
-            ...prev,
-            ...remotePrefs,
-          }));
-        }
-      });
-    }
   }, [studentId]);
 
   useEffect(() => {
@@ -89,7 +49,6 @@ function PortalRoute() {
     if (page === "cluster")
       return (
         <ClusterSelection
-          studentId={studentId}
           cluster={cluster}
           setCluster={(nextCluster) => {
             setCluster(nextCluster);
@@ -100,27 +59,23 @@ function PortalRoute() {
       );
     if (page === "subjects")
       return (
-        <SubjectSelection studentId={studentId} selections={selections} setSelections={setSelections} goTo={setPage} />
+        <SubjectSelection selections={selections} setSelections={setSelections} goTo={setPage} />
       );
     if (page === "preferences")
       return (
         <FacultyPreferences
-          studentId={studentId}
           selections={selections}
           prefs={preferences}
           setPrefs={setPreferences}
           cluster={cluster || "Cluster 2"}
         />
       );
-    if (page === "directory") return <FacultyDirectory cluster={cluster || "Cluster 2"} studentId={studentId} selections={selections} />;
+    if (page === "directory") return <FacultyDirectory cluster={cluster || "Cluster 2"} />;
     if (page === "my-preference")
       return (
         <MyPreferences
-          studentId={studentId}
           selections={selections}
-          setSelections={setSelections}
           prefs={preferences}
-          setPrefs={setPreferences}
           cluster={cluster || "Cluster 2"}
           onResetAll={() => {
             setSelections({});
@@ -140,15 +95,9 @@ function PortalRoute() {
       studentId={studentId}
       onLogout={() => {
         signOut();
-        window.location.href = "/";
+        navigate("/");
       }}
     >
-      {showGuidelines && (
-        <RegistrationGuidelinesModal
-          studentId={studentId}
-          onAgree={handleAgreeGuidelines}
-        />
-      )}
       {content}
     </PortalShell>
   );
