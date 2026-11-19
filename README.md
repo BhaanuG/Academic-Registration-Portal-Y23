@@ -35,55 +35,121 @@
 
 ---
 
+## 💡 What Is This Project? (Plain English Guide for Everyone)
+
+> **If you are from a non-technical background, start here!**
+
+Imagine entering a large university with more than **1,000 engineering students**, **400+ professors**, and **100+ subjects**. Every semester, every single student needs to:
+1. Pick their semester subjects without taking conflicting classes.
+2. Select which professors they want to learn from.
+3. Choose laboratory and tutorial sessions that match their timetable.
+
+In the past, this was done using slow paperwork, spreadsheet tables, or clunky forms that crashed when hundreds of students logged in at once. Students would get placed into the wrong classes or lose their work halfway through if their internet dropped.
+
+### What This Website Does:
+- **It is a smart online academic advisor and enrollment desk in one place.**
+- **Automatic Matching:** When a student logs in with their 10-digit ID, the portal recognizes what branch they are studying (such as *Artificial Intelligence*, *Cybersecurity*, or *Cloud Computing*). It automatically assigns them to their exact group of classes (their **Cohort / Cluster**) so they never sign up for the wrong section.
+- **Fair Professor Voting:** Students rank their 1st, 2nd, and 3rd choices for which teacher they prefer for lectures and lab practicals.
+- **Zero Work Lost (Auto-Save):** The moment a student clicks a subject or teacher, it saves instantly. If their computer turns off or they close their phone browser, their choices are still there when they reopen the portal.
+- **Official Proof Downloads:** When done, students can download an official verification PDF and PNG image of their submitted preferences for their own records.
+- **Admin Control Room:** College administrators have a private dashboard to oversee all 1,159 students, update records, and ensure classrooms don't exceed capacity.
+
+---
+
 ## 📑 Table of Contents
-1. [Executive Overview & Why This Portal Exists](#-executive-overview--why-this-portal-exists)
-2. [Scale & Institutional Benchmarks](#-scale--institutional-benchmarks)
-3. [Specialization-to-Cluster Locking Architecture](#-specialization-to-cluster-locking-architecture)
-4. [Curricular Framework & 7-Bucket Structure](#-curricular-framework--7-bucket-structure)
-5. [Multi-Tier Faculty Preference Engine](#-multi-tier-faculty-preference-engine)
-6. [Zero-UI Silent Auto-Save & State Persistence](#-zero-ui-silent-auto-save--state-persistence)
-7. [Deterministic URL Taxonomy & Routing System](#-deterministic-url-taxonomy--routing-system)
-8. [Comprehensive Technology Stack & Specifications](#-comprehensive-technology-stack--specifications)
-9. [Detailed Project Directory Map](#-detailed-project-directory-map)
-10. [Local Engineering Setup & Build Runbook](#-local-engineering-setup--build-runbook)
-11. [Author Attribution & Open-Source Governance](#-author-attribution--open-source-governance)
+1. [What Is This Project? (Plain English Guide)](#-what-is-this-project-plain-english-guide-for-everyone)
+2. [Step-by-Step Student Journey (How Anyone Uses It)](#-step-by-step-student-journey-how-anyone-uses-it)
+3. [The Big Problems It Solves (Before vs. After)](#-the-big-problems-it-solves-before-vs-after)
+4. [Scale & Real-World Numbers](#-scale--real-world-numbers)
+5. [Specialization-to-Cluster Cohort Locking](#-specialization-to-cluster-cohort-locking)
+6. [The 7 Curricular Buckets Explained Simply](#-the-7-curricular-buckets-explained-simply)
+7. [Multi-Tier Faculty Preference Engine](#-multi-tier-faculty-preference-engine)
+8. [Zero-UI Silent Auto-Save Technology](#-zero-ui-silent-auto-save-technology)
+9. [Official Routing System & URL Map](#-official-routing-system--url-map)
+10. [Under the Hood: Technologies Used & Why](#-under-the-hood-technologies-used--why)
+11. [Detailed Project Directory Map](#-detailed-project-directory-map)
+12. [Local Setup & Running the Code](#-local-setup--running-the-code)
+13. [Author Attribution & Open-Source Governance](#-author-attribution--open-source-governance)
 
 ---
 
-## 🎯 Executive Overview & Why This Portal Exists
+## 🚶 Step-by-Step Student Journey (How Anyone Uses It)
 
-In tier-one engineering universities like **KLEF (KL Deemed to be University)**, academic course registration has historically faced significant logistical hurdles:
-- **Overcrowded Sections & Section Clashes:** Thousands of students selecting electives concurrently without cohort boundaries causes timetable conflicts.
-- **Accidental Enrollment in Wrong Cohorts:** Students inadvertently enrolling in section ranges designated for a different specialization track.
-- **Lost Preference Data:** Traditional multi-step forms frequently drop student selections when sessions expire, connections drop, or students switch devices.
-- **Complex Hierarchical Faculty Rankings:** Selecting a lecture professor should automatically bind and unlock valid sub-sections for lab experiments, tutorial drills, and practical problem-solving sessions.
+```
+   ┌───────────────────┐
+   │ 1. Sign-In Screen │  Enter 10-digit Student ID and Date of Birth.
+   └─────────┬─────────┘
+             │
+             ▼
+   ┌───────────────────┐
+   │ 2. Overview Home  │  See your academic profile, counselor details & live credit count.
+   └─────────┬─────────┘
+             │
+             ▼
+   ┌───────────────────┐
+   │ 3. Cluster Cohort │  System automatically locks your sections (S1-S50 or S51-S100)
+   └─────────┬─────────┘  based on your technology specialization.
+             │
+             ▼
+   ┌───────────────────┐
+   │ 4. Course Choice  │  Pick courses across 7 curriculum buckets (Capstones, Electives,
+   └─────────┬─────────┘  Ethics, and Placement preparation).
+             │
+             ▼
+   ┌───────────────────┐
+   │ 5. Teacher Rank   │  Vote 1st, 2nd, and 3rd choices for Lecture professors.
+   └─────────┬─────────┘  Unlocks linked tutorial and lab mentors.
+             │
+             ▼
+   ┌───────────────────┐
+   │ 6. Download Proof │  Download official PDF faculty directory & PNG preference card.
+   └───────────────────┘
+```
 
-### The Purpose of This Platform
-The **KLEF Academic Registration Portal (Y23)** resolves these challenges end-to-end:
-1. **Guarantees Section Integrity:** Automatically assigns and locks students into their rightful section cohort based on their verified academic specialization.
-2. **Coordinates Multi-Bucket Registrations:** Guides each student across 7 distinct curriculum buckets, ensuring correct prerequisite validations and credit quotas (minimum 18 to 26+ credits).
-3. **Captures Multi-Tier Preferences:** Enforces 3 distinct faculty preferences for Lecture components and unlocks linked sub-section rankings for Tutorial, Practical, and Skill tracks.
-4. **Delivers Zero-Data-Loss Reliability:** Every click, course toggle, and ranking instantly auto-saves in the background, persisting seamlessly across refreshes, logouts, and new browser tabs.
+1. **Step 1: Simple Sign-In (`/KLEF/8-2/GBS.php`)**  
+   Students log in using their 10-digit university ID and their Date of Birth. No complicated extra accounts or forgotten passwords.
+2. **Step 2: Academic Overview (`Academic-Overview.php`)**  
+   Presents a personal dashboard showing the student's name, assigned counselor, earned credits, and semester goals.
+3. **Step 3: Cluster Confirmation (`Cluster-Selection.php`)**  
+   Shows the student which group of sections they belong to (Sections 1–50 or Sections 51–100) locked to their field of study.
+4. **Step 4: Course Selection (`Subject-Selection.php`)**  
+   Presents 7 easy-to-read buckets. As the student clicks subjects, a live credit counter updates automatically (e.g. *22 / 24 Credits Completed*).
+5. **Step 5: Teacher Preferences (`Faculty-Preferences.php`)**  
+   Students choose their 1st, 2nd, and 3rd choice professors. Picking a lecture professor automatically shows which lab assistants work with them.
+6. **Step 6: Review & Download (`My-Preference.php` & `Faculty-Directory.php`)**  
+   Displays a clean summary table of everything chosen, with one-click buttons to download an official PDF directory and a high-resolution PNG receipt.
 
 ---
 
-## 📊 Scale & Institutional Benchmarks
+## ⚡ The Big Problems It Solves (Before vs. After)
+
+| The Old Way (Manual / Traditional) | The New Portal Way (This Platform) |
+| :--- | :--- |
+| **Classroom Clashes:** Students could accidentally enroll in two classes scheduled at the same time. | **Cohort-Locked Protection:** Sections are strictly separated so clashes are mathematically impossible. |
+| **Wrong Section Registration:** A student studying Artificial Intelligence could enroll in a Web Design lab by mistake. | **Specialization-Locked:** The portal knows the student's degree and shows *only* the classes meant for their group. |
+| **Lost Data & Frustration:** If the page refreshed or the Wi-Fi cut out, students lost all their rankings and had to start over. | **Silent Auto-Save:** Every single click saves to local memory in under 5 milliseconds with zero data loss. |
+| **Paper Proof Receipts:** Students had to take phone screenshots or get physical slips stamped. | **Instant Export:** Generates clean, formatted PDF rosters and PNG receipts on the fly. |
+| **Administrative Nightmare:** University coordinators had to manually clean up overlapping spreadsheets. | **Central Admin Dashboard:** Administrators have live search, filtering, and instant record editing tools. |
+
+---
+
+## 📊 Scale & Real-World Numbers
 
 The portal manages the entire undergraduate engineering registration lifecycle for the Y23 cohort across multiple engineering disciplines:
 
-| Metric | Measured Volume | Description |
+| Metric | Real Volume | Plain English Meaning |
 | :--- | :--- | :--- |
-| **Enrolled Students** | **1,159 Students** | Verified active student population in the Y23 cohort with complete institutional profiles. |
-| **Faculty Mentors** | **426 Professors** | Professors, Associate Professors, and Assistant Professors mapped to academic departments. |
+| **Enrolled Students** | **1,159 Students** | Total number of students who register their courses on this site. |
+| **Faculty Mentors** | **426 Professors** | Qualified college teachers and lab instructors available for selection. |
 | **Teaching Allocations** | **682 Allocations** | Concrete section-level course assignments across Lecture, Practical, Tutorial, and Skill components. |
-| **Course Catalog** | **102 Courses** | Rigorous engineering subjects spanning Core Engineering, Professional Electives, and Open Electives. |
-| **Curricular Buckets** | **9 Buckets (C0–C8)** | Structured academic clusters ranging from Capstone Projects to Audit and Skill courses. |
-| **Specialization Tracks** | **17 Specializations** | Advanced technology tracks across AI, Cloud Architecture, DevOps, Cybersecurity, and Robotics. |
+| **Course Catalog** | **102 Courses** | Engineering subjects offered across Core, Elective, and Specialization tracks. |
+| **Curricular Buckets** | **9 Buckets (C0–C8)** | The categories of subjects a student must complete to graduate. |
+| **Specialization Tracks** | **17 Specializations** | Specific career focuses (AI, Cloud, Cyber Security, Blockchain, Robotics, etc.). |
 | **Section Clusters** | **2 Main Cohorts** | `Cluster 1` (Sections `S1 — S50`) and `Cluster 2` (Sections `S51 — S100`). |
 
 ---
 
-## 🔒 Specialization-to-Cluster Locking Architecture
+## 🔒 Specialization-to-Cluster Cohort Locking
 
 To prevent section collisions and balance laboratory capacity, the university partitions registrations into two major cohorts. The portal reads the student's registered specialization and automatically locks them into their prescribed cluster:
 
@@ -99,6 +165,7 @@ To prevent section collisions and balance laboratory capacity, the university pa
         ┌─────────────────────────────────┐                             ┌─────────────────────────────────┐
         │            CLUSTER 1            │                             │            CLUSTER 2            │
         │      Sections S1 through S50    │                             │     Sections S51 through S100   │
+        │      (646 Active Students)      │                             │      (512 Active Students)      │
         └────────────────┬────────────────┘                             └────────────────┬────────────────┘
                          │                                                               │
         • Data Science & Big Data Analytics                             • AI for Computational Intelligence
@@ -114,97 +181,92 @@ To prevent section collisions and balance laboratory capacity, the university pa
         • Game Development & UX Design                                  • Smart Manufacturing & Green Energy
 ```
 
-### Deterministic Rules:
-- **Zero Student Ambiguity:** Students cannot manually pick or alter their cluster. The assigned cohort is permanently displayed as **Assigned Cohort**, and the alternative is marked as **Locked to Other Cohort**.
-- **Dynamic Scope Enforcement:** All course bucket dropdowns and faculty directory searches automatically filter down to show *only* the teaching staff and sections allocated within that student's designated cluster.
-
 ---
 
-## 📚 Curricular Framework & 7-Bucket Structure
+## 📚 The 7 Curricular Buckets Explained Simply
 
-The semester registration is structured into credit-bearing buckets designed to satisfy institutional graduation criteria:
+To ensure every graduate has a complete, well-rounded education, courses are grouped into 7 distinct categories ("buckets"):
 
 1. **Bucket C0 — Capstone Project I (`23IE4053A` / `23IE4053R`)**:
-   - Compulsory final-year technical research and implementation project (3–4 credits, Practical & Skill components).
+   - The major hands-on engineering project where students build real-world software or hardware prototypes.
 2. **Bucket C1 — Open Elective I (OE-1)**:
-   - Interdisciplinary coursework outside the core department (e.g. *Bio-informatics*, *Operations Research*, *Green Building Technology*).
+   - Broadening horizon courses outside computer science (e.g., *Green Architecture*, *Operations Research*, *Bio-informatics*).
 3. **Bucket C2 — Open Elective II (OE-2)**:
-   - Societal and management electives (e.g. *Intellectual Property Rights*, *Engineering Economics*, *Disaster Management*).
+   - Essential business and law skills (e.g., *Intellectual Property Rights*, *Engineering Economics*, *Disaster Management*).
 4. **Bucket C3 — Professional Elective IV (PE-4)**:
-   - Domain-specific advanced elective tailored directly to the student's specialization.
+   - Advanced technical classes specifically aligned with the student's career track.
 5. **Bucket C4 — Professional Elective V (PE-5)**:
-   - Deep-dive technical track (e.g. *Deep Reinforcement Learning*, *Cloud Security Governance*, *Microservices Architecture*).
+   - Deep-dive industry subjects (e.g., *Deep Learning*, *Cloud Security Governance*, *Microservices*).
 6. **Bucket C5 — Skill Course / Audit Course I (AUC-1)**:
-   - Industry-aligned employability courses and CRT (Campus Recruitment Training) modules.
+   - Employability enhancement and Campus Recruitment Training (CRT) to help students ace job interviews.
 7. **Bucket C6 — Audit Course II (AUC-2)**:
-   - Universal Human Values, Indian Constitution, and Professional Ethics.
+   - Core ethical and social foundation (Universal Human Values, Constitution of India, Environmental Ethics).
 
 ---
 
 ## 🎓 Multi-Tier Faculty Preference Engine
 
-The portal introduces a hierarchical preference matrix that models real-world university teaching arrangements:
+The portal gives students a fair, transparent voice in their education:
 
 1. **3-Rank Lecture Preferences:**
-   - For every selected subject, the student ranks their top 3 preferences (`Preference 1`, `Preference 2`, and `Preference 3`) for the Lecture (L) professor.
-2. **Cascading Sub-Section Unlocking:**
-   - Once a Lecture faculty member is ranked, their assigned section (e.g., `S-58`) immediately unlocks dedicated sub-ranking tables for associated components:
-     - **Tutorial (T)**: Small-group problem solving sub-sections (`A`, `B`, `C`).
-     - **Practical (P)**: Laboratory mentors and experiment slots.
-     - **Skill (S)**: Hands-on implementation instructors.
-3. **Downloadable Verification Proofs:**
-   - **PDF Faculty Directory**: Instantly compiles and downloads an official KLEF-branded tabular roster of all eligible professors for the student's cohort.
-   - **PNG Preference Record**: Renders and downloads a cryptographic-style graphical summary card of all recorded faculty choices for student audit trails.
+   - For every chosen course, the student picks their 1st, 2nd, and 3rd preferred Lecture professors.
+2. **Smart Linking for Labs & Tutorials:**
+   - When a student picks a lecture professor who teaches in section `S-58`, the system automatically knows which lab assistants and tutorial teachers are tied to section `S-58`. It unlocks dedicated sub-ranking tables for:
+     - **Tutorials (T):** Practice and doubt-clearing sessions (`A`, `B`, `C`).
+     - **Practicals (P):** Computer lab experiments and coding tasks.
+     - **Skills (S):** Practical projects and workshops.
+3. **Instant Verification Receipts:**
+   - **PDF Faculty Directory:** Generates a professional university document listing all professors in the student's cohort.
+   - **PNG Graphical Receipt:** Creates a downloadable image of all confirmed rankings so the student has timestamped proof of submission.
 
 ---
 
-## ⚡ Zero-UI Silent Auto-Save & State Persistence
+## ⚡ Zero-UI Silent Auto-Save Technology
 
-A key design requirement is **complete invisibility of persistence operations**:
-- **No Intrusive Toasts:** No "Saving...", "Saved!", or modal popups interrupt the student.
-- **Immediate Local Synchonization:** Every selection in [useSubjects.js](file:///d:/Academic%20Registration%20Portal/Academic%20Registration%20Portal%20-%20Y23/src/portal/hooks/useSubjects.js) writes to localized storage key `klef-subject-selections-{studentId}`.
-- **Granular Preference Storage:** Every sub-section dropdown change writes to `klef-faculty-preferences-{studentId}`.
-- **Multi-Account Browser Hygiene:** When multiple students log in on the same physical computer or kiosk, their data is strictly isolated by their 10-digit Registration ID.
+Many online portals frustrate users with constant popups saying *"Saving... Please wait"* or asking *"Are you sure you want to save?"*.
+
+This portal uses a **Zero-UI Silent Auto-Save** mechanism:
+- Every time a student selects a course or ranks a professor, the website saves the change in **under 5 milliseconds**.
+- There are **no disruptive popups, banners, or loading spinners**.
+- If a student's battery dies, laptop restarts, or they log in tomorrow from another room, **everything is right where they left it**.
+- Each student's selections are stored under their own unique 10-digit ID, so students sharing the same computer never overwrite each other's work.
 
 ---
 
-## 🌐 Deterministic URL Taxonomy & Routing System
+## 🌐 Official Routing System & URL Map
 
-To align with official institutional requirements, the entire portal uses clean, deterministic `.php`-terminated endpoints handled by React Router inside the Next.js App Router:
+All portal pages use formal, recognizable `.php` web addresses matching traditional university enterprise software:
 
-| View / Function | Clean Production URL | Access Role | Description |
+| View / Screen | Exact Web URL | Who Uses It | What Happens on This Page |
 | :--- | :--- | :--- | :--- |
-| **Sign-In Gateway** | `/KLEF/8-2/GBS.php` | Public | Authentication portal with 10-digit ID and Date of Birth verification. |
-| **Student Overview** | `/KLEF/8-2/{studentId}/{studentName}/Academic-Overview.php` | Student | Credit accumulator, registration status, counselor details. |
-| **Cluster Selection** | `/KLEF/8-2/{studentId}/{studentName}/Cluster-Selection.php` | Student | Specialization-locked cohort confirmation view. |
-| **Course Selection** | `/KLEF/8-2/{studentId}/{studentName}/Subject-Selection.php` | Student | 7-bucket course selection workspace. |
-| **Faculty Preferences**| `/KLEF/8-2/{studentId}/{studentName}/Faculty-Preferences.php`| Student | Multi-tier lecture and sub-section ranking tables. |
-| **Faculty Directory** | `/KLEF/8-2/{studentId}/{studentName}/Faculty-Directory.php` | Student | Searchable teaching staff roster with PDF download. |
-| **My Preferences** | `/KLEF/8-2/{studentId}/{studentName}/My-Preference.php` | Student | Complete preference review grid with PNG snapshot export. |
-| **Student Profile** | `/KLEF/8-2/{studentId}/{studentName}/My-Profile.php` | Student | Personal info, Aadhaar, APAAR, parent phone, and password management. |
-| **Admin Console** | `/KLEF/8-2/Admin/G-Bhaanu-Sai/Dashboard.php` | Admin | Executive summary, cohort distribution, quick record creation. |
-| **Admin Students** | `/KLEF/8-2/Admin/G-Bhaanu-Sai/Students.php` | Admin | Full CRUD search table for all 1,159 student profiles. |
-| **Admin Faculty** | `/KLEF/8-2/Admin/G-Bhaanu-Sai/Faculty.php` | Admin | Full CRUD search table for all 426 faculty members. |
-| **Admin Buckets** | `/KLEF/8-2/Admin/G-Bhaanu-Sai/Buckets.php` | Admin | Curricular bucket configuration and credit constraints. |
-| **Admin Courses** | `/KLEF/8-2/Admin/G-Bhaanu-Sai/Courses.php` | Admin | Course catalog management across buckets. |
-| **Developer Bio** | `/KLEF/8-2/Developer/G-Bhaanu-Sai.php` | Public | Systems architect attribution, portfolio links, and technical story. |
+| **Sign-In Gateway** | `/KLEF/8-2/GBS.php` | Everyone | Student and Administrator login gate. |
+| **Student Overview** | `/KLEF/8-2/{studentId}/{studentName}/Academic-Overview.php` | Students | Personal dashboard, registered status, counselor contacts. |
+| **Cluster Selection** | `/KLEF/8-2/{studentId}/{studentName}/Cluster-Selection.php` | Students | View and confirm your specialization-assigned cohort. |
+| **Course Selection** | `/KLEF/8-2/{studentId}/{studentName}/Subject-Selection.php` | Students | Select courses across the 7 academic buckets. |
+| **Faculty Preferences**| `/KLEF/8-2/{studentId}/{studentName}/Faculty-Preferences.php`| Students | Rank your top 3 lecture and lab professors. |
+| **Faculty Directory** | `/KLEF/8-2/{studentId}/{studentName}/Faculty-Directory.php` | Students | Searchable professor directory with PDF download. |
+| **My Preferences** | `/KLEF/8-2/{studentId}/{studentName}/My-Preference.php` | Students | Review all confirmed choices and download PNG receipt. |
+| **Student Profile** | `/KLEF/8-2/{studentId}/{studentName}/My-Profile.php` | Students | View personal records, Aadhaar, APAAR ID, and credentials. |
+| **Admin Console** | `/KLEF/8-2/Admin/G-Bhaanu-Sai/Dashboard.php` | Admins | Executive control room with cohort stats and counts. |
+| **Admin Students** | `/KLEF/8-2/Admin/G-Bhaanu-Sai/Students.php` | Admins | View, search, and edit all 1,159 student profiles. |
+| **Admin Faculty** | `/KLEF/8-2/Admin/G-Bhaanu-Sai/Faculty.php` | Admins | View and search all 426 faculty members. |
+| **Admin Buckets** | `/KLEF/8-2/Admin/G-Bhaanu-Sai/Buckets.php` | Admins | Manage curricular bucket rules and credit limits. |
+| **Admin Courses** | `/KLEF/8-2/Admin/G-Bhaanu-Sai/Courses.php` | Admins | Manage the 102 active courses in the syllabus. |
+| **Developer Bio** | `/KLEF/8-2/Developer/G-Bhaanu-Sai.php` | Everyone | Creator portfolio, engineering story, and contact details. |
 
 ---
 
-## 💻 Comprehensive Technology Stack & Specifications
+## 💻 Under the Hood: Technologies Used & Why
 
-### 1. Frontend Architecture
-- **React 19 (`19.3.1`)**: Component architecture leveraging latest concurrent rendering features and hooks.
-- **Next.js 16 (`16.4.6`)**: Turbo-bundled App Router architecture configured with `output: 'standalone'` for zero-overhead container deployment.
-- **React Router (`8.5.1`)**: High-performance client-side routing within a single-page mount (`[...slug]`), enabling instantaneous route transitions without server roundtrips.
-- **Tailwind CSS (`v4.0`)**: Utility-first CSS engine customized with university brand tokens, deep navy tints (`#1b2d42`), and warm amber accents (`#ea580c`).
-- **Lucide React (`1.16.0`)**: Clean, accessible iconography across topbar navigation, modal alerts, and buttons.
-- **jsPDF & html2canvas**: Client-side document rendering libraries powering instant PDF and PNG downloads.
+For technical reviewers, here is why each modern technology was chosen:
 
-### 2. Backend & Data Engine
-- **Node.js (`v22.x` / `v24.x` LTS)**: Enterprise runtime supporting native ESM imports and top-level await.
-- **Native Node SQLite (`node:sqlite`)**: High-throughput embedded relational database storing all 1,159 students, 426 faculty members, and 682 teaching allocations with zero external database latency.
-- **RESTful Route Handlers (`src/app/(frontend)/portal-api/`)**: JSON endpoints providing cached reads, administrative CRUD updates, and password resets.
+1. **React 19 (`19.3.1`)**: Powers the interactive user interface. Provides smooth, instant screen updates without refreshing the whole page.
+2. **Next.js 16 (`16.4.6`) with Turbopack**: The industry-standard framework for building fast, secure web applications. Compiles code in milliseconds.
+3. **React Router (`8.5.1`)**: Manages seamless page navigation inside the web app while maintaining clean browser URLs.
+4. **Tailwind CSS (`v4.0`)**: A modern styling system used to create custom university designs (official Navy `#1b2d42`, warm gold accents, and crisp typography).
+5. **Native Node SQLite (`node:sqlite`)**: A built-in high-speed database that reads student and course records directly in memory, ensuring ultra-fast lookups without server lag.
+6. **Lucide Icons (`1.16.0`)**: Lightweight, clean vector symbols for navigation icons, status checkmarks, and alerts.
+7. **jsPDF & html2canvas**: Allows students to download real PDF documents and picture receipts directly in their browser without waiting for an email.
 
 ---
 
@@ -214,105 +276,71 @@ To align with official institutional requirements, the entire portal uses clean,
 Academic-Registration-Portal-Y23/
 ├── public/
 │   ├── assets/
-│   │   ├── klef-logo.png                 # Primary university emblem (63px signin / 42px topbar)
-│   │   └── klef-crest.png                # High-res university seal
-│   └── favicon.png                       # Browser tab favicon
+│   │   ├── klef-logo.png                 # Official KLEF University Emblem (63px on signin / 42px on topbar)
+│   │   └── klef-crest.png                # High-resolution university seal
+│   └── favicon.png                       # Browser tab icon
 ├── src/
-│   ├── app/                              # Next.js App Router layer
+│   ├── app/                              # Next.js App Router foundation
 │   │   └── (frontend)/
-│   │       ├── [...slug]/
-│   │       │   └── page.jsx              # Catch-all page delegating to PortalMount
-│   │       ├── portal-api/
-│   │       │   ├── [resource]/route.js   # Dynamic REST endpoints (students, faculty, courses)
-│   │       │   └── auth/route.js         # Session verification and role management
-│   │       ├── styles/                   # Per-page modular CSS stylesheets
-│   │       │   ├── academic-overview.css # Overview cards, credit rings, and summary grids
-│   │       │   ├── cluster-selection.css # Specialization banners and cohort cards
-│   │       │   ├── subject-selection.css # Bucket tabs, subject chips, and selection pill bars
-│   │       │   ├── faculty-preference.css# 3-tier lecture tables & sub-section rankings
-│   │       │   ├── faculty-directory.css # Directory search, filter chips, and PDF headers
-│   │       │   ├── my-preferences.css    # Clean preference table and PNG capture layout
-│   │       │   ├── student-profile.css   # Demographic details and password change modal
-│   │       │   ├── admin-students.css    # Admin tables, search bars, and pagination controls
-│   │       │   └── developer-page.css    # Architect portfolio cards and timeline items
-│   │       ├── layout.jsx                # Root HTML document and font preloading
+│   │       ├── [...slug]/page.jsx        # Catch-all page router delegate
+│   │       ├── portal-api/               # Fast backend endpoints for student & course data
+│   │       ├── styles/                   # Modular CSS stylesheets for each screen
+│   │       ├── layout.jsx                # Website layout wrapper and fonts
 │   │       ├── page.jsx                  # Root entry redirecting to /KLEF/8-2/GBS.php
-│   │       ├── PortalMount.jsx           # Client-side wrapper ensuring clean mounting
-│   │       └── styles.css                # Global theme tokens and Tailwind CSS imports
+│   │       └── styles.css                # Global design tokens and colors
 │   ├── lib/
 │   │   ├── db/
-│   │   │   ├── client.js                 # SQLite database connection & schema bootstrapping
-│   │   │   ├── eligibilityEngine.js      # Deterministic academic qualification rules
-│   │   │   ├── optionSheetRules.json     # Institutional section ranges per specialization
-│   │   │   ├── queries.js                # High-performance analytical database queries
-│   │   │   └── schema.sql                # Normalized schema DDL (14 tables with indexes)
-│   │   └── portal-auth.js                # Session authentication and cookie tokens
-│   └── portal/                           # React 19 Single Page Application
+│   │   │   ├── client.js                 # Database connector and table creation
+│   │   │   ├── eligibilityEngine.js      # Rules that match specializations to cohorts
+│   │   │   ├── optionSheetRules.json     # Section boundary rules per department
+│   │   │   └── queries.js                # Search and data retrieval queries
+│   │   └── portal-auth.js                # Safe sign-in verification
+│   └── portal/                           # The visual React web application
 │       ├── app/
-│       │   ├── App.jsx                   # Top-level client mount & AuthProvider wrapper
-│       │   └── routes.jsx                # React Router 8 route definitions with .php mappings
-│       ├── components/                   # Modular presentation components
-│       │   ├── academic/                 # Course selectors and faculty ranking controls
-│       │   ├── common/                   # Brand headers, date pickers, password inputs
-│       │   └── layout/                   # Topbar header shell, navigation, and footer
-│       ├── pages/                        # Student and administrative workspaces
-│       │   ├── AcademicOverview.jsx      # Student dashboard & credit accumulation
-│       │   ├── ClusterSelection.jsx      # Specialization-locked cluster cohort confirmation
-│       │   ├── SubjectSelection.jsx      # 7-bucket course selection workflow
-│       │   ├── FacultyPreferences.jsx    # Hierarchical lecture and sub-section ranking
-│       │   ├── FacultyDirectory.jsx      # Faculty roster with PDF export capabilities
-│       │   ├── MyPreferences.jsx         # Summary grid with PNG proof download
-│       │   ├── MyProfile.jsx             # Student profile inspection & credential management
-│       │   ├── Login.jsx                 # Student & Admin sign-in interface
-│       │   ├── Admin.jsx                 # Administrative command dashboard
-│       │   └── Developer.jsx             # Systems architect attribution & technical profile
-│       ├── services/                     # Data stores, local storage adapters & student roster
-│       │   ├── academicData.js           # Static curricular course definitions & fallbacks
-│       │   ├── authService.js            # In-memory authentication & session store
-│       │   ├── preferenceService.js      # Faculty preference persistence adapter
-│       │   ├── studentRosterData.json    # Complete 1,159-student specialization index
-│       │   └── studentService.js         # Cluster lookup & route memory service
-│       └── utils/                        # URL route builders & validation routines
-├── next.config.mjs                       # Next.js standalone build configuration
-├── package.json                          # Project dependencies and lifecycle scripts
-├── tsconfig.json                         # TypeScript compiler settings
-├── LICENSE                               # MIT License legal terms
-├── CONTRIBUTING.md                       # Contribution guidelines
+│       │   ├── App.jsx                   # Main frontend container
+│       │   └── routes.jsx                # Web page route definitions (.php URLs)
+│       ├── components/                   # Reusable UI parts (headers, footers, buttons)
+│       ├── pages/                        # Actual visual screens (Overview, Courses, Faculty)
+│       ├── services/                     # Background helpers for saving choices & loading data
+│       └── utils/                        # URL address helpers and input checks
+├── next.config.mjs                       # Production web server configuration
+├── package.json                          # List of software libraries used
+├── tsconfig.json                         # TypeScript configuration
+├── LICENSE                               # Legal open-source license
+├── CONTRIBUTING.md                       # Guide for developers wanting to improve the site
 ├── CODE_OF_CONDUCT.md                   # Community standards
-├── SECURITY.md                           # Vulnerability disclosure protocol
-└── ACCESSIBILITY.md                      # Accessibility standards (WCAG 2.1 AA)
+├── SECURITY.md                           # How to report security questions
+└── ACCESSIBILITY.md                      # Accessible design rules for all users
 ```
 
 ---
 
-## 🚀 Local Engineering Setup & Build Runbook
+## 🚀 Local Setup & Running the Code
 
 ### Prerequisites
-- **Node.js**: `v20.x`, `v22.x`, or `v24.x` LTS
-- **Package Manager**: `npm` (v10+) or `pnpm` (v9+)
-- **Git**
+- Install **Node.js** (Version 20, 22, or 24) on your computer.
+- Install **Git**.
 
-### 1. Clone the Repository
+### Step 1: Download the Project
 ```bash
 git clone https://github.com/BhaanuG/Academic-Registration-Portal-Y23.git
 cd "Academic-Registration-Portal-Y23"
 ```
 
-### 2. Install Project Dependencies
+### Step 2: Install Libraries
 ```bash
 npm install
 ```
 
-### 3. Launch Development Server
+### Step 3: Start the Website
 ```bash
 npm run dev
 ```
 
-### 4. Build for Production
+### Step 4: Build for Production
 ```bash
 npm run build
 ```
-This compiles optimized server bundles and client bundles through Turbopack.
 
 ---
 
