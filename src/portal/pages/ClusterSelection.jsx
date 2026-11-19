@@ -1,15 +1,16 @@
 import { useState, useEffect } from "react";
 import { CheckCircle2, ShieldAlert } from "lucide-react";
+import { getStudentRosterInfo } from "../services/studentService";
 
 export default function ClusterSelection({ studentId, cluster, setCluster, goTo }) {
-  const [student, setStudent] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [assignedCluster, setAssignedCluster] = useState(null);
-  const [isUnverified, setIsUnverified] = useState(false);
+  const initialInfo = getStudentRosterInfo(studentId);
+  const [student, setStudent] = useState(initialInfo);
+  const [loading, setLoading] = useState(false);
+  const [assignedCluster, setAssignedCluster] = useState(initialInfo?.cluster || null);
+  const [isUnverified, setIsUnverified] = useState(initialInfo?.cluster === "UNVERIFIED");
 
   useEffect(() => {
     if (!studentId) return;
-    setLoading(true);
     fetch(`/portal-api/student-profile?studentId=${studentId}`)
       .then((r) => r.json())
       .then((res) => {
@@ -30,9 +31,6 @@ export default function ClusterSelection({ studentId, cluster, setCluster, goTo 
       })
       .catch((err) => {
         console.error("Error loading student profile in ClusterSelection:", err);
-      })
-      .finally(() => {
-        setLoading(false);
       });
   }, [studentId, setCluster]);
 
@@ -54,9 +52,7 @@ export default function ClusterSelection({ studentId, cluster, setCluster, goTo 
   const currentClusterName = assignedCluster || (cluster === "Cluster 1" || cluster === "Cluster 2" ? cluster : "Cluster 2");
 
   // Determine display specialization (matches student record or falls back accurately)
-  const displaySpecialization = student?.specialization
-    ? student.specialization
-    : "Cloud Infrastructure Design And Engineering";
+  const displaySpecialization = student?.specialization || initialInfo?.specialization || "Generative AI for Agentic and Multi-Modal Intelligence";
 
   return (
     <div className="cluster-selection-screen-fit">
