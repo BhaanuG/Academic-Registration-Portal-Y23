@@ -63,12 +63,19 @@ export default function Subjects({ selections, setSelections, goTo }) {
 
             <button
               type="button"
-              className="reset-action-pill"
+              className="reset-action-pill vertical-reset-btn"
               onClick={() => setShowResetModal(true)}
               title="Reset course selections to default"
+              aria-label="Reset course selections"
             >
-              <RotateCcw size={13} />
-              <span>Reset Course Selections</span>
+              <span className="vertical-text">
+                <span>R</span>
+                <span>e</span>
+                <span>s</span>
+                <span>e</span>
+                <span>t</span>
+              </span>
+              <RotateCcw size={13} className="vertical-reset-icon" />
             </button>
           </div>
         }
