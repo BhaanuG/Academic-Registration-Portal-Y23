@@ -1,7 +1,7 @@
 import { useRef, useState, useMemo, useEffect } from "react";
 import { toPng } from "html-to-image";
 import PageHeading from "../components/common/PageHeading";
-import { buckets, componentNames, faculty, getSubSectionFaculty, sectionBase, sectionFor } from "../services/academicData";
+import { buckets, componentNames, faculty, sectionFor } from "../services/academicData";
 import { CheckCircle2, Download, Layers, ShieldCheck, Check, Trash2, Edit3, Lock, RotateCcw } from "lucide-react";
 
 export default function MyPreference({ studentId, selections = {}, setSelections, prefs = {}, setPrefs, cluster }) {
@@ -151,84 +151,35 @@ export default function MyPreference({ studentId, selections = {}, setSelections
     return rows.filter((r) => r.subject).length;
   }, [rows]);
 
-  const completedLecturePrefs = useMemo(() => {
+  const completedPreferencesCount = useMemo(() => {
     return rows.filter((r) => {
       if (!r.subject) return false;
-      const lPrefs = prefs[`${r.subject.code}-L`] || [];
-      return lPrefs.filter(Boolean).length === 3;
+      const comps = Array.isArray(r.subject.components) && r.subject.components.length > 0 ? r.subject.components : ["L"];
+      return comps.every((comp) => {
+        const compPrefs = prefs[`${r.subject.code}-${comp}`] || [];
+        return compPrefs.filter(Boolean).length === 3;
+      });
     }).length;
   }, [rows, prefs]);
 
   const preferenceCell = (subject, component, rank) => {
-    const primaryComp = subject.components.includes("L") ? "L" : subject.components[0] || "L";
-
-    if (component === primaryComp) {
-      const facultyId = prefs[`${subject.code}-${primaryComp}`]?.[rank];
-      const person = faculty.find((item) => item.id === facultyId);
-      if (!person) {
-        return (
-          <div className="pref-cell-empty">
-            <span>Rank {rank + 1} pending</span>
-          </div>
-        );
-      }
-      return (
-        <div className="pref-cell-filled">
-          <div className="pref-cell-top">
-            <span className="pref-cell-sec">{sectionFor(subject.code, person.id, primaryComp, cluster)}</span>
-            <span className="pref-cell-rank">Choice {rank + 1}</span>
-          </div>
-          <strong>{person.name}</strong>
-          <span className="pref-cell-empid">ID · {person.id}</span>
-        </div>
-      );
-    }
-
-    const primaryFacultyId = prefs[`${subject.code}-${primaryComp}`]?.[rank];
-    const primaryFaculty = faculty.find((item) => item.id === primaryFacultyId);
-    const baseSec = primaryFaculty ? sectionBase(sectionFor(subject.code, primaryFaculty.id, primaryComp, cluster)) : null;
-
-    if (!baseSec) {
+    const facultyId = prefs[`${subject.code}-${component}`]?.[rank];
+    const person = faculty.find((item) => item.id === facultyId);
+    if (!person) {
       return (
         <div className="pref-cell-empty">
-          <span>Set {componentNames[primaryComp] || "Primary"} Pref {rank + 1}</span>
+          <span>Choice {rank + 1} pending</span>
         </div>
       );
     }
-
-    const subRanks = [1, 2, 3].map((subR) => {
-      const key = `${subject.code}-${component}-L${rank + 1}-R${subR}`;
-      const subCode = prefs[key];
-      if (!subCode) return null;
-      const subLetter = subCode.slice(-1);
-      const fPerson = getSubSectionFaculty(subject.code, baseSec, subLetter, component);
-      return {
-        subRank: subR,
-        subCode,
-        faculty: fPerson,
-      };
-    }).filter(Boolean);
-
-    if (!subRanks.length) {
-      return (
-        <div className="pref-cell-empty">
-          <span>Sub-sections pending</span>
-        </div>
-      );
-    }
-
     return (
-      <div className="sub-ranked-grid">
-        {subRanks.map((item) => (
-          <div key={item.subRank} className="sub-ranked-chip">
-            <div className="sub-chip-header">
-              <span className="sub-chip-code">{item.subCode}</span>
-              <span className="sub-chip-rank">Pref {item.subRank}</span>
-            </div>
-            <strong>{item.faculty ? item.faculty.name : "Faculty Member"}</strong>
-            <span className="sub-chip-empid">{item.faculty ? `ID · ${item.faculty.id}` : ""}</span>
-          </div>
-        ))}
+      <div className="pref-cell-filled">
+        <div className="pref-cell-top">
+          <span className="pref-cell-sec">{sectionFor(subject.code, person.id, component, cluster)}</span>
+          <span className="pref-cell-rank">Choice {rank + 1}</span>
+        </div>
+        <strong>{person.name}</strong>
+        <span className="pref-cell-empid">ID · {person.id}</span>
       </div>
     );
   };
@@ -237,7 +188,7 @@ export default function MyPreference({ studentId, selections = {}, setSelections
     <>
       <PageHeading
         title="My Preference"
-        description="A consolidated, automatically saved view of your lecture preferences and corresponding sub-section rankings (A, B, C) for every selected course."
+        description="A consolidated, automatically saved view of your faculty preferences across all delivery components for each selected course."
         aside={
           <div className="flex items-center gap-2">
             {!isFinalized ? (
@@ -303,8 +254,8 @@ export default function MyPreference({ studentId, selections = {}, setSelections
         <div className="metric-chip">
           <ShieldCheck size={18} className="text-emerald-700" />
           <div>
-            <span>Lecture Rankings</span>
-            <strong>{completedLecturePrefs} of {selectedCoursesCount} Fully Ranked</strong>
+            <span>Faculty Rankings</span>
+            <strong>{completedPreferencesCount} of {selectedCoursesCount} Fully Ranked</strong>
           </div>
         </div>
 

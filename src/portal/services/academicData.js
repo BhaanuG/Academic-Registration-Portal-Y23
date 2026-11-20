@@ -18342,13 +18342,3 @@ export function sectionFor(subjectCode, facultyId, component, cluster = "Cluster
 export function sectionBase(section = "") {
   return String(section).match(/\d+/)?.[0] || "";
 }
-
-export function getSubSectionFaculty(subjectCode, secNum, subLetter, component) {
-  const pool = faculty.filter((person) => person.components.includes(component));
-  if (!pool.length) return null;
-  const num = parseInt(secNum, 10) || 1;
-  const subIdx = subLetter.toUpperCase().charCodeAt(0) - 65; // A=0, B=1, C=2
-  const baseOffset = (num * 3 + Math.floor(num / 2)) % pool.length;
-  const index = (baseOffset + (subIdx >= 0 ? subIdx : 0)) % pool.length;
-  return pool[index];
-}
