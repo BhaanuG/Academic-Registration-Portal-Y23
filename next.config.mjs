@@ -35,6 +35,20 @@ const nextConfig = {
   env: {
     NEXT_PUBLIC_SITE_URL: process.env.FIGMA_PUBLIC_URL || 'http://localhost:3000',
   },
+  async redirects() {
+    return [
+      {
+        source: '/',
+        destination: '/KLEF/8-2/GBS.php',
+        permanent: false,
+      },
+      {
+        source: '/login',
+        destination: '/KLEF/8-2/GBS.php',
+        permanent: false,
+      },
+    ]
+  },
 }
 
 export default nextConfig

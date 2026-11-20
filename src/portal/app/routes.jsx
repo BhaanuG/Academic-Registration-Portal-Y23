@@ -158,8 +158,8 @@ export function PortalRoutes() {
   return (
     <Routes>
       {/* Primary GBS.php and login endpoints */}
-      <Route path="/" element={<Login />} />
-      <Route path="/login" element={<Login />} />
+      <Route path="/" element={<Navigate to="/KLEF/8-2/GBS.php" replace />} />
+      <Route path="/login" element={<Navigate to="/KLEF/8-2/GBS.php" replace />} />
       <Route path="/KLEF/8-2/GBS.php" element={<Login />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/reset-password.php" element={<ResetPassword />} />
