@@ -205,13 +205,30 @@ export default function Preferences({ studentId, selections, prefs, setPrefs, cl
             const completed =
               item &&
               comps.every((comp) => {
-                const assignedRange = item.optionSheetRange || (
-                  comp === "P"
-                    ? (item.sections?.pracSection !== "NA" ? item.sections?.pracSection : null)
-                    : comp === "S"
-                    ? (item.sections?.skillSection !== "NA" ? item.sections?.skillSection : null)
-                    : (item.sections?.lecSection !== "NA" ? item.sections?.lecSection : null)
-                );
+                let assignedRange = null;
+                if (comp === "S") {
+                  const pChoiceId = prefs[`${item.code}-P`]?.[0];
+                  if (pChoiceId) {
+                    const pSec = sectionFor(item.code, pChoiceId, "P", cluster);
+                    if (pSec) {
+                      const testSkillPool = getFacultyOptionsForSubject(item.code, "S", cluster, pSec);
+                      if (testSkillPool.length > 0) assignedRange = pSec;
+                    }
+                  }
+                  if (!assignedRange) {
+                    assignedRange = item.sections?.skillSection !== "NA" && item.sections?.skillSection
+                      ? item.sections.skillSection
+                      : item.optionSheetRange || null;
+                  }
+                } else if (comp === "P") {
+                  assignedRange = item.sections?.pracSection !== "NA" && item.sections?.pracSection
+                    ? item.sections.pracSection
+                    : item.optionSheetRange || null;
+                } else {
+                  assignedRange = item.sections?.lecSection !== "NA" && item.sections?.lecSection
+                    ? item.sections.lecSection
+                    : item.optionSheetRange || null;
+                }
                 let pool = getFacultyOptionsForSubject(item.code, comp, cluster, assignedRange);
                 if (pool.length === 0) pool = getFacultyOptionsForSubject(item.code, comp, cluster, null);
                 if (pool.length === 0) pool = getFacultyOptionsForSubject(item.code, comp, null, null);
@@ -323,32 +340,70 @@ export default function Preferences({ studentId, selections, prefs, setPrefs, cl
                   component === "P" ? "Practical" :
                   component === "S" ? "Skill" : component
                 );
-                // Determine assigned section range for this subject/component
-                const assignedRange = subject.optionSheetRange || (
-                  component === "P"
-                    ? (subject.sections?.pracSection !== "NA" ? subject.sections?.pracSection : null)
-                    : component === "S"
-                    ? (subject.sections?.skillSection !== "NA" ? subject.sections?.skillSection : null)
-                    : (subject.sections?.lecSection !== "NA" ? subject.sections?.lecSection : null)
-                );
+
+                // Determine assigned section range for this subject/component:
+                // Component-specific sections (pracSection, skillSection, lecSection) take absolute priority over optionSheetRange.
+                // For sub-components (such as Skill 'S' in 23IE4053A):
+                // If a 1st preference is chosen in the primary component (e.g. Practical 'P'), anchor Skill to that section!
+                let assignedRange = null;
+                if (component === "S") {
+                  // Check if primary component 'P' has a selected 1st preference with a known section
+                  const pChoiceId = prefs[`${subject.code}-P`]?.[0];
+                  if (pChoiceId) {
+                    const pSec = sectionFor(subject.code, pChoiceId, "P", cluster);
+                    if (pSec) {
+                      // Verify if this section exists in Skill allocations
+                      const testSkillPool = getFacultyOptionsForSubject(subject.code, "S", cluster, pSec);
+                      if (testSkillPool.length > 0) {
+                        assignedRange = pSec;
+                      }
+                    }
+                  }
+                  if (!assignedRange) {
+                    assignedRange = subject.sections?.skillSection !== "NA" && subject.sections?.skillSection
+                      ? subject.sections.skillSection
+                      : subject.optionSheetRange || null;
+                  }
+                } else if (component === "P") {
+                  assignedRange = subject.sections?.pracSection !== "NA" && subject.sections?.pracSection
+                    ? subject.sections.pracSection
+                    : subject.optionSheetRange || null;
+                } else {
+                  assignedRange = subject.sections?.lecSection !== "NA" && subject.sections?.lecSection
+                    ? subject.sections.lecSection
+                    : subject.optionSheetRange || null;
+                }
 
                 // Compute available faculty count for this course and component
                 let facultyPool = getFacultyOptionsForSubject(subject.code, component, cluster, assignedRange);
-                if (facultyPool.length === 0) facultyPool = getFacultyOptionsForSubject(subject.code, component, cluster, null);
+                if (facultyPool.length === 0 && assignedRange) facultyPool = getFacultyOptionsForSubject(subject.code, component, cluster, null);
                 if (facultyPool.length === 0) facultyPool = getFacultyOptionsForSubject(subject.code, component, null, null);
                 const availableCount = facultyPool.length;
                 const totalRanksToShow = Math.min(3, Math.max(1, availableCount));
                 const activeRankLabels = rankLabels.slice(0, totalRanksToShow);
+
+                // Extract active section name if all options in facultyPool belong to the same section
+                const distinctSecs = Array.from(new Set(facultyPool.map((f) => f.section_id).filter(Boolean)));
+                const singleSectionName = distinctSecs.length === 1 ? distinctSecs[0] : null;
 
                 return (
                   <div key={component} className="lecture-preference-card">
                     <div className="card-heading">
                       <div>
                         <span className="eyebrow">{compName} Component</span>
-                        <h3>{compName} ({component})</h3>
+                        <h3>
+                          {compName} ({component})
+                          {singleSectionName && (
+                            <span className="ml-2 text-xs font-semibold px-2 py-0.5 rounded bg-amber-100 text-amber-800 border border-amber-300">
+                              Section {singleSectionName}
+                            </span>
+                          )}
+                        </h3>
                         <p>
                           {availableCount === 1
                             ? `Only one section and faculty member is allocated for ${compName} in this course. Preference is pre-assigned to the allocated faculty.`
+                            : singleSectionName
+                            ? `All faculty members below are allocated to Section ${singleSectionName}. Select ${totalRanksToShow} distinct faculty member${totalRanksToShow > 1 ? "s" : ""} in order of preference for this section.`
                             : `Select ${totalRanksToShow} distinct faculty member${totalRanksToShow > 1 ? "s" : ""} in order of preference for ${compName}.`}
                         </p>
                       </div>
