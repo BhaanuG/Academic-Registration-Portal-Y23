@@ -14,6 +14,7 @@ import {
   getAuthenticatedStudent,
 } from "../services/authService";
 import { portalPath } from "../utils/routes";
+import { getLastRoute } from "../services/studentService";
 import { isValidStudentId } from "../utils/validation";
 import { KeyRound, Phone, HelpCircle, X, ExternalLink } from "lucide-react";
 import OverlayPortal from "../components/common/OverlayPortal";
@@ -53,18 +54,23 @@ export default function Login() {
       if (activeStudent === "8897337687") {
         navigate("/KLEF/8-2/Admin/G-Bhaanu-Sai/Dashboard.php");
       } else {
-        fetch(`/portal-api/student-profile?studentId=${activeStudent}`)
-          .then((r) => r.json())
-          .then((res) => {
-            if (res.ok && res.data) {
-              const studentRecord = res.data;
-              const studentSlug = studentRecord.name
-                ? studentRecord.name.replace(/[^a-zA-Z0-9]+/g, "-").replace(/^-+|-+$/g, "")
-                : "Student";
-              navigate(portalPath(activeStudent, studentSlug, "overview"));
-            }
-          })
-          .catch(() => {});
+        const lastRoute = getLastRoute();
+        if (lastRoute && lastRoute.includes(`/KLEF/8-2/${activeStudent}/`)) {
+          navigate(lastRoute);
+        } else {
+          fetch(`/portal-api/student-profile?studentId=${activeStudent}`)
+            .then((r) => r.json())
+            .then((res) => {
+              if (res.ok && res.data) {
+                const studentRecord = res.data;
+                const studentSlug = studentRecord.name
+                  ? studentRecord.name.replace(/[^a-zA-Z0-9]+/g, "-").replace(/^-+|-+$/g, "")
+                  : "Student";
+                navigate(portalPath(activeStudent, studentSlug, "overview"));
+              }
+            })
+            .catch(() => {});
+        }
       }
     }
   }, [navigate]);
@@ -143,7 +149,12 @@ export default function Login() {
         ? studentRecord.name.replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-+|-+$/g, '')
         : 'Student';
       signIn(studentId);
-      navigate(portalPath(studentId, studentSlug, "overview"));
+      const lastRoute = getLastRoute();
+      if (lastRoute && lastRoute.includes(`/KLEF/8-2/${studentId}/`)) {
+        navigate(lastRoute);
+      } else {
+        navigate(portalPath(studentId, studentSlug, "overview"));
+      }
     } catch {
       return setError("Unable to authenticate at this time. Please check your network connection.");
     }

@@ -15,8 +15,16 @@ import {
 } from "lucide-react";
 import OverlayPortal from "../components/common/OverlayPortal";
 
-export default function Subjects({ studentId, selections, setSelections, goTo }) {
-  const [active, setActive] = useState("C0");
+export default function Subjects({
+  studentId,
+  studentName = "Student",
+  selections,
+  setSelections,
+  goTo,
+  activeBucketId,
+  onBucketChange,
+}) {
+  const [active, setActive] = useState(activeBucketId || "C0");
   const [showResetModal, setShowResetModal] = useState(false);
   const [resetStatus, setResetStatus] = useState("");
 
@@ -31,9 +39,24 @@ export default function Subjects({ studentId, selections, setSelections, goTo })
       return () => window.removeEventListener("keydown", handleKeyDown);
     }
   }, [showResetModal]);
+
   const [studentBuckets, setStudentBuckets] = useState([]);
   const [studentSubjects, setStudentSubjects] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // Sync internal active with external activeBucketId prop if provided
+  useEffect(() => {
+    if (activeBucketId && activeBucketId !== active) {
+      setActive(activeBucketId);
+    }
+  }, [activeBucketId]);
+
+  const handleSelectBucket = (bucketId) => {
+    setActive(bucketId);
+    if (onBucketChange) {
+      onBucketChange(bucketId);
+    }
+  };
 
   useEffect(() => {
     if (!studentId) return;
@@ -45,8 +68,12 @@ export default function Subjects({ studentId, selections, setSelections, goTo })
       .then(([bRes, sRes]) => {
         if (bRes.ok && bRes.data && bRes.data.length > 0) {
           setStudentBuckets(bRes.data);
-          if (!active || !bRes.data.some((b) => b.id === active)) {
-            setActive(bRes.data[0].id);
+          // If active is not in student buckets, set to first
+          const targetActive = activeBucketId || active;
+          if (!targetActive || !bRes.data.some((b) => b.id === targetActive)) {
+            const firstId = bRes.data[0].id;
+            setActive(firstId);
+            if (onBucketChange) onBucketChange(firstId);
           }
         }
         if (sRes.ok && sRes.data) {
@@ -97,29 +124,37 @@ export default function Subjects({ studentId, selections, setSelections, goTo })
             description: "",
             faculty_display: ms.faculty_display,
             sections: ms.sections,
-            is_prescribed: ms.is_prescribed,
+            is_prescribed: ms.is_prescribed || false,
           }];
         });
 
-        // Deduplicate subjects by course code to prevent duplicate key errors and repeated cards
-        const seenCodes = new Set();
+        // Deduplicate subjects within the bucket
+        const seen = new Set();
         const uniqueSubjects = [];
-        for (const subj of subjectsList) {
-          if (!seenCodes.has(subj.code)) {
-            seenCodes.add(subj.code);
-            uniqueSubjects.push(subj);
+        subjectsList.forEach((s) => {
+          if (!seen.has(s.code)) {
+            seen.add(s.code);
+            uniqueSubjects.push(s);
           }
-        }
+        });
 
         return {
           id: b.id,
           short: b.short_code || b.id,
-          title: b.title,
-          subjects: uniqueSubjects.length > 0 ? uniqueSubjects : (fallbackBuckets.find((fb) => fb.id === b.id)?.subjects || []),
+          title: b.title || b.id,
+          description: b.title,
+          subjects: uniqueSubjects,
         };
       });
     }
-    return fallbackBuckets;
+
+    return fallbackBuckets.map((b) => ({
+      ...b,
+      subjects: b.subjects.map((s) => ({
+        ...s,
+        faculty_display: null,
+      })),
+    }));
   }, [studentBuckets, studentSubjects]);
 
   // Alias displayBuckets as buckets for cleaner template bindings
@@ -149,43 +184,24 @@ export default function Subjects({ studentId, selections, setSelections, goTo })
   };
 
   return (
-    <div className="subject-selection-page">
+    <>
       <PageHeading
-        title="Bucket-Wise Course Selection"
-        description="Choose one course from each academic bucket. Review credits, teaching components, and syllabus outlines. Your selections save automatically."
+        title="Course Bucket Selection"
+        description="Select exactly one course option for each academic bucket. Your choices determine available faculty preferences."
         aside={
-          <div className="subject-aside-meter-row">
-            <div className="credit-meter">
-              <div className="meter-header">
-                <span>Selected Credits</span>
-                <strong>
-                  <span className="animated-number">{credits}</span>
-                  <small> / 25 Max</small>
-                </strong>
-              </div>
-              <div className="meter-track">
-                <i style={{ width: `${Math.min((credits / 25) * 100, 100)}%` }} />
-              </div>
-              <p>
-                {credits === 25
-                  ? "Requirement met (25 Credits)"
-                  : `${buckets.length - selectedSubjects.length} of ${buckets.length} buckets remaining`}
-              </p>
-            </div>
-
+          <div className="flex items-center gap-2">
             <button
               type="button"
-              className="reset-action-pill vertical-reset-btn"
+              className="reset-action-pill"
               onClick={() => setShowResetModal(true)}
-              title="Reset course selections to default"
-              aria-label="Reset course selections"
+              title="Reset all course selections"
             >
-              <span className="vertical-text">
-                <span>Re</span>
-                <span>Set</span>
-              </span>
-              <RotateCcw size={13} className="vertical-reset-icon" />
+              <RotateCcw size={13} />
+              <span>Reset Selections</span>
             </button>
+            <span className="credits-badge">
+              <strong>{credits}</strong> credits selected
+            </span>
           </div>
         }
       />
@@ -203,11 +219,14 @@ export default function Subjects({ studentId, selections, setSelections, goTo })
         {/* Bucket Navigation Sidebar */}
         <aside className="bucket-nav">
           <div className="bucket-nav-header">
-            <p className="eyebrow">Academic Buckets</p>
+            <span className="eyebrow">Academic Buckets</span>
+            <small>
+              {Object.keys(selections).length} of {displayBuckets.length} Completed
+            </small>
           </div>
 
-          <div className="bucket-nav-list">
-            {buckets.map((item) => {
+          <div className="bucket-nav-list" role="tablist">
+            {displayBuckets.map((item) => {
               const selectedCode = selections[item.id];
               const isNone = selectedCode === "NONE";
               const subject = item.subjects.find((s) => s.code === selectedCode);
@@ -226,9 +245,7 @@ export default function Subjects({ studentId, selections, setSelections, goTo })
                   type="button"
                   className={`bucket-nav-item ${isCurrent ? "active" : ""} ${statusClass}`}
                   aria-current={isCurrent ? "step" : undefined}
-                  onClick={() => {
-                    setActive(item.id);
-                  }}
+                  onClick={() => handleSelectBucket(item.id)}
                 >
                   <span className="nav-bucket-badge">{item.id}</span>
                   <div className="nav-bucket-info">
@@ -241,6 +258,15 @@ export default function Subjects({ studentId, selections, setSelections, goTo })
                         : "Selection needed"}
                     </small>
                   </div>
+                  <span className="nav-bucket-indicator">
+                    {isRegisteredCourse ? (
+                      <Check size={14} className="text-emerald-700" />
+                    ) : isNone ? (
+                      <span className="text-[10px] font-bold text-slate-500">OPT-OUT</span>
+                    ) : (
+                      <span className="pending-dot" />
+                    )}
+                  </span>
                 </button>
               );
             })}
@@ -248,12 +274,15 @@ export default function Subjects({ studentId, selections, setSelections, goTo })
 
           <div className="bucket-nav-footer">
             <div className="nav-legend">
-              <span className="legend-dot completed" />
-              <span>Selected</span>
-              <span className="legend-dot opted-none" />
-              <span>None chosen</span>
-              <span className="legend-dot pending" />
-              <span>Pending</span>
+              <span className="legend-item">
+                <span className="legend-dot completed" /> Selected
+              </span>
+              <span className="legend-item">
+                <span className="legend-dot pending" /> Pending
+              </span>
+              <span className="legend-item">
+                <span className="legend-dot opted-none" /> Opt-out
+              </span>
             </div>
           </div>
         </aside>
@@ -283,22 +312,20 @@ export default function Subjects({ studentId, selections, setSelections, goTo })
                     delete next[bucket.id];
                     return next;
                   });
-                  setResetStatus(`Selection for ${bucket.id} (${bucket.short}) has been reset.`);
-                  setTimeout(() => setResetStatus(""), 4000);
                 }}
-                disabled={!selections[bucket.id]}
-                title={`Reset selected course for ${bucket.id}`}
+                title={`Clear selection for ${bucket.id}`}
               >
                 <RotateCcw size={12} />
-                <span>Reset {bucket.id}</span>
+                <span>Clear {bucket.id}</span>
               </button>
             </div>
           </div>
 
-          {/* Subjects Option Cards */}
+          {/* Subjects Grid */}
           <div className="subject-cards-grid">
             {bucket.subjects.map((item) => {
               const isSelected = selections[bucket.id] === item.code;
+              const hasFacultyDisplay = Boolean(item.faculty_display);
 
               return (
                 <article
@@ -314,7 +341,7 @@ export default function Subjects({ studentId, selections, setSelections, goTo })
                     }))
                   }
                   onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
+                    if (e.key === " " || e.key === "Enter") {
                       e.preventDefault();
                       setSelections((current) => ({
                         ...current,
@@ -322,49 +349,57 @@ export default function Subjects({ studentId, selections, setSelections, goTo })
                       }));
                     }
                   }}
-                  style={{ cursor: "pointer" }}
                 >
-                  <div className="card-top">
-                    <div className="card-left-content">
-                      <div className="card-code-group">
-                        <span className="card-code">{item.code}</span>
-                        <span className="card-credits">{item.credits} Credits</span>
-                      </div>
-                      <h3 className="card-title">{item.name}</h3>
-                      {item.description && !item.description.includes(item.name) ? (
-                        <p className="card-description">{item.description}</p>
-                      ) : null}
-                    </div>
-
-                    <div className="card-right-group">
-                      <div className="card-radio-mark" aria-hidden="true">
-                        {isSelected && <Check size={14} />}
-                      </div>
-
-                      {/* L-T-P-S Structure below the selection dot: Shows real numbers if available in curriculum, else "-" */}
-                      {(() => {
-                        const labels = ["L", "T", "P", "S"];
-                        return (
-                          <div className="ltps-badge" title="Course hours per week (L - T - P - S)">
-                            <div className="ltps-matrix-labels">
-                              {labels.map((lbl) => (
-                                <span key={lbl}>{lbl}</span>
-                              ))}
-                            </div>
-                            <div className="ltps-matrix-values">
-                              {labels.map((_, idx) => (
-                                <span key={idx}>-</span>
-                              ))}
-                            </div>
-                          </div>
-                        );
-                      })()}
-                    </div>
+                  <div className="subject-card-head">
+                    <div className="subject-code-tag">{item.code}</div>
+                    <div className="subject-credits-tag">{item.credits} Credits</div>
                   </div>
 
-                  <div className="card-action-row">
-                    <span className="action-hint">
-                      {isSelected ? "Selected for Registration" : "Click to Select Course"}
+                  <h3 className="subject-title">{item.name}</h3>
+
+                  {item.description && (
+                    <p className="subject-description">{item.description}</p>
+                  )}
+
+                  {/* LTPS Breakdown */}
+                  {item.ltps && (
+                    <div className="subject-ltps-row">
+                      <span className="ltps-pill">L: {item.ltps[0]}</span>
+                      <span className="ltps-pill">T: {item.ltps[1]}</span>
+                      <span className="ltps-pill">P: {item.ltps[2]}</span>
+                      <span className="ltps-pill">S: {item.ltps[3]}</span>
+                    </div>
+                  )}
+
+                  {/* Allocated Section / Faculty metadata if available in option sheet */}
+                  {hasFacultyDisplay && (
+                    <div className="allocated-faculty-box">
+                      <div className="box-label">Institutional Allocation</div>
+                      <div className="allocated-faculty-row">
+                        <User size={13} className="text-slate-500" />
+                        <span className="faculty-name-label">{item.faculty_display}</span>
+                      </div>
+                      {item.sections && (
+                        <div className="allocated-section-meta">
+                          {item.sections.lecSection && item.sections.lecSection !== "NA" && (
+                            <span className="section-meta-chip">Lec: {item.sections.lecSection}</span>
+                          )}
+                          {item.sections.pracSection && item.sections.pracSection !== "NA" && (
+                            <span className="section-meta-chip">Prac: {item.sections.pracSection}</span>
+                          )}
+                          {item.sections.skillSection && item.sections.skillSection !== "NA" && (
+                            <span className="section-meta-chip">Skill: {item.sections.skillSection}</span>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  <div className="subject-card-footer">
+                    <span className="components-tag">
+                      {item.components && item.components.length > 0
+                        ? `Components: ${item.components.join(", ")}`
+                        : "Component: L"}
                     </span>
                     {isSelected && (
                       <span className="selected-indicator-pill">
@@ -392,7 +427,7 @@ export default function Subjects({ studentId, selections, setSelections, goTo })
                     }))
                   }
                   onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
+                    if (e.key === " " || e.key === "Enter") {
                       e.preventDefault();
                       setSelections((current) => ({
                         ...current,
@@ -400,29 +435,19 @@ export default function Subjects({ studentId, selections, setSelections, goTo })
                       }));
                     }
                   }}
-                  style={{ cursor: "pointer" }}
                 >
-                  <div className="card-top">
-                    <div className="card-code-group">
-                      <span className="card-code">NONE</span>
-                      <span className="card-credits">0 Credits</span>
-                    </div>
-
-                    <div className="card-radio-mark" aria-hidden="true">
-                      {isNoneSelected && <Check size={14} />}
-                    </div>
+                  <div className="subject-card-head">
+                    <div className="subject-code-tag">NONE</div>
+                    <div className="subject-credits-tag">0 Credits</div>
                   </div>
 
-                  <h3 className="card-title">None of the above</h3>
-
-                  <p className="card-description">
-                    Choose this option if you do not wish to register for any of the listed courses in {bucket.short} ({bucket.title}) this semester.
+                  <h3 className="subject-title">None of the above</h3>
+                  <p className="subject-description">
+                    Choose this option if you have already satisfied the requirements for this bucket or are taking an authorized alternative.
                   </p>
 
-                  <div className="card-action-row">
-                    <span className="action-hint">
-                      {isNoneSelected ? "Selected: None of the above" : "Click to select none"}
-                    </span>
+                  <div className="subject-card-footer">
+                    <span className="components-tag text-slate-500">No components required</span>
                     {isNoneSelected && (
                       <span className="selected-indicator-pill">
                         <CheckCircle2 size={14} /> Active
@@ -446,8 +471,8 @@ export default function Subjects({ studentId, selections, setSelections, goTo })
                   <CheckCircle2 size={16} /> Course selected for {bucket.short}
                 </span>
               ) : (
-                <span className="text-amber-700 font-semibold flex items-center gap-1.5 text-xs">
-                  Pending selection for {bucket.short}
+                <span className="text-amber-800 font-semibold flex items-center gap-1.5 text-xs">
+                  <AlertTriangle size={16} /> Selection pending for {bucket.short}
                 </span>
               )}
             </div>
@@ -460,7 +485,7 @@ export default function Subjects({ studentId, selections, setSelections, goTo })
                   className="secondary-btn btn-sm"
                   onClick={() => {
                     const idx = buckets.findIndex((b) => b.id === bucket.id);
-                    setActive(buckets[idx - 1].id);
+                    handleSelectBucket(buckets[idx - 1].id);
                   }}
                 >
                   Previous Bucket
@@ -474,7 +499,7 @@ export default function Subjects({ studentId, selections, setSelections, goTo })
                   className="primary-btn btn-sm"
                   onClick={() => {
                     const idx = buckets.findIndex((b) => b.id === bucket.id);
-                    setActive(buckets[idx + 1].id);
+                    handleSelectBucket(buckets[idx + 1].id);
                   }}
                 >
                   Next Bucket
@@ -509,26 +534,26 @@ export default function Subjects({ studentId, selections, setSelections, goTo })
           >
             <div className="admin-confirm-header">
               <div className="admin-confirm-icon-wrap">
-                <AlertTriangle size={24} className="text-amber-600" />
+                <AlertTriangle size={24} className="text-rose-600" />
               </div>
               <div>
                 <h2>Reset Course Selections</h2>
-                <p>Are you sure you want to reset all selected subjects?</p>
+                <p>Are you sure you want to clear all your course selections?</p>
               </div>
             </div>
 
             <div className="admin-confirm-body">
               <p className="text-sm text-slate-600">
-                This will clear your course selections across all 7 academic buckets (SDC, PCC-1, PCC-2, PCC-3, PE-1, PE-2, OE-1).
+                This will clear all course selections across all academic buckets. Associated faculty preferences will also be invalidated.
               </p>
               <div className="admin-confirm-summary-box">
                 <div className="admin-confirm-row">
-                  <span>Scope:</span>
-                  <strong>All 7 Course Buckets (25 Credits)</strong>
+                  <span>Target:</span>
+                  <strong>All {displayBuckets.length} Academic Buckets</strong>
                 </div>
                 <div className="admin-confirm-row">
                   <span>Action:</span>
-                  <span className="text-amber-700 font-semibold">Clear All Selections</span>
+                  <span className="text-rose-700 font-semibold">Clear All Selections</span>
                 </div>
               </div>
             </div>
@@ -553,6 +578,6 @@ export default function Subjects({ studentId, selections, setSelections, goTo })
           </div>
         </OverlayPortal>
       )}
-    </div>
+    </>
   );
 }

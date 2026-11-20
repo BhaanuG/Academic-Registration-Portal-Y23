@@ -6,7 +6,16 @@ import { buckets, componentNames, faculty, getSubSectionFaculty, sectionBase, se
 import { RotateCcw, AlertTriangle, CheckCircle2, X } from "lucide-react";
 import OverlayPortal from "../components/common/OverlayPortal";
 
-export default function Preferences({ studentId, selections, prefs, setPrefs, cluster }) {
+export default function Preferences({
+  studentId,
+  studentName = "Student",
+  selections,
+  prefs,
+  setPrefs,
+  cluster,
+  activeBucketId,
+  onBucketChange,
+}) {
   const [studentBuckets, setStudentBuckets] = useState(null);
   const [studentSubjects, setStudentSubjects] = useState(null);
 
@@ -98,13 +107,30 @@ export default function Preferences({ studentId, selections, prefs, setPrefs, cl
     });
   }, [studentBuckets, studentSubjects, selections]);
 
-  const [activeBucket, setActiveBucket] = useState("C0");
+  const [activeBucket, setActiveBucket] = useState(activeBucketId || "C0");
+
+  useEffect(() => {
+    if (activeBucketId && activeBucketId !== activeBucket) {
+      setActiveBucket(activeBucketId);
+    }
+  }, [activeBucketId]);
+
+  const handleSelectBucket = (bucketId) => {
+    setActiveBucket(bucketId);
+    if (onBucketChange) {
+      const entry = entries.find((e) => e.bucket.id === bucketId);
+      onBucketChange(bucketId, entry?.subject || null);
+    }
+  };
 
   useEffect(() => {
     if (entries.length > 0 && !entries.some((e) => e.bucket.id === activeBucket)) {
-      setActiveBucket(entries[0].bucket.id);
+      const firstId = entries[0].bucket.id;
+      setActiveBucket(firstId);
+      if (onBucketChange) onBucketChange(firstId, entries[0].subject || null);
     }
   }, [entries, activeBucket]);
+
   const [showResetAllModal, setShowResetAllModal] = useState(false);
   const [showResetCurrentModal, setShowResetCurrentModal] = useState(false);
   const [resetStatus, setResetStatus] = useState("");
@@ -217,7 +243,7 @@ export default function Preferences({ studentId, selections, prefs, setPrefs, cl
         title="Faculty Preferences"
         description={
           subComponents.length > 0
-            ? `Rank three faculty choices for ${primaryComponentName}. Each selected section unlocks a dedicated sub-preference table to rank sub-sections (A, B, C) for remaining course components.`
+            ? `Rank three faculty choices for ${primaryComponentName}. Each selected section unlocks a dedicated sub-preference table to rank sub-sections for remaining course components.`
             : `Rank three faculty choices in order of preference for ${primaryComponentName}. This course has a single delivery component (${primaryComponent}).`
         }
         aside={
@@ -257,7 +283,7 @@ export default function Preferences({ studentId, selections, prefs, setPrefs, cl
               <button
                 key={bucket.id}
                 className={`${activeEntry.bucket.id === bucket.id ? "active" : ""} ${!item ? "selection-error" : ""}`}
-                onClick={() => setActiveBucket(bucket.id)}
+                onClick={() => handleSelectBucket(bucket.id)}
               >
                 <span>{bucket.id}</span>
                 <div>
@@ -291,7 +317,9 @@ export default function Preferences({ studentId, selections, prefs, setPrefs, cl
                 You selected “None of the above” for this bucket. Return to Course Selection and
                 choose a course before entering faculty preferences.
               </p>
-              <Link to="/KLEF/8-2/Course-Bucket-Selection.php">Back to Course Selection</Link>
+              <Link to={`/KLEF/8-2/${encodeURIComponent(studentId)}/${encodeURIComponent(studentName)}/Subject-Selection/${activeEntry.bucket.id}/${encodeURIComponent(activeEntry.bucket.short)}.php`}>
+                Back to Course Selection
+              </Link>
             </div>
           ) : (
             <>
@@ -441,8 +469,7 @@ export default function Preferences({ studentId, selections, prefs, setPrefs, cl
                     <div>
                       <h3>{subComponents.map((c) => componentNames[c] || c).join(" & ")}</h3>
                       <p>
-                        For each {primaryComponentName.toLowerCase()} choice, configure your preferred order for sub-sections.
-                        Sub-section faculty are assigned by the department based on availability.
+                        For each {primaryComponentName.toLowerCase()} choice, configure your preferred order for faculty members in this section.
                       </p>
                     </div>
                   </div>
@@ -487,8 +514,13 @@ export default function Preferences({ studentId, selections, prefs, setPrefs, cl
 
                         <div className="subcomponent-tables">
                           {subComponents.map((component) => {
-                            const letters = ["A", "B", "C"];
                             const compName = componentNames[component] || component;
+                            // Retrieve real allocated faculty for this subject, component, and section
+                            let subOptions = getFacultyOptionsForSubject(subject.code, component, null, `S-${baseSec}`);
+                            if (subOptions.length === 0) {
+                              subOptions = getFacultyOptionsForSubject(subject.code, component, null, null);
+                            }
+
                             return (
                               <div key={component} className="subcomponent-table-wrap">
                                 <div className="table-caption">
@@ -499,8 +531,7 @@ export default function Preferences({ studentId, selections, prefs, setPrefs, cl
                                   <thead>
                                     <tr>
                                       <th>Rank</th>
-                                      <th>Section</th>
-                                      <th>Assigned faculty</th>
+                                      <th>Section &amp; Faculty</th>
                                     </tr>
                                   </thead>
                                   <tbody>
@@ -511,10 +542,10 @@ export default function Preferences({ studentId, selections, prefs, setPrefs, cl
                                         .filter((i) => i !== subRank)
                                         .map((i) => prefs[`${subject.code}-${component}-L${primaryRank + 1}-R${i + 1}`])
                                         .filter(Boolean);
-                                      const availableLetters = letters.filter((l) => !otherSubVals.includes(l));
-                                      const assignedFac = currentSubVal && baseSec
-                                        ? getSubSectionFaculty(subject.code, baseSec, currentSubVal, component)
-                                        : null;
+
+                                      // Exclude faculty chosen in other ranks of this tier
+                                      const availableOpts = subOptions.filter((opt) => !otherSubVals.includes(opt.id));
+                                      const selectedOpt = subOptions.find((opt) => opt.id === currentSubVal);
 
                                       return (
                                         <tr key={rankLabel}>
@@ -533,39 +564,18 @@ export default function Preferences({ studentId, selections, prefs, setPrefs, cl
                                                 )
                                               }
                                             >
-                                              <option value="">Select sub-section</option>
-                                              {availableLetters.map((letter) => {
-                                                const optFac = baseSec
-                                                  ? getSubSectionFaculty(subject.code, baseSec, letter, component)
-                                                  : null;
-                                                return (
-                                                  <option key={letter} value={letter}>
-                                                    S - {baseSec}{letter}{optFac ? ` • ${optFac.name} • ${optFac.id}` : ""}
-                                                  </option>
-                                                );
-                                              })}
-                                              {currentSubVal && !availableLetters.includes(currentSubVal) && (() => {
-                                                const curFac = baseSec
-                                                  ? getSubSectionFaculty(subject.code, baseSec, currentSubVal, component)
-                                                  : null;
-                                                return (
-                                                  <option value={currentSubVal}>
-                                                    S - {baseSec}{currentSubVal}{curFac ? ` • ${curFac.name} • ${curFac.id}` : ""}
-                                                  </option>
-                                                );
-                                              })()}
+                                              <option value="">Select faculty member</option>
+                                              {availableOpts.map((opt) => (
+                                                <option key={opt.id} value={opt.id}>
+                                                  {opt.section_id} • {opt.name} • {opt.emp_id || opt.id}
+                                                </option>
+                                              ))}
+                                              {currentSubVal && !availableOpts.some((o) => o.id === currentSubVal) && selectedOpt && (
+                                                <option value={selectedOpt.id}>
+                                                  {selectedOpt.section_id} • {selectedOpt.name} • {selectedOpt.emp_id || selectedOpt.id}
+                                                </option>
+                                              )}
                                             </select>
-                                          </td>
-                                          <td className="faculty-col">
-                                            {assignedFac ? (
-                                              <span className="faculty-name-assigned">
-                                                {assignedFac.name}
-                                              </span>
-                                            ) : (
-                                              <span className="faculty-pending">
-                                                Select section
-                                              </span>
-                                            )}
                                           </td>
                                         </tr>
                                       );
@@ -611,7 +621,7 @@ export default function Preferences({ studentId, selections, prefs, setPrefs, cl
 
             <div className="admin-confirm-body">
               <p className="text-sm text-slate-600">
-                This will clear all 1st, 2nd, and 3rd faculty rankings and associated sub-section preferences for {subject.name} ({subject.code}). Other bucket preferences remain untouched.
+                This will clear all 1st, 2nd, and 3rd faculty rankings and associated sub-component preferences for {subject.name} ({subject.code}). Other bucket preferences remain untouched.
               </p>
               <div className="admin-confirm-summary-box">
                 <div className="admin-confirm-row">
@@ -671,7 +681,7 @@ export default function Preferences({ studentId, selections, prefs, setPrefs, cl
 
             <div className="admin-confirm-body">
               <p className="text-sm text-slate-600">
-                This will clear all 1st, 2nd, and 3rd faculty choices and sub-section preferences across all your enrolled courses.
+                This will clear all 1st, 2nd, and 3rd faculty choices and sub-component preferences across all your enrolled courses.
               </p>
               <div className="admin-confirm-summary-box">
                 <div className="admin-confirm-row">

@@ -1,7 +1,7 @@
 import { useRef, useState, useMemo, useEffect } from "react";
 import { toPng } from "html-to-image";
 import PageHeading from "../components/common/PageHeading";
-import { buckets, componentNames, faculty, getSubSectionFaculty, sectionBase, sectionFor, getFacultyOptionsForSubject } from "../services/academicData";
+import { buckets, componentNames, faculty, sectionBase, sectionFor, getFacultyOptionsForSubject } from "../services/academicData";
 import { CheckCircle2, Download, Layers, ShieldCheck, Check, Trash2, Edit3, Lock, RotateCcw } from "lucide-react";
 
 export default function MyPreference({ studentId, selections = {}, setSelections, prefs = {}, setPrefs, cluster }) {
@@ -246,13 +246,12 @@ export default function MyPreference({ studentId, selections = {}, setSelections
     const subRanks = [1, 2, 3]
       .map((subR) => {
         const key = `${subject.code}-${component}-L${rank + 1}-R${subR}`;
-        const subCode = prefs[key];
-        if (!subCode) return null;
-        const subLetter = subCode.slice(-1);
-        const fPerson = getSubSectionFaculty(subject.code, baseSec, subLetter, component);
+        const facultyId = prefs[key];
+        if (!facultyId) return null;
+        const fPerson = faculty.find((f) => f.id === facultyId);
         return {
           subRank: subR,
-          subCode: `S-${baseSec}${subLetter}`,
+          sectionId: `S-${baseSec}`,
           faculty: fPerson,
         };
       })
@@ -261,7 +260,7 @@ export default function MyPreference({ studentId, selections = {}, setSelections
     if (!subRanks.length) {
       return (
         <div className="pref-cell-empty">
-          <span>Sub-sections pending</span>
+          <span>Sub-components pending</span>
         </div>
       );
     }
@@ -271,7 +270,7 @@ export default function MyPreference({ studentId, selections = {}, setSelections
         {subRanks.map((item) => (
           <div key={item.subRank} className="sub-ranked-chip">
             <div className="sub-chip-header">
-              <span className="sub-chip-code">{item.subCode}</span>
+              <span className="sub-chip-code">{item.sectionId}</span>
               <span className="sub-chip-rank">Pref {item.subRank}</span>
             </div>
             <strong>{item.faculty ? item.faculty.name : "Faculty Member"}</strong>
