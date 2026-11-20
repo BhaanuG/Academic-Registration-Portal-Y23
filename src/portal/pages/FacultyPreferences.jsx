@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router";
 import PageHeading from "../components/common/PageHeading";
 import PreferenceSelect from "../components/academic/PreferenceSelect";
-import { buckets, componentNames, faculty, sectionFor } from "../services/academicData";
+import { buckets, componentNames, faculty, sectionFor, getFacultyOptionsForSubject } from "../services/academicData";
 import { RotateCcw, AlertTriangle, CheckCircle2, X } from "lucide-react";
 import OverlayPortal from "../components/common/OverlayPortal";
 
@@ -204,7 +204,21 @@ export default function Preferences({ studentId, selections, prefs, setPrefs, cl
             const comps = item && Array.isArray(item.components) && item.components.length > 0 ? item.components : ["L"];
             const completed =
               item &&
-              comps.every((comp) => (prefs[`${item.code}-${comp}`] || []).filter(Boolean).length === 3);
+              comps.every((comp) => {
+                const assignedRange = item.optionSheetRange || (
+                  comp === "P"
+                    ? (item.sections?.pracSection !== "NA" ? item.sections?.pracSection : null)
+                    : comp === "S"
+                    ? (item.sections?.skillSection !== "NA" ? item.sections?.skillSection : null)
+                    : (item.sections?.lecSection !== "NA" ? item.sections?.lecSection : null)
+                );
+                let pool = getFacultyOptionsForSubject(item.code, comp, cluster, assignedRange);
+                if (pool.length === 0) pool = getFacultyOptionsForSubject(item.code, comp, cluster, null);
+                if (pool.length === 0) pool = getFacultyOptionsForSubject(item.code, comp, null, null);
+                const maxRanks = Math.min(3, Math.max(1, pool.length));
+                const currentRankings = (prefs[`${item.code}-${comp}`] || []).filter(Boolean);
+                return currentRankings.length >= maxRanks;
+              });
             return (
               <button
                 key={bucket.id}
@@ -318,6 +332,14 @@ export default function Preferences({ studentId, selections, prefs, setPrefs, cl
                     : (subject.sections?.lecSection !== "NA" ? subject.sections?.lecSection : null)
                 );
 
+                // Compute available faculty count for this course and component
+                let facultyPool = getFacultyOptionsForSubject(subject.code, component, cluster, assignedRange);
+                if (facultyPool.length === 0) facultyPool = getFacultyOptionsForSubject(subject.code, component, cluster, null);
+                if (facultyPool.length === 0) facultyPool = getFacultyOptionsForSubject(subject.code, component, null, null);
+                const availableCount = facultyPool.length;
+                const totalRanksToShow = Math.min(3, Math.max(1, availableCount));
+                const activeRankLabels = rankLabels.slice(0, totalRanksToShow);
+
                 return (
                   <div key={component} className="lecture-preference-card">
                     <div className="card-heading">
@@ -325,38 +347,42 @@ export default function Preferences({ studentId, selections, prefs, setPrefs, cl
                         <span className="eyebrow">{compName} Component</span>
                         <h3>{compName} ({component})</h3>
                         <p>
-                          Select three distinct faculty members in order of preference for {compName}.
+                          {availableCount === 1
+                            ? `Only one section and faculty member is allocated for ${compName} in this course. Preference is pre-assigned to the allocated faculty.`
+                            : `Select ${totalRanksToShow} distinct faculty member${totalRanksToShow > 1 ? "s" : ""} in order of preference for ${compName}.`}
                         </p>
                       </div>
                     </div>
 
                     <div className="preference-selectors">
-                      {rankLabels.map((label, rank) => {
+                      {activeRankLabels.map((label, rank) => {
                         const compPrefs = prefs[`${subject.code}-${component}`] || ["", "", ""];
-                        const currentVal = compPrefs[rank] || "";
+                        // If only 1 faculty available, default/auto-select that faculty member
+                        const currentVal = compPrefs[rank] || (availableCount === 1 ? facultyPool[0]?.id : "");
                         const excluded = compPrefs.filter((val, i) => i !== rank && Boolean(val));
-                        const selectedFaculty = faculty.find((f) => f.id === currentVal);
+                        const selectedFaculty = faculty.find((f) => f.id === currentVal) || facultyPool.find((f) => f.id === currentVal);
 
                         return (
                           <div key={label} className="preference-rank-field">
                             <label>
                               <span className="rank-badge">{rank + 1}</span>
-                              <span>{label}</span>
+                              <span>{availableCount === 1 ? "Allocated Faculty" : label}</span>
                             </label>
                             <PreferenceSelect
                               subjectCode={subject.code}
                               component={component}
                               cluster={cluster}
                               sectionFilter={assignedRange}
+                              options={facultyPool}
                               value={currentVal}
                               onChange={(val) => setPreference(component, rank, val)}
                               excludedIds={excluded}
-                              placeholder={`Choose ${label.toLowerCase()}`}
+                              placeholder={availableCount === 1 ? "Allocated faculty assigned" : `Choose ${label.toLowerCase()}`}
                             />
                             {selectedFaculty && (
                               <div className="selected-faculty-chip">
                                 <span className="faculty-badge">Section</span>
-                                <strong>{sectionFor(subject.code, selectedFaculty.id, component, cluster)}</strong>
+                                <strong>{selectedFaculty.section_id || sectionFor(subject.code, selectedFaculty.id, component, cluster)}</strong>
                                 <span className="faculty-name">{selectedFaculty.name}</span>
                               </div>
                             )}

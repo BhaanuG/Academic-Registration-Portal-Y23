@@ -1,7 +1,7 @@
 import { useRef, useState, useMemo, useEffect } from "react";
 import { toPng } from "html-to-image";
 import PageHeading from "../components/common/PageHeading";
-import { buckets, componentNames, faculty, sectionFor } from "../services/academicData";
+import { buckets, componentNames, faculty, sectionFor, getFacultyOptionsForSubject } from "../services/academicData";
 import { CheckCircle2, Download, Layers, ShieldCheck, Check, Trash2, Edit3, Lock, RotateCcw } from "lucide-react";
 
 export default function MyPreference({ studentId, selections = {}, setSelections, prefs = {}, setPrefs, cluster }) {
@@ -156,15 +156,59 @@ export default function MyPreference({ studentId, selections = {}, setSelections
       if (!r.subject) return false;
       const comps = Array.isArray(r.subject.components) && r.subject.components.length > 0 ? r.subject.components : ["L"];
       return comps.every((comp) => {
+        let pool = getFacultyOptionsForSubject(r.subject.code, comp, cluster, null);
+        if (pool.length === 0) pool = getFacultyOptionsForSubject(r.subject.code, comp, null, null);
+        const requiredRanks = Math.min(3, Math.max(1, pool.length));
         const compPrefs = prefs[`${r.subject.code}-${comp}`] || [];
-        return compPrefs.filter(Boolean).length === 3;
+        // If single faculty available, automatically counted if set or single
+        if (pool.length === 1) {
+          return Boolean(compPrefs[0]) || Boolean(pool[0]);
+        }
+        return compPrefs.filter(Boolean).length >= requiredRanks;
       });
     }).length;
-  }, [rows, prefs]);
+  }, [rows, prefs, cluster]);
 
   const preferenceCell = (subject, component, rank) => {
+    let pool = getFacultyOptionsForSubject(subject.code, component, cluster, null);
+    if (pool.length === 0) pool = getFacultyOptionsForSubject(subject.code, component, null, null);
+    const availableCount = pool.length;
+
+    // For single faculty course: rank 0 is the allocated faculty; rank 1 and 2 are Not Applicable
+    if (availableCount === 1) {
+      if (rank === 0) {
+        const allocated = pool[0];
+        const facultyId = prefs[`${subject.code}-${component}`]?.[0] || allocated?.id;
+        const person = faculty.find((item) => item.id === facultyId) || allocated;
+        return (
+          <div className="pref-cell-filled">
+            <div className="pref-cell-top">
+              <span className="pref-cell-sec">{allocated?.section_id || sectionFor(subject.code, person.id, component, cluster)}</span>
+              <span className="pref-cell-rank">Single Allocation</span>
+            </div>
+            <strong>{person.name}</strong>
+            <span className="pref-cell-empid">ID · {person.id}</span>
+          </div>
+        );
+      }
+      return (
+        <div className="pref-cell-empty">
+          <span style={{ color: "#94a3b8" }}>— Not Applicable —</span>
+        </div>
+      );
+    }
+
+    // For 2 faculty courses: rank 2 is Not Applicable
+    if (availableCount === 2 && rank === 2) {
+      return (
+        <div className="pref-cell-empty">
+          <span style={{ color: "#94a3b8" }}>— Not Applicable —</span>
+        </div>
+      );
+    }
+
     const facultyId = prefs[`${subject.code}-${component}`]?.[rank];
-    const person = faculty.find((item) => item.id === facultyId);
+    const person = faculty.find((item) => item.id === facultyId) || pool.find((item) => item.id === facultyId);
     if (!person) {
       return (
         <div className="pref-cell-empty">
@@ -175,7 +219,7 @@ export default function MyPreference({ studentId, selections = {}, setSelections
     return (
       <div className="pref-cell-filled">
         <div className="pref-cell-top">
-          <span className="pref-cell-sec">{sectionFor(subject.code, person.id, component, cluster)}</span>
+          <span className="pref-cell-sec">{person.section_id || sectionFor(subject.code, person.id, component, cluster)}</span>
           <span className="pref-cell-rank">Choice {rank + 1}</span>
         </div>
         <strong>{person.name}</strong>

@@ -18241,6 +18241,7 @@ export function getFacultyOptionsForSubject(subjectCode, component = "L", cluste
     }
   }
 
+  // 1. Check exact course + component + cluster + sectionFilter
   let matched = allocations.filter(a => {
     const codeMatch = a.course_code === subjectCode || a.course_code.trim() === subjectCode.trim();
     const compMatch = !component || a.component === component;
@@ -18249,13 +18250,32 @@ export function getFacultyOptionsForSubject(subjectCode, component = "L", cluste
     return codeMatch && compMatch && clusterMatch && sectionMatch;
   });
 
-  // If no direct cluster matches, check across all clusters for this subject and component (respecting sectionFilter if given)
+  // 2. If no match with sectionFilter, check course + component + cluster without sectionFilter (using true allocated section)
+  if (matched.length === 0 && allowedSectionNumbers) {
+    matched = allocations.filter(a => {
+      const codeMatch = a.course_code === subjectCode || a.course_code.trim() === subjectCode.trim();
+      const compMatch = !component || a.component === component;
+      const clusterMatch = !normalizedCluster || a.cluster_id === normalizedCluster || a.cluster_id === 'NA' || !a.cluster_id;
+      return codeMatch && compMatch && clusterMatch;
+    });
+  }
+
+  // 3. If still no direct cluster matches, check across all clusters for this subject and component (respecting sectionFilter if given)
   if (matched.length === 0) {
     matched = allocations.filter(a => {
       const codeMatch = a.course_code === subjectCode || a.course_code.trim() === subjectCode.trim();
       const compMatch = !component || a.component === component;
       const sectionMatch = !allowedSectionNumbers || allowedSectionNumbers.has(a.section_number);
       return codeMatch && compMatch && sectionMatch;
+    });
+  }
+
+  // 4. If still no matches with sectionFilter across clusters, check across all clusters without sectionFilter
+  if (matched.length === 0 && allowedSectionNumbers) {
+    matched = allocations.filter(a => {
+      const codeMatch = a.course_code === subjectCode || a.course_code.trim() === subjectCode.trim();
+      const compMatch = !component || a.component === component;
+      return codeMatch && compMatch;
     });
   }
 
