@@ -236,10 +236,7 @@ export default function Subjects({
         {/* Bucket Navigation Sidebar */}
         <aside className="bucket-nav">
           <div className="bucket-nav-header">
-            <span className="eyebrow">Academic Buckets</span>
-            <small>
-              {Object.keys(selections).length} of {displayBuckets.length} Completed
-            </small>
+            <p className="eyebrow">Academic Buckets</p>
           </div>
 
           <div className="bucket-nav-list" role="tablist">
@@ -275,15 +272,6 @@ export default function Subjects({
                         : "Selection needed"}
                     </small>
                   </div>
-                  <span className="nav-bucket-indicator">
-                    {isRegisteredCourse ? (
-                      <Check size={14} className="text-emerald-700" />
-                    ) : isNone ? (
-                      <span className="text-[10px] font-bold text-slate-500">OPT-OUT</span>
-                    ) : (
-                      <span className="pending-dot" />
-                    )}
-                  </span>
                 </button>
               );
             })}
@@ -291,15 +279,12 @@ export default function Subjects({
 
           <div className="bucket-nav-footer">
             <div className="nav-legend">
-              <span className="legend-item">
-                <span className="legend-dot completed" /> Selected
-              </span>
-              <span className="legend-item">
-                <span className="legend-dot pending" /> Pending
-              </span>
-              <span className="legend-item">
-                <span className="legend-dot opted-none" /> Opt-out
-              </span>
+              <span className="legend-dot completed" />
+              <span>Selected</span>
+              <span className="legend-dot opted-none" />
+              <span>None chosen</span>
+              <span className="legend-dot pending" />
+              <span>Pending</span>
             </div>
           </div>
         </aside>
@@ -330,10 +315,11 @@ export default function Subjects({
                     return next;
                   });
                 }}
-                title={`Clear selection for ${bucket.id}`}
+                disabled={!selections[bucket.id]}
+                title={`Reset selection for ${bucket.id}`}
               >
                 <RotateCcw size={12} />
-                <span>Clear {bucket.id}</span>
+                <span>Reset {bucket.id}</span>
               </button>
             </div>
           </div>
@@ -342,7 +328,6 @@ export default function Subjects({
           <div className="subject-cards-grid">
             {bucket.subjects.map((item) => {
               const isSelected = selections[bucket.id] === item.code;
-              const hasFacultyDisplay = Boolean(item.faculty_display);
 
               return (
                 <article
@@ -366,71 +351,49 @@ export default function Subjects({
                       }));
                     }
                   }}
+                  style={{ cursor: "pointer" }}
                 >
                   <div className="card-top">
-                    <div className="card-code-group">
-                      <span className="card-code">{item.code}</span>
-                      <span className="card-credits">{item.credits} Credits</span>
+                    <div className="card-left-content">
+                      <div className="card-code-group">
+                        <span className="card-code">{item.code}</span>
+                        <span className="card-credits">{item.credits} Credits</span>
+                      </div>
+                      <h3 className="card-title">{item.name}</h3>
+                      {item.description && !item.description.includes(item.name) ? (
+                        <p className="card-description">{item.description}</p>
+                      ) : null}
                     </div>
-                    <div className="card-radio-mark" aria-hidden="true">
-                      {isSelected && <Check size={14} />}
+
+                    <div className="card-right-group">
+                      <div className="card-radio-mark" aria-hidden="true">
+                        {isSelected && <Check size={14} />}
+                      </div>
+
+                      {/* L-T-P-S Structure below the selection dot */}
+                      {(() => {
+                        const labels = ["L", "T", "P", "S"];
+                        return (
+                          <div className="ltps-badge" title="Course hours per week (L - T - P - S)">
+                            <div className="ltps-matrix-labels">
+                              {labels.map((lbl) => (
+                                <span key={lbl}>{lbl}</span>
+                              ))}
+                            </div>
+                            <div className="ltps-matrix-values">
+                              {labels.map((_, idx) => (
+                                <span key={idx}>{item.ltps && item.ltps[idx] !== undefined && item.ltps[idx] !== null ? item.ltps[idx] : "-"}</span>
+                              ))}
+                            </div>
+                          </div>
+                        );
+                      })()}
                     </div>
                   </div>
-
-                  <h3 className="card-title">{item.name}</h3>
-
-                  <p className="card-description">
-                    {item.description || "Core foundational coursework and practical laboratory sessions designed for computer science engineering."}
-                  </p>
-
-                  <div className="card-details-strip">
-                    <div className="component-badges">
-                      {(item.components && item.components.length > 0 ? item.components : ["L"]).map((c) => (
-                        <span key={c} className={`badge-comp badge-${c}`} title={`Component: ${c}`}>
-                          {c}
-                        </span>
-                      ))}
-                    </div>
-
-                    {item.ltps && (
-                      <div className="ltps-badge" title="Lecture - Tutorial - Practical - Skill hours per week">
-                        <div className="ltps-matrix-labels">
-                          <span>L</span><span>T</span><span>P</span><span>S</span>
-                        </div>
-                        <div className="ltps-matrix-values">
-                          <span>{item.ltps[0]}</span><span>{item.ltps[1]}</span><span>{item.ltps[2]}</span><span>{item.ltps[3]}</span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Allocated Section / Faculty metadata if available in option sheet */}
-                  {hasFacultyDisplay && (
-                    <div className="allocated-faculty-box">
-                      <div className="box-label">Institutional Allocation</div>
-                      <div className="allocated-faculty-row">
-                        <User size={13} className="text-slate-500" />
-                        <span className="faculty-name-label">{item.faculty_display}</span>
-                      </div>
-                      {item.sections && (
-                        <div className="allocated-section-meta">
-                          {item.sections.lecSection && item.sections.lecSection !== "NA" && (
-                            <span className="section-meta-chip">Lec: {item.sections.lecSection}</span>
-                          )}
-                          {item.sections.pracSection && item.sections.pracSection !== "NA" && (
-                            <span className="section-meta-chip">Prac: {item.sections.pracSection}</span>
-                          )}
-                          {item.sections.skillSection && item.sections.skillSection !== "NA" && (
-                            <span className="section-meta-chip">Skill: {item.sections.skillSection}</span>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  )}
 
                   <div className="card-action-row">
                     <span className="action-hint">
-                      {isSelected ? "Selected for Registration" : "Click to Select Course"}
+                      {isSelected ? "Selected for Registration" : "Click to select course"}
                     </span>
                     {isSelected && (
                       <span className="selected-indicator-pill">
@@ -466,6 +429,7 @@ export default function Subjects({
                       }));
                     }
                   }}
+                  style={{ cursor: "pointer" }}
                 >
                   <div className="card-top">
                     <div className="card-code-group">
@@ -479,16 +443,12 @@ export default function Subjects({
 
                   <h3 className="card-title">None of the above</h3>
                   <p className="card-description">
-                    Choose this option if you have already satisfied the requirements for this bucket or are taking an authorized alternative.
+                    Choose this option if you do not wish to register for any of the listed courses in {bucket.short} ({bucket.title}) this semester.
                   </p>
-
-                  <div className="card-details-strip">
-                    <span className="text-xs text-slate-500 font-medium">No components required</span>
-                  </div>
 
                   <div className="card-action-row">
                     <span className="action-hint">
-                      {isNoneSelected ? "Opted Out for Bucket" : "Click to Opt Out"}
+                      {isNoneSelected ? "Selected: None of the above" : "Click to select none"}
                     </span>
                     {isNoneSelected && (
                       <span className="selected-indicator-pill">
@@ -513,8 +473,8 @@ export default function Subjects({
                   <CheckCircle2 size={16} /> Course selected for {bucket.short}
                 </span>
               ) : (
-                <span className="text-amber-800 font-semibold flex items-center gap-1.5 text-xs">
-                  <AlertTriangle size={16} /> Selection pending for {bucket.short}
+                <span className="text-amber-700 font-semibold flex items-center gap-1.5 text-xs">
+                  Pending selection for {bucket.short}
                 </span>
               )}
             </div>
