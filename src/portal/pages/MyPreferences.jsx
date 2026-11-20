@@ -243,7 +243,11 @@ export default function MyPreference({ studentId, selections = {}, setSelections
       );
     }
 
-    const subRanks = [1, 2, 3]
+    // Retrieve all available options for this section
+    const subOptions = getFacultyOptionsForSubject(subject.code, component, null, `S-${baseSec}`);
+    const maxSubRanks = Math.max(1, subOptions.length);
+
+    const subRanks = Array.from({ length: maxSubRanks }, (_, i) => i + 1)
       .map((subR) => {
         const key = `${subject.code}-${component}-L${rank + 1}-R${subR}`;
         const facultyId = prefs[key];

@@ -164,11 +164,12 @@ export default function Preferences({
 
       // When primary choice changes, clear its corresponding sub-component rankings
       if (component === primaryComponent) {
-        subComponents.forEach((sc) => {
-          [0, 1, 2].forEach((subRank) => {
-            const subKey = `${subject.code}-${sc}-L${rank + 1}-R${subRank + 1}`;
-            delete next[subKey];
-          });
+        const prefix = `${subject.code}-`;
+        const tierTag = `-L${rank + 1}-R`;
+        Object.keys(next).forEach((k) => {
+          if (k.startsWith(prefix) && k.includes(tierTag)) {
+            delete next[k];
+          }
         });
       }
 
@@ -243,7 +244,7 @@ export default function Preferences({
         title="Faculty Preferences"
         description={
           subComponents.length > 0
-            ? `Rank three faculty choices for ${primaryComponentName}. Each selected section unlocks a dedicated sub-preference table to rank sub-sections for remaining course components.`
+            ? `Rank three faculty choices for ${primaryComponentName}. Each selected section unlocks a dedicated sub-preference table to rank all allocated faculty members under that section.`
             : `Rank three faculty choices in order of preference for ${primaryComponentName}. This course has a single delivery component (${primaryComponent}).`
         }
         aside={
@@ -521,11 +522,15 @@ export default function Preferences({
                               subOptions = getFacultyOptionsForSubject(subject.code, component, null, null);
                             }
 
+                            // Do not limit to only 3 if more are available: show rows for all available options under this section
+                            const ranksCount = Math.max(1, subOptions.length);
+                            const tierRanks = Array.from({ length: ranksCount }, (_, idx) => idx);
+
                             return (
                               <div key={component} className="subcomponent-table-wrap">
                                 <div className="table-caption">
                                   <strong>{compName}</strong>
-                                  <small>Rank 3 section options</small>
+                                  <small>Rank {ranksCount} option{ranksCount > 1 ? "s" : ""}</small>
                                 </div>
                                 <table className="subcomponent-table">
                                   <thead>
@@ -535,10 +540,10 @@ export default function Preferences({
                                     </tr>
                                   </thead>
                                   <tbody>
-                                    {rankLabels.map((rankLabel, subRank) => {
+                                    {tierRanks.map((subRank) => {
                                       const currentSubVal =
                                         prefs[`${subject.code}-${component}-L${primaryRank + 1}-R${subRank + 1}`] || "";
-                                      const otherSubVals = [0, 1, 2]
+                                      const otherSubVals = tierRanks
                                         .filter((i) => i !== subRank)
                                         .map((i) => prefs[`${subject.code}-${component}-L${primaryRank + 1}-R${i + 1}`])
                                         .filter(Boolean);
@@ -548,7 +553,7 @@ export default function Preferences({
                                       const selectedOpt = subOptions.find((opt) => opt.id === currentSubVal);
 
                                       return (
-                                        <tr key={rankLabel}>
+                                        <tr key={subRank}>
                                           <td className="rank-col">
                                             <span>{subRank + 1}</span>
                                           </td>
