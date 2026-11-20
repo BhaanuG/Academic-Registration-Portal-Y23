@@ -184,24 +184,41 @@ export default function Subjects({
   };
 
   return (
-    <>
+    <div className="subject-selection-page">
       <PageHeading
         title="Course Bucket Selection"
         description="Select exactly one course option for each academic bucket. Your choices determine available faculty preferences."
         aside={
-          <div className="flex items-center gap-2">
+          <div className="subject-aside-meter-row">
+            <div className="credit-meter">
+              <div className="meter-header">
+                <span>Selected Credits</span>
+                <strong>
+                  <span className="animated-number">{credits}</span>
+                  <small> / 25 Max</small>
+                </strong>
+              </div>
+              <div className="meter-track">
+                <i style={{ width: `${Math.min((credits / 25) * 100, 100)}%` }} />
+              </div>
+              <p>
+                {credits === 25
+                  ? "Requirement met (25 Credits)"
+                  : `${displayBuckets.length - selectedSubjects.length} of ${displayBuckets.length} buckets remaining`}
+              </p>
+            </div>
             <button
               type="button"
-              className="reset-action-pill"
+              className="reset-action-pill vertical-reset-btn"
               onClick={() => setShowResetModal(true)}
               title="Reset all course selections"
             >
-              <RotateCcw size={13} />
-              <span>Reset Selections</span>
+              <span className="vertical-text">
+                <span>Re</span>
+                <span>Set</span>
+              </span>
+              <RotateCcw size={13} className="vertical-reset-icon" />
             </button>
-            <span className="credits-badge">
-              <strong>{credits}</strong> credits selected
-            </span>
           </div>
         }
       />
@@ -350,26 +367,42 @@ export default function Subjects({
                     }
                   }}
                 >
-                  <div className="subject-card-head">
-                    <div className="subject-code-tag">{item.code}</div>
-                    <div className="subject-credits-tag">{item.credits} Credits</div>
+                  <div className="card-top">
+                    <div className="card-code-group">
+                      <span className="card-code">{item.code}</span>
+                      <span className="card-credits">{item.credits} Credits</span>
+                    </div>
+                    <div className="card-radio-mark" aria-hidden="true">
+                      {isSelected && <Check size={14} />}
+                    </div>
                   </div>
 
-                  <h3 className="subject-title">{item.name}</h3>
+                  <h3 className="card-title">{item.name}</h3>
 
-                  {item.description && (
-                    <p className="subject-description">{item.description}</p>
-                  )}
+                  <p className="card-description">
+                    {item.description || "Core foundational coursework and practical laboratory sessions designed for computer science engineering."}
+                  </p>
 
-                  {/* LTPS Breakdown */}
-                  {item.ltps && (
-                    <div className="subject-ltps-row">
-                      <span className="ltps-pill">L: {item.ltps[0]}</span>
-                      <span className="ltps-pill">T: {item.ltps[1]}</span>
-                      <span className="ltps-pill">P: {item.ltps[2]}</span>
-                      <span className="ltps-pill">S: {item.ltps[3]}</span>
+                  <div className="card-details-strip">
+                    <div className="component-badges">
+                      {(item.components && item.components.length > 0 ? item.components : ["L"]).map((c) => (
+                        <span key={c} className={`badge-comp badge-${c}`} title={`Component: ${c}`}>
+                          {c}
+                        </span>
+                      ))}
                     </div>
-                  )}
+
+                    {item.ltps && (
+                      <div className="ltps-badge" title="Lecture - Tutorial - Practical - Skill hours per week">
+                        <div className="ltps-matrix-labels">
+                          <span>L</span><span>T</span><span>P</span><span>S</span>
+                        </div>
+                        <div className="ltps-matrix-values">
+                          <span>{item.ltps[0]}</span><span>{item.ltps[1]}</span><span>{item.ltps[2]}</span><span>{item.ltps[3]}</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
 
                   {/* Allocated Section / Faculty metadata if available in option sheet */}
                   {hasFacultyDisplay && (
@@ -395,11 +428,9 @@ export default function Subjects({
                     </div>
                   )}
 
-                  <div className="subject-card-footer">
-                    <span className="components-tag">
-                      {item.components && item.components.length > 0
-                        ? `Components: ${item.components.join(", ")}`
-                        : "Component: L"}
+                  <div className="card-action-row">
+                    <span className="action-hint">
+                      {isSelected ? "Selected for Registration" : "Click to Select Course"}
                     </span>
                     {isSelected && (
                       <span className="selected-indicator-pill">
@@ -436,18 +467,29 @@ export default function Subjects({
                     }
                   }}
                 >
-                  <div className="subject-card-head">
-                    <div className="subject-code-tag">NONE</div>
-                    <div className="subject-credits-tag">0 Credits</div>
+                  <div className="card-top">
+                    <div className="card-code-group">
+                      <span className="card-code">NONE</span>
+                      <span className="card-credits">0 Credits</span>
+                    </div>
+                    <div className="card-radio-mark" aria-hidden="true">
+                      {isNoneSelected && <Check size={14} />}
+                    </div>
                   </div>
 
-                  <h3 className="subject-title">None of the above</h3>
-                  <p className="subject-description">
+                  <h3 className="card-title">None of the above</h3>
+                  <p className="card-description">
                     Choose this option if you have already satisfied the requirements for this bucket or are taking an authorized alternative.
                   </p>
 
-                  <div className="subject-card-footer">
-                    <span className="components-tag text-slate-500">No components required</span>
+                  <div className="card-details-strip">
+                    <span className="text-xs text-slate-500 font-medium">No components required</span>
+                  </div>
+
+                  <div className="card-action-row">
+                    <span className="action-hint">
+                      {isNoneSelected ? "Opted Out for Bucket" : "Click to Opt Out"}
+                    </span>
                     {isNoneSelected && (
                       <span className="selected-indicator-pill">
                         <CheckCircle2 size={14} /> Active
@@ -578,6 +620,6 @@ export default function Subjects({
           </div>
         </OverlayPortal>
       )}
-    </>
+    </div>
   );
 }
