@@ -689,14 +689,38 @@ export const eligibilityEngine = {
       const params = [s.default_course_code];
 
       if (secIds.length > 0) {
-        q += ` AND fa.section_id IN (${secIds.map(() => '?').join(',')})`;
-        params.push(...secIds);
+        const testAllocs = db.prepare(`${q} AND fa.section_id IN (${secIds.map(() => '?').join(',')})`).all(s.default_course_code, ...secIds);
+        if (testAllocs.length > 0) {
+          q += ` AND fa.section_id IN (${secIds.map(() => '?').join(',')})`;
+          params.push(...secIds);
+        } else if (student.cluster_id) {
+          q += " AND (sec.cluster_id = ? OR sec.cluster_id = 'NA')";
+          params.push(student.cluster_id);
+        }
       } else if (student.cluster_id) {
         q += " AND (sec.cluster_id = ? OR sec.cluster_id = 'NA')";
         params.push(student.cluster_id);
       }
 
-      const allocs = db.prepare(q).all(...params);
+      let allocs = db.prepare(q).all(...params);
+      if (allocs.length === 0) {
+        // Fallback: fetch all allocations for this course regardless of cluster or section
+        allocs = db.prepare(`
+          SELECT 
+            fa.course_code,
+            c.name as course_name,
+            fa.section_id,
+            sec.section_number,
+            fa.component,
+            fa.faculty_id,
+            f.name as faculty_name
+          FROM faculty_allocations fa
+          JOIN courses c ON fa.course_code = c.code
+          JOIN sections sec ON fa.section_id = sec.id
+          JOIN faculty f ON fa.faculty_id = f.id
+          WHERE fa.course_code = ?
+        `).all(s.default_course_code);
+      }
       for (const a of allocs) {
         const key = `${s.bucket_id}-${a.course_code}-${a.section_number}-${a.component}-${a.faculty_id}`;
         if (!seen.has(key)) {

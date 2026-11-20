@@ -142,7 +142,7 @@ export default function FacultyDirectory({ cluster, studentId, selections }) {
         month: "short",
         day: "numeric",
       });
-      doc.text(`Generated on: ${today}  |  Assigned Cohort: ${cluster || "Cluster 2"}  |  Total Allocations: ${directoryRows.length}`, 14, 31);
+      doc.text(`Generated on: ${today}  |  Total Allocations: ${directoryRows.length}`, 14, 31);
 
       // Build table rows (7 columns: BUCKET NO., COURSE CODE, NAME OF THE COURSE, SECTION NUMBER, DELIVERY COMPONENT, EMP ID, NAME OF THE FACULTY)
       const tableRows = directoryRows.map((r) => [
@@ -213,11 +213,6 @@ export default function FacultyDirectory({ cluster, studentId, selections }) {
         description="Search and inspect faculty allocations, teaching components (L, T, P, S), and section distributions across all offered semester courses."
         aside={
           <div className="flex items-center gap-3">
-            <div className="status-stamp">
-              <span>ASSIGNED COHORT</span>
-              <strong>{cluster || "Cluster 2"}</strong>
-            </div>
-
             <button
               type="button"
               className="faculty-download-icon-btn"

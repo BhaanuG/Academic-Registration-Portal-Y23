@@ -18362,3 +18362,40 @@ export function sectionFor(subjectCode, facultyId, component, cluster = "Cluster
 export function sectionBase(section = "") {
   return String(section).match(/\d+/)?.[0] || "";
 }
+
+/**
+ * Returns allocated faculty members for a given section in a sub-component.
+ * If letter A, B, C is passed, returns the corresponding allocated faculty member.
+ */
+export function getSubSectionFaculty(subjectCode, secNum, subLetter, component = "S") {
+  if (!secNum) return null;
+  const cleanSec = parseInt(String(secNum).replace(/\D/g, ''), 10);
+  const targetSecId = `S-${cleanSec}`;
+
+  // Find real allocated faculty in this section and component
+  const pool = allocations.filter(a => 
+    (!subjectCode || a.course_code === subjectCode || a.course_code.trim() === subjectCode.trim()) &&
+    a.section_number === cleanSec &&
+    (!component || a.component === component)
+  );
+
+  const subIdx = subLetter ? subLetter.toUpperCase().charCodeAt(0) - 65 : 0; // A=0, B=1, C=2
+  if (pool.length > 0) {
+    const matchedAlloc = pool[subIdx % pool.length];
+    return {
+      id: matchedAlloc.faculty_id,
+      emp_id: matchedAlloc.faculty_id,
+      name: matchedAlloc.faculty_name,
+      section_id: matchedAlloc.section_id,
+      designation: matchedAlloc.designation,
+      department: matchedAlloc.department,
+    };
+  }
+
+  // Fallback to general faculty pool
+  const qualified = faculty.filter(f => !component || f.components.includes(component));
+  const fallbackPool = qualified.length > 0 ? qualified : faculty;
+  const baseOffset = (cleanSec * 3 + Math.floor(cleanSec / 2)) % fallbackPool.length;
+  const index = (baseOffset + (subIdx >= 0 ? subIdx : 0)) % fallbackPool.length;
+  return fallbackPool[index];
+}
