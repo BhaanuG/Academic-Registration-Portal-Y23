@@ -145,9 +145,10 @@ img, svg, canvas, video {
   }
 
   footer {
-    padding: 16px !important;
+    padding: 10px 14px !important;
+    min-height: auto !important;
     grid-template-columns: 1fr !important;
-    gap: 8px !important;
+    gap: 4px !important;
     text-align: center !important;
   }
 
