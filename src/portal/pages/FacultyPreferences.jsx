@@ -206,6 +206,14 @@ export default function Preferences({ studentId, selections, prefs, setPrefs, cl
               item &&
               comps.every((comp) => {
                 let assignedRange = null;
+                const fullItemRange = item.optionSheetRange || (
+                  comp === "P"
+                    ? (item.sections?.pracSection !== "NA" ? item.sections?.pracSection : null)
+                    : comp === "S"
+                    ? (item.sections?.skillSection !== "NA" ? item.sections?.skillSection : null)
+                    : (item.sections?.lecSection !== "NA" ? item.sections?.lecSection : null)
+                );
+
                 if (comp === "S") {
                   const pChoiceId = prefs[`${item.code}-P`]?.[0];
                   if (pChoiceId) {
@@ -215,19 +223,9 @@ export default function Preferences({ studentId, selections, prefs, setPrefs, cl
                       if (testSkillPool.length > 0) assignedRange = pSec;
                     }
                   }
-                  if (!assignedRange) {
-                    assignedRange = item.sections?.skillSection !== "NA" && item.sections?.skillSection
-                      ? item.sections.skillSection
-                      : item.optionSheetRange || null;
-                  }
-                } else if (comp === "P") {
-                  assignedRange = item.sections?.pracSection !== "NA" && item.sections?.pracSection
-                    ? item.sections.pracSection
-                    : item.optionSheetRange || null;
+                  if (!assignedRange) assignedRange = fullItemRange;
                 } else {
-                  assignedRange = item.sections?.lecSection !== "NA" && item.sections?.lecSection
-                    ? item.sections.lecSection
-                    : item.optionSheetRange || null;
+                  assignedRange = fullItemRange;
                 }
                 let pool = getFacultyOptionsForSubject(item.code, comp, cluster, assignedRange);
                 if (pool.length === 0) pool = getFacultyOptionsForSubject(item.code, comp, cluster, null);
@@ -342,17 +340,27 @@ export default function Preferences({ studentId, selections, prefs, setPrefs, cl
                 );
 
                 // Determine assigned section range for this subject/component:
-                // Component-specific sections (pracSection, skillSection, lecSection) take absolute priority over optionSheetRange.
-                // For sub-components (such as Skill 'S' in 23IE4053A):
-                // If a 1st preference is chosen in the primary component (e.g. Practical 'P'), anchor Skill to that section!
+                // Option 1 Logic:
+                // If the student has a multi-section range (e.g. S26-S29, S9-S15, S6-S8):
+                // - Students freely pick their 1st, 2nd, and 3rd preference sections/faculty across their full assigned range.
+                // - In the sub-component (Skill 'S'): if they selected a 1st preference in Practical ('P') that corresponds to a section
+                //   which has Skill allocations, anchor Skill to that chosen section (where up to 6 faculty teach that section).
+                //   Otherwise (or before a choice is made), allow them to choose from their full specialization section range without restricting to only 1 section.
+                // - If the student has only a single section assigned (e.g. S20, S32): strictly show that single section.
                 let assignedRange = null;
+                const fullCourseRange = subject.optionSheetRange || (
+                  component === "P"
+                    ? (subject.sections?.pracSection !== "NA" ? subject.sections?.pracSection : null)
+                    : component === "S"
+                    ? (subject.sections?.skillSection !== "NA" ? subject.sections?.skillSection : null)
+                    : (subject.sections?.lecSection !== "NA" ? subject.sections?.lecSection : null)
+                );
+
                 if (component === "S") {
-                  // Check if primary component 'P' has a selected 1st preference with a known section
                   const pChoiceId = prefs[`${subject.code}-P`]?.[0];
                   if (pChoiceId) {
                     const pSec = sectionFor(subject.code, pChoiceId, "P", cluster);
                     if (pSec) {
-                      // Verify if this section exists in Skill allocations
                       const testSkillPool = getFacultyOptionsForSubject(subject.code, "S", cluster, pSec);
                       if (testSkillPool.length > 0) {
                         assignedRange = pSec;
@@ -360,18 +368,10 @@ export default function Preferences({ studentId, selections, prefs, setPrefs, cl
                     }
                   }
                   if (!assignedRange) {
-                    assignedRange = subject.sections?.skillSection !== "NA" && subject.sections?.skillSection
-                      ? subject.sections.skillSection
-                      : subject.optionSheetRange || null;
+                    assignedRange = fullCourseRange;
                   }
-                } else if (component === "P") {
-                  assignedRange = subject.sections?.pracSection !== "NA" && subject.sections?.pracSection
-                    ? subject.sections.pracSection
-                    : subject.optionSheetRange || null;
                 } else {
-                  assignedRange = subject.sections?.lecSection !== "NA" && subject.sections?.lecSection
-                    ? subject.sections.lecSection
-                    : subject.optionSheetRange || null;
+                  assignedRange = fullCourseRange;
                 }
 
                 // Compute available faculty count for this course and component
