@@ -224,9 +224,6 @@ export default function Login() {
             </div>
             <p className="eyebrow">{isAdmin ? "Admin Access" : "Student access"}</p>
             <h2>Sign in to continue</h2>
-            <p className="muted">
-              Enter your university {isAdmin ? "Admin ID" : "Student ID"} and registered credential.
-            </p>
             <form onSubmit={submit} className="login-form">
               <label>
                 {isAdmin ? "Admin ID" : "Student ID"}
