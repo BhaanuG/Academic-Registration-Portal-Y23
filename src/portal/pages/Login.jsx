@@ -28,10 +28,43 @@ export default function Login() {
   const [error, setError] = useState("");
   const [showResetModal, setShowResetModal] = useState(false);
 
+  const RESET_STEPS_PATH = "/KLEF/8-2/GBS/Auth/Reset-Password-Steps.php";
+
+  useEffect(() => {
+    // If user navigates directly to reset steps URL or presses back/forward
+    if (window.location.pathname === RESET_STEPS_PATH) {
+      setShowResetModal(true);
+    }
+  }, []);
+
+  const openResetModal = () => {
+    setShowResetModal(true);
+    window.history.pushState(null, "", RESET_STEPS_PATH);
+  };
+
+  const closeResetModal = () => {
+    setShowResetModal(false);
+    if (window.location.pathname === RESET_STEPS_PATH) {
+      window.history.pushState(null, "", "/KLEF/8-2/GBS.php");
+    }
+  };
+
+  useEffect(() => {
+    const handlePopState = () => {
+      if (window.location.pathname === RESET_STEPS_PATH) {
+        setShowResetModal(true);
+      } else if (showResetModal) {
+        setShowResetModal(false);
+      }
+    };
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, [showResetModal]);
+
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === "Escape") {
-        setShowResetModal(false);
+        closeResetModal();
       }
     };
     if (showResetModal) {
@@ -268,7 +301,7 @@ export default function Login() {
               <span>Academic Registration Portal · Official Access</span>
               <button
                 type="button"
-                onClick={() => setShowResetModal(true)}
+                onClick={openResetModal}
                 className="text-blue-600 hover:text-blue-800 font-medium text-xs underline cursor-pointer bg-transparent border-0 p-0"
               >
                 Reset password
@@ -282,7 +315,7 @@ export default function Login() {
       {showResetModal && (
         <OverlayPortal
           isOpen={showResetModal}
-          onClose={() => setShowResetModal(false)}
+          onClose={closeResetModal}
           className="clean-popup-backdrop"
         >
           <div
@@ -304,7 +337,7 @@ export default function Login() {
               <button
                 type="button"
                 className="clean-popup-close-btn"
-                onClick={() => setShowResetModal(false)}
+                onClick={closeResetModal}
                 aria-label="Close dialog"
               >
                 <X size={18} />
@@ -349,7 +382,7 @@ Thank you.`}
               <button
                 type="button"
                 className="clean-popup-btn-dismiss"
-                onClick={() => setShowResetModal(false)}
+                onClick={closeResetModal}
               >
                 Close
               </button>

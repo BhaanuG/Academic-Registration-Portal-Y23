@@ -248,6 +248,7 @@ export function PortalRoutes() {
       <Route path="/" element={<Navigate to="/KLEF/8-2/GBS.php" replace />} />
       <Route path="/login" element={<Navigate to="/KLEF/8-2/GBS.php" replace />} />
       <Route path="/KLEF/8-2/GBS.php" element={<Login />} />
+      <Route path="/KLEF/8-2/GBS/Auth/Reset-Password-Steps.php" element={<Login />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/reset-password.php" element={<ResetPassword />} />
 
