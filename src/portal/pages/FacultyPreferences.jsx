@@ -416,7 +416,7 @@ export default function Preferences({
                           {subComponents.length > 0
                             ? "Select three distinct faculty members in order of preference. Your choice sets the section anchor for tutorials, practicals, and skills."
                             : availableCount === 1
-                            ? `Only one section and faculty member is allocated for ${primaryComponentName} in this course. Preference is pre-assigned to the allocated faculty.`
+                            ? `Only one section and faculty member is allocated for ${primaryComponentName} in this course. Please select the allocated faculty to record your preference.`
                             : singleSectionName
                             ? `All faculty members below are allocated to Section ${singleSectionName}. Select ${totalRanksToShow} distinct faculty member${totalRanksToShow > 1 ? "s" : ""} in order of preference for this section.`
                             : `Select ${totalRanksToShow} distinct faculty member${totalRanksToShow > 1 ? "s" : ""} in order of preference for ${primaryComponentName}.`}
@@ -427,7 +427,7 @@ export default function Preferences({
                     <div className="preference-selectors">
                       {activeRankLabels.map((label, rank) => {
                         const primaryPrefs = prefs[`${subject.code}-${primaryComponent}`] || ["", "", ""];
-                        const currentVal = primaryPrefs[rank] || (availableCount === 1 ? facultyPool[0]?.id : "");
+                        const currentVal = primaryPrefs[rank] || "";
                         const excluded = primaryPrefs.filter((val, i) => i !== rank && Boolean(val));
                         const selectedFaculty = faculty.find((f) => f.id === currentVal) || facultyPool.find((f) => f.id === currentVal);
 
@@ -435,7 +435,7 @@ export default function Preferences({
                           <div key={label} className="preference-rank-field">
                             <label>
                               <span className="rank-badge">{rank + 1}</span>
-                              <span>{availableCount === 1 ? "Allocated Faculty" : label}</span>
+                              <span>{availableCount === 1 ? "1st Preference" : label}</span>
                             </label>
                             <PreferenceSelect
                               subjectCode={subject.code}
@@ -446,7 +446,7 @@ export default function Preferences({
                               value={currentVal}
                               onChange={(val) => setPreference(primaryComponent, rank, val)}
                               excludedIds={excluded}
-                              placeholder={availableCount === 1 ? "Allocated faculty assigned" : `Choose ${label.toLowerCase()}`}
+                              placeholder={`Choose ${label.toLowerCase()}`}
                             />
                             {selectedFaculty && (
                               <div className="selected-faculty-chip">

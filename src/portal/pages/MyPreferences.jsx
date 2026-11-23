@@ -178,14 +178,20 @@ export default function MyPreference({ studentId, selections = {}, setSelections
 
       if (availableCount === 1) {
         if (rank === 0) {
-          const allocated = pool[0];
-          const facultyId = prefs[`${subject.code}-${primaryComp}`]?.[0] || allocated?.id;
-          const person = faculty.find((item) => item.id === facultyId) || allocated;
+          const facultyId = prefs[`${subject.code}-${primaryComp}`]?.[0];
+          if (!facultyId) {
+            return (
+              <div className="pref-cell-empty">
+                <span>Not Selected</span>
+              </div>
+            );
+          }
+          const person = faculty.find((item) => item.id === facultyId) || pool.find((item) => item.id === facultyId);
           return (
             <div className="pref-cell-filled">
               <div className="pref-cell-top">
-                <span className="pref-cell-sec">{allocated?.section_id || sectionFor(subject.code, person.id, primaryComp, cluster)}</span>
-                <span className="pref-cell-rank">Single Allocation</span>
+                <span className="pref-cell-sec">{person?.section_id || sectionFor(subject.code, person.id, primaryComp, cluster)}</span>
+                <span className="pref-cell-rank">1st Preference</span>
               </div>
               <strong>{person.name}</strong>
               <span className="pref-cell-empid">ID · {person.id}</span>
