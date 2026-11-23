@@ -148,15 +148,15 @@
 .login-context::after {
   content: "";
   position: absolute;
-  width: 220px;
-  height: 220px;
-  right: -60px;
-  bottom: -90px;
+  width: 520px;
+  height: 520px;
+  right: -130px;
+  bottom: -200px;
   border: 1px solid rgba(234, 179, 8, 0.2);
   border-radius: 50%;
   box-shadow:
-    0 0 0 35px rgba(254, 240, 138, 0.25),
-    0 0 0 70px rgba(254, 240, 138, 0.15);
+    0 0 0 80px rgba(254, 240, 138, 0.25),
+    0 0 0 160px rgba(254, 240, 138, 0.15);
 }
 .login-context .brand {
   color: var(--subject-text);
