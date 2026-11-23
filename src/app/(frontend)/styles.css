@@ -4354,6 +4354,14 @@ select:focus {
 
 
 
+.login-form input,
+.login-panel input,
+.password-field input,
+.password-field,
+.date-trigger {
+  border-radius: 8px !important;
+}
+
 .login-panel .primary-btn,
 .login-form .primary-btn,
 .security-card .primary-btn,

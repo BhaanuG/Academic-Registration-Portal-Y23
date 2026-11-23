@@ -238,17 +238,13 @@ export default function Login() {
                   onChange={(e) => {
                     setStudentId(e.target.value.replace(/\D/g, ""));
                   }}
-                  placeholder="Enter 10-digit ID"
+                  placeholder="Enter Your Registration Number"
                 />
-                <small>
-                  {isAdmin
-                    ? "Administrator identified · Enter password below"
-                    : isFull10Digits && studentHasCustomPassword
-                    ? "Custom password configured · Enter your password"
-                    : isFull10Digits
-                    ? "Default credential · Select your Date of Birth"
-                    : "Enter your 10-digit university ID"}
-                </small>
+                {isAdmin ? (
+                  <small>Administrator identified · Enter password below</small>
+                ) : isFull10Digits && studentHasCustomPassword ? (
+                  <small>Custom password configured · Enter your password</small>
+                ) : null}
               </label>
 
               <div
@@ -287,7 +283,6 @@ export default function Login() {
                       value={dateOfBirth}
                       onChange={setDateOfBirth}
                     />
-                    <small>Default credential · Select Date of Birth in DD Month YYYY</small>
                   </label>
                 )}
               </div>
