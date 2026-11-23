@@ -27,6 +27,7 @@ import RecordModal from "./admin/RecordModal";
 import OverlayPortal from "../components/common/OverlayPortal";
 import { adminNavigation, resources, singularLabels, fields, normalizeForm } from "./admin/adminConfig";
 import { getAsyncRecord, setAsyncRecord } from "../services/api";
+import { resetPasswordToDefaultDob, rememberDateOfBirth } from "../services/authService";
 
 const iconMap = {
   Dashboard: LayoutDashboard,
@@ -415,8 +416,27 @@ export default function Admin() {
   };
 
   const resetPassword = async (record) => {
-    if (!record.dateOfBirth) return setStatus("Add a date of birth before resetting this password.");
-    setStatus(`Password reset: Default credential for ${record.name} restored to registered Date of Birth (${record.dateOfBirth}).`);
+    const studentId = record.username || record.student_id;
+    if (!studentId) return setStatus("Invalid student record: missing Student ID.");
+    const targetDob = record.dateOfBirth || record.date_of_birth || "2005-01-01";
+
+    try {
+      // 1. Clear custom password in browser and set reset flag
+      resetPasswordToDefaultDob(studentId);
+      rememberDateOfBirth(studentId, targetDob);
+
+      // 2. Call backend student-reset-password API
+      await fetch("/portal-api/student-reset-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ studentId, targetDob }),
+      });
+
+      setStatus(`Password reset: Default credential for ${record.name} (${studentId}) restored to Date of Birth (${targetDob}).`);
+    } catch (err) {
+      console.error("Error in resetPassword:", err);
+      setStatus(`Password reset attempted for ${record.name}.`);
+    }
   };
 
   const logout = async () => {

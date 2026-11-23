@@ -139,6 +139,10 @@ export function getRememberedDateOfBirth(studentId) {
  */
 export function hasCustomPassword(studentId) {
   if (typeof window === "undefined" || !studentId) return false;
+  // If explicitly flagged as reset to DOB in this browser
+  if (localStorage.getItem(`klef-student-dob-reset-${studentId}`) === "true") {
+    return false;
+  }
   const pwd = localStorage.getItem(`${CUSTOM_PASSWORD_PREFIX}${studentId}`);
   return Boolean(pwd && pwd.length >= 8);
 }
@@ -148,6 +152,9 @@ export function hasCustomPassword(studentId) {
  */
 export function getCustomPassword(studentId) {
   if (typeof window === "undefined" || !studentId) return null;
+  if (localStorage.getItem(`klef-student-dob-reset-${studentId}`) === "true") {
+    return null;
+  }
   return localStorage.getItem(`${CUSTOM_PASSWORD_PREFIX}${studentId}`);
 }
 
@@ -156,7 +163,15 @@ export function getCustomPassword(studentId) {
  */
 export function setCustomPassword(studentId, newPassword) {
   if (typeof window === "undefined" || !studentId) return;
+  localStorage.removeItem(`klef-student-dob-reset-${studentId}`);
   localStorage.setItem(`${CUSTOM_PASSWORD_PREFIX}${studentId}`, newPassword);
+
+  // Sync to backend database
+  fetch("/portal-api/student-set-password", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ studentId, newPassword }),
+  }).catch(() => {});
 }
 
 /**
@@ -165,6 +180,14 @@ export function setCustomPassword(studentId, newPassword) {
 export function resetPasswordToDefaultDob(studentId) {
   if (typeof window === "undefined" || !studentId) return;
   localStorage.removeItem(`${CUSTOM_PASSWORD_PREFIX}${studentId}`);
+  localStorage.setItem(`klef-student-dob-reset-${studentId}`, "true");
+
+  // Sync reset to backend database
+  fetch("/portal-api/student-reset-password", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ studentId }),
+  }).catch(() => {});
 }
 
 export async function requestPasswordReset(studentId) {

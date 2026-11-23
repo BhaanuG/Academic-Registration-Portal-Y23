@@ -622,4 +622,41 @@ export const academicDb = {
 
     return { success: true };
   },
+
+  getStudentCustomPassword(studentId) {
+    const db = getDatabase();
+    try {
+      db.exec('CREATE TABLE IF NOT EXISTS student_custom_passwords (student_id TEXT PRIMARY KEY, password TEXT NOT NULL, updated_at TEXT DEFAULT CURRENT_TIMESTAMP);');
+      const row = db.prepare('SELECT password FROM student_custom_passwords WHERE student_id = ?').get(studentId);
+      return row ? row.password : null;
+    } catch {
+      return null;
+    }
+  },
+
+  setStudentCustomPassword(studentId, password) {
+    const db = getDatabase();
+    try {
+      db.exec('CREATE TABLE IF NOT EXISTS student_custom_passwords (student_id TEXT PRIMARY KEY, password TEXT NOT NULL, updated_at TEXT DEFAULT CURRENT_TIMESTAMP);');
+      db.prepare(`
+        INSERT INTO student_custom_passwords (student_id, password, updated_at)
+        VALUES (?, ?, CURRENT_TIMESTAMP)
+        ON CONFLICT(student_id) DO UPDATE SET password = excluded.password, updated_at = CURRENT_TIMESTAMP
+      `).run(studentId, password);
+      return true;
+    } catch {
+      return false;
+    }
+  },
+
+  deleteStudentCustomPassword(studentId) {
+    const db = getDatabase();
+    try {
+      db.exec('CREATE TABLE IF NOT EXISTS student_custom_passwords (student_id TEXT PRIMARY KEY, password TEXT NOT NULL, updated_at TEXT DEFAULT CURRENT_TIMESTAMP);');
+      db.prepare('DELETE FROM student_custom_passwords WHERE student_id = ?').run(studentId);
+      return true;
+    } catch {
+      return false;
+    }
+  },
 };

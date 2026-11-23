@@ -638,3 +638,143 @@
   }
 }
 
+/* ==========================================================================
+   ADMIN PAGES UNIFICATION: COLORS & TYPOGRAPHY FROM STUDENT & LOGIN PAGES
+   Aligns Admin workspace with #fdf8ee wash, DM Sans body, Newsreader headings,
+   warm amber borders #ebdcc5, and institutional navy topbars #24344d.
+   ========================================================================== */
+.page-shell-admin {
+  background: var(--wash, #fdf8ee) !important;
+  color: var(--ink, #1c1917) !important;
+  font-family: "DM Sans", sans-serif !important;
+}
+
+.page-shell-admin .content.admin-content-workspace {
+  background: transparent !important;
+  font-family: "DM Sans", sans-serif !important;
+  color: var(--ink, #1c1917) !important;
+}
+
+/* Headings in Admin: styled like student portal & login pages */
+.page-shell-admin h1,
+.page-shell-admin .admin-page-title,
+.page-shell-admin .section-title h2,
+.page-shell-admin .admin-records-header h1 {
+  font-family: "Newsreader", serif !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.025em !important;
+  color: #1c1917 !important;
+}
+
+.page-shell-admin .admin-page-desc {
+  font-family: "DM Sans", sans-serif !important;
+  font-size: 14px !important;
+  color: #64748b !important;
+  line-height: 1.6 !important;
+}
+
+/* Admin kicker / eyebrow */
+.page-shell-admin .kicker,
+.page-shell-admin .eyebrow {
+  font-family: "DM Sans", sans-serif !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+  color: var(--green, #15803d) !important;
+}
+
+/* Admin Card surfaces, Table wrappers & Panes */
+.page-shell-admin .admin-stat-card,
+.page-shell-admin .admin-table-wrap,
+.page-shell-admin .admin-records-container,
+.page-shell-admin .admin-filter-bar,
+.page-shell-admin .admin-reset-single-pane,
+.page-shell-admin .admin-clean-box,
+.page-shell-admin .admin-account-card {
+  background: #ffffff !important;
+  border-color: #ebdcc5 !important;
+}
+
+/* Filter bar & Inputs matching Student/Login style */
+.page-shell-admin .admin-filter-bar {
+  background: #ffffff !important;
+  border: 1px solid #ebdcc5 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+}
+
+.page-shell-admin .admin-search-box {
+  background: #fdfbf7 !important;
+  border: 1px solid #ebdcc5 !important;
+  border-radius: 8px !important;
+}
+
+.page-shell-admin .admin-search-box:focus-within {
+  border-color: #d97706 !important;
+  background: #ffffff !important;
+  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.12) !important;
+}
+
+.page-shell-admin .admin-filter-select {
+  background: #fdfbf7 !important;
+  border: 1px solid #ebdcc5 !important;
+  color: #1c1917 !important;
+  border-radius: 8px !important;
+  font-family: "DM Sans", sans-serif !important;
+  font-size: 13.5px !important;
+}
+
+.page-shell-admin .admin-filter-select:focus {
+  border-color: #d97706 !important;
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.12) !important;
+}
+
+/* Table styling with Newsreader/DM Sans harmony */
+.page-shell-admin .admin-table-wrap table {
+  font-family: "DM Sans", sans-serif !important;
+}
+
+.page-shell-admin .admin-table-wrap th {
+  background: #fdfbf7 !important;
+  color: #78716c !important;
+  font-size: 11.5px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+  border-bottom: 1px solid #ebdcc5 !important;
+}
+
+.page-shell-admin .admin-table-wrap td {
+  border-bottom: 1px solid #f5ede1 !important;
+  color: #1c1917 !important;
+  font-size: 13.5px !important;
+}
+
+.page-shell-admin .admin-table-row:hover td {
+  background: #fffdf9 !important;
+}
+
+/* Action buttons in Admin table */
+.page-shell-admin .admin-action-btn {
+  border: 1px solid #ebdcc5 !important;
+  background: #fdfbf7 !important;
+  color: #57534e !important;
+  transition: all 0.15s ease !important;
+}
+
+.page-shell-admin .admin-action-btn:hover {
+  background: #ffffff !important;
+  border-color: #d97706 !important;
+  color: #b45309 !important;
+  transform: translateY(-1px);
+}
+
+.page-shell-admin .admin-action-btn.delete-btn:hover {
+  border-color: #ef4444 !important;
+  color: #dc2626 !important;
+  background: #fef2f2 !important;
+}
+
+

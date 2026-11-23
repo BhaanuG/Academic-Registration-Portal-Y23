@@ -589,6 +589,78 @@ export async function POST(request, { params }) {
         });
       }
 
+      case 'student-password-status': {
+        const { studentId } = body;
+        if (!studentId) {
+          return NextResponse.json({ ok: false, message: 'studentId is required' }, { status: 400 });
+        }
+
+        // Check Supabase first, fallback to SQLite
+        const { getStudentCustomPassword } = await import('@/lib/db/supabaseClient');
+        let customPwd = await getStudentCustomPassword(studentId);
+        if (!customPwd) {
+          customPwd = academicDb.getStudentCustomPassword(studentId);
+        }
+
+        return NextResponse.json({
+          ok: true,
+          hasCustomPassword: Boolean(customPwd && customPwd.length >= 8),
+        });
+      }
+
+      case 'student-set-password': {
+        const { studentId, newPassword } = body;
+        if (!studentId || !newPassword) {
+          return NextResponse.json({ ok: false, message: 'studentId and newPassword are required' }, { status: 400 });
+        }
+
+        if (currentUser && currentUser.role === 'student') {
+          const authStudentId = currentUser.studentId || currentUser.username;
+          if (authStudentId && authStudentId !== studentId) {
+            return NextResponse.json({ ok: false, message: 'Unauthorized' }, { status: 403 });
+          }
+        }
+
+        // Save in both SQLite and Supabase
+        academicDb.setStudentCustomPassword(studentId, newPassword);
+        const { setStudentCustomPassword } = await import('@/lib/db/supabaseClient');
+        await setStudentCustomPassword(studentId, newPassword);
+
+        return NextResponse.json({ ok: true, message: 'Custom password saved successfully' });
+      }
+
+      case 'student-reset-password': {
+        const { studentId, targetDob } = body;
+        if (!studentId) {
+          return NextResponse.json({ ok: false, message: 'studentId is required' }, { status: 400 });
+        }
+
+        // Admin privilege required
+        if (currentUser && currentUser.role === 'student') {
+          return NextResponse.json({ ok: false, message: 'Unauthorized. Admin privileges required.' }, { status: 403 });
+        }
+
+        // 1. Delete custom password from both SQLite and Supabase
+        academicDb.deleteStudentCustomPassword(studentId);
+        const { deleteStudentCustomPassword } = await import('@/lib/db/supabaseClient');
+        await deleteStudentCustomPassword(studentId);
+
+        // 2. If targetDob provided, update student date_of_birth in SQLite
+        if (targetDob) {
+          const adminIdentity = currentUser?.adminUser || currentUser?.username || 'admin-central';
+          try {
+            academicDb.updateStudentByAdmin(studentId, { date_of_birth: targetDob }, adminIdentity, 'Administrative reset to DOB credential');
+          } catch (e) {
+            console.warn('Update DOB error on reset:', e);
+          }
+        }
+
+        return NextResponse.json({
+          ok: true,
+          message: `Student ${studentId} password successfully reset to default Date of Birth credential.`,
+        });
+      }
+
       default:
         return NextResponse.json({ ok: false, message: `Mutation not supported for resource: ${resource}` }, { status: 404 });
     }

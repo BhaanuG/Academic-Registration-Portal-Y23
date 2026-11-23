@@ -75,7 +75,47 @@ export default function Login() {
 
   const isFull10Digits = studentId.length === 10;
   const isAdmin = isFull10Digits && studentId === "8897337687";
-  const studentHasCustomPassword = isFull10Digits && !isAdmin && hasCustomPassword(studentId);
+  const [serverCustomPassword, setServerCustomPassword] = useState(null);
+
+  // Check backend server status for student custom password vs DOB reset
+  useEffect(() => {
+    if (!isFull10Digits || isAdmin) {
+      setServerCustomPassword(null);
+      return;
+    }
+
+    // Check if browser has explicit DOB reset flag
+    if (localStorage.getItem(`klef-student-dob-reset-${studentId}`) === "true") {
+      setServerCustomPassword(false);
+      return;
+    }
+
+    // Check backend API status
+    fetch("/portal-api/student-password-status", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ studentId }),
+    })
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.ok) {
+          setServerCustomPassword(Boolean(data.hasCustomPassword));
+          if (!data.hasCustomPassword) {
+            localStorage.removeItem(`klef-student-custom-pwd-${studentId}`);
+          }
+        } else {
+          setServerCustomPassword(hasCustomPassword(studentId));
+        }
+      })
+      .catch(() => {
+        setServerCustomPassword(hasCustomPassword(studentId));
+      });
+  }, [studentId, isFull10Digits, isAdmin]);
+
+  const studentHasCustomPassword =
+    isFull10Digits &&
+    !isAdmin &&
+    (serverCustomPassword !== null ? serverCustomPassword : hasCustomPassword(studentId));
 
   const now = new Date();
   const isEvenSemester = now.getMonth() === 11 || (now.getMonth() === 10 && now.getDate() >= 30);

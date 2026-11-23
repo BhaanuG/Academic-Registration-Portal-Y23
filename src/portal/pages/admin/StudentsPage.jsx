@@ -5,6 +5,7 @@ import {
   RefreshCcw,
   Search,
   Trash2,
+  KeyRound,
   ArrowUpDown,
   GraduationCap,
   X,
@@ -688,6 +689,14 @@ export default function StudentsPage({
                       <button
                         type="button"
                         className="admin-action-btn edit-btn"
+                        onClick={() => onResetPassword && onResetPassword(student)}
+                        title="Reset password to Date of Birth"
+                      >
+                        <KeyRound size={15} />
+                      </button>
+                      <button
+                        type="button"
+                        className="admin-action-btn edit-btn"
                         onClick={() => onEdit(student)}
                         title="Edit student"
                       >
@@ -1047,17 +1056,30 @@ export default function StudentsPage({
                 )}
               </div>
 
-              <div className="drawer-actions">
+              <div className="drawer-actions flex gap-2">
                 <button
                   type="button"
-                  className="primary-btn w-full"
+                  className="secondary-btn flex-1"
+                  onClick={() => {
+                    if (onResetPassword && selectedStudent) {
+                      onResetPassword(selectedStudent);
+                    }
+                  }}
+                  title="Reset student's password back to their official Date of Birth"
+                >
+                  <KeyRound size={15} />
+                  <span>Reset Password (DOB)</span>
+                </button>
+                <button
+                  type="button"
+                  className="primary-btn flex-1"
                   onClick={() => {
                     onEdit(selectedStudent);
                     setSelectedStudent(null);
                   }}
                 >
                   <Pencil size={15} />
-                  <span>Edit Profile Details</span>
+                  <span>Edit Profile</span>
                 </button>
               </div>
             </div>
