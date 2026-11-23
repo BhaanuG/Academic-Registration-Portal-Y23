@@ -4360,7 +4360,43 @@ select:focus {
 .password-field input,
 .password-field,
 .date-trigger {
-  border-radius: 8px !important;
+  border-radius: 12px !important;
+  border: 1.5px solid #cbd5e1 !important;
+  background: #ffffff !important;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+}
+
+.login-form input:hover,
+.password-field input:hover,
+.date-trigger:hover {
+  border-color: #94a3b8 !important;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.06) !important;
+  transform: translateY(-1px);
+}
+
+.login-form input:focus,
+.password-field input:focus,
+.date-trigger:focus-visible,
+.date-trigger:focus {
+  border-color: #d97706 !important;
+  box-shadow: 0 0 0 4px rgba(217, 119, 6, 0.15), 0 4px 12px rgba(217, 119, 6, 0.1) !important;
+  transform: translateY(-1.5px);
+  outline: none !important;
+}
+
+.login-form .primary-btn {
+  border-radius: 12px !important;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.login-form .primary-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(180, 83, 9, 0.35) !important;
+}
+
+.login-form .primary-btn:active {
+  transform: translateY(0);
 }
 
 .login-form-wrap .eyebrow {
