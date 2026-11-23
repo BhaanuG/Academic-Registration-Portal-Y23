@@ -298,11 +298,10 @@ export default function Login() {
               </button>
             </form>
             <div className="login-help">
-              <span>Academic Registration Portal · Official Access</span>
               <button
                 type="button"
                 onClick={openResetModal}
-                className="text-blue-600 hover:text-blue-800 font-medium text-xs underline cursor-pointer bg-transparent border-0 p-0"
+                className="text-blue-600 hover:text-blue-800 font-medium text-xs underline cursor-pointer bg-transparent border-0 p-0 ml-auto"
               >
                 Reset password
               </button>
