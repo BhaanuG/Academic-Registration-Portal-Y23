@@ -350,47 +350,8 @@ export default function MyPreference({ studentId, selections = {}, setSelections
         </div>
       )}
 
-      <div className="summary-status-bar">
-        <div className="metric-chip">
-          <Layers size={18} className="text-blue-700" />
-          <div>
-            <span>Courses Selected</span>
-            <strong>
-              {selectedCoursesCount} of {rows.length} Buckets
-            </strong>
-          </div>
-        </div>
-
-        <div className="metric-chip">
-          <CheckCircle2 size={18} className="text-emerald-700" />
-          <div>
-            <span>Faculty Preferences Complete</span>
-            <strong>
-              {completedPreferencesCount} of {selectedCoursesCount} Courses
-            </strong>
-          </div>
-        </div>
-
-        <div className="metric-chip">
-          <CheckCircle2 size={18} className={isFinalized ? "text-emerald-700" : "text-amber-700"} />
-          <div>
-            <span>Preference Status</span>
-            <strong>{isFinalized ? "Finalized (Reference Ready)" : "Draft (Auto-Saved)"}</strong>
-          </div>
-        </div>
-      </div>
-
       <div className="my-preferences-container">
         <div className="my-preferences-table-wrap" ref={tableRef}>
-          <div className="summary-print-header">
-            <div>
-              <h2>Koneru Lakshmaiah Education Foundation</h2>
-              <p>Academic Registration Portal · Student Course &amp; Faculty Preferences</p>
-            </div>
-            <div className="print-cohort-tag">
-              <span>Cohort: <strong>{cluster || "Cluster 2"}</strong></span>
-            </div>
-          </div>
 
           <table className="summary-table">
             <thead>
