@@ -24,3 +24,9 @@ logs/
 # beside it.
 /.plugins/
 /.opencode-skills/
+
+# Excel, CSV and raw data protection (ensuring sensitive student records are never tracked)
+*.xlsx
+*.xls
+*.csv
+*.tsv
