@@ -15,6 +15,7 @@ export default function OverlayPortal({
   children,
   className = "modal-portal-overlay",
   lockScroll = true,
+  closeOnOutsideClick = false,
 }) {
   const [mounted, setMounted] = useState(false);
   const scrollPosRef = useRef(0);
@@ -68,7 +69,7 @@ export default function OverlayPortal({
       className={className}
       role="presentation"
       onMouseDown={(e) => {
-        if (e.target === e.currentTarget && onClose) {
+        if (closeOnOutsideClick && e.target === e.currentTarget && onClose) {
           onClose();
         }
       }}
