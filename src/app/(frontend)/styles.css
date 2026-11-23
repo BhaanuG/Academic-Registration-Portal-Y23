@@ -4362,6 +4362,23 @@ select:focus {
   border-radius: 8px !important;
 }
 
+.login-form-wrap .eyebrow {
+  font-size: 13.5px !important;
+  letter-spacing: 0.1em !important;
+  font-weight: 750 !important;
+}
+
+.login-form-wrap h2 {
+  font-size: 40px !important;
+  line-height: 1.15 !important;
+}
+
+.login-form label {
+  font-size: 15.5px !important;
+  font-weight: 650 !important;
+  color: #1e293b !important;
+}
+
 .login-panel .primary-btn,
 .login-form .primary-btn,
 .security-card .primary-btn,

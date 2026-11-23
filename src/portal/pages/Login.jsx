@@ -274,7 +274,7 @@ export default function Login() {
                   </label>
                 ) : (
                   <label className="date-login-field">
-                    Date of birth
+                    Date of Birth
                     <DatePicker
                       label="Registered DOB"
                       value={dateOfBirth}
