@@ -240,7 +240,8 @@ export default function FacultyDirectory({ cluster, studentId, selections }) {
         },
       });
 
-      doc.save(`KLEF-Faculty-Directory-${cluster ? cluster.replace(/\s+/g, "_") : "Cohort"}.pdf`);
+      const exportFileName = studentId ? `KLEF-Faculty-Directory-${studentId}.pdf` : `KLEF-Faculty-Directory.pdf`;
+      doc.save(exportFileName);
     } catch (err) {
       console.error("PDF generation error:", err);
     } finally {
