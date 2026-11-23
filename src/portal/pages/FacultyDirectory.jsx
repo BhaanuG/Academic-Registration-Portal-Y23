@@ -492,14 +492,6 @@ export default function FacultyDirectory({ cluster, studentId, selections }) {
                 <Users size={15} />
                 <span>Download Entire Faculty Directory</span>
               </button>
-
-              <button
-                type="button"
-                className="w-full py-2 text-center text-xs font-medium text-slate-500 hover:text-slate-800 transition-colors"
-                onClick={() => setShowExportModal(false)}
-              >
-                Close
-              </button>
             </div>
           </div>
         </OverlayPortal>
