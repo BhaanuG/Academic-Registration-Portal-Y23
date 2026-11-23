@@ -104,7 +104,7 @@ export default function PortalShell({ page, setPage, onLogout, studentId, childr
 
           <div className="portal-title">
             <strong>Academic Registration Portal</strong>
-            <span>CSE-2 · Academic Semester {semester} · {currentNav.label}</span>
+            <span>CSE-2 · Academic Semester {semester}</span>
           </div>
 
           <div className="account-menu">
