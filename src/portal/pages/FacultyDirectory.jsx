@@ -120,30 +120,6 @@ export default function FacultyDirectory({ cluster, studentId, selections }) {
         format: "a4",
       });
 
-      // Header Banner - Brand Top Header Navy #26364A
-      doc.setFillColor(38, 54, 74);
-      doc.rect(0, 0, 210, 24, "F");
-
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(14);
-      doc.setTextColor(255, 255, 255);
-      doc.text("Koneru Lakshmaiah Education Foundation", 14, 11);
-
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(9);
-      doc.setTextColor(190, 205, 225);
-      doc.text("Academic Registration Portal · CSE-2 · Academic Semester 8", 14, 18);
-
-      // Meta Info
-      doc.setFontSize(8);
-      doc.setTextColor(100, 116, 139);
-      const today = new Date().toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-      });
-      doc.text(`Generated on: ${today}  |  Cohort: ${cluster || "All"}  |  Total Allocations: ${directoryRows.length}`, 14, 31);
-
       // Build table rows (7 columns: BUCKET NO., COURSE CODE, NAME OF THE COURSE, SECTION NUMBER, DELIVERY COMPONENT, EMP ID, NAME OF THE FACULTY)
       const tableRows = directoryRows.map((r) => [
         r.bucketNo,
@@ -155,32 +131,68 @@ export default function FacultyDirectory({ cluster, studentId, selections }) {
         r.facultyName,
       ]);
 
+      const drawPageBackground = (data) => {
+        // Fill entire page with website wash background (#FDF8EE)
+        doc.setFillColor(253, 248, 238);
+        doc.rect(0, 0, doc.internal.pageSize.width, doc.internal.pageSize.height, "F");
+
+        // Top Header Banner in #26364A on first page
+        if (data.pageNumber === 1) {
+          doc.setFillColor(38, 54, 74); // #26364A
+          doc.rect(0, 0, doc.internal.pageSize.width, 24, "F");
+
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(14);
+          doc.setTextColor(255, 255, 255);
+          doc.text("Koneru Lakshmaiah Education Foundation", 14, 11);
+
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(9);
+          doc.setTextColor(190, 205, 225);
+          doc.text("Academic Semester 8 · Faculty Allocation Directory", 14, 18);
+
+          doc.setFontSize(8);
+          doc.setTextColor(115, 115, 115);
+          doc.text(`Generated on: ${today}  |  Total Allocations: ${directoryRows.length}`, 14, 31);
+        }
+
+        // Footer Page Number
+        const pageCount = doc.internal.getNumberOfPages();
+        doc.setFontSize(7.5);
+        doc.setTextColor(120, 113, 108);
+        doc.text(
+          `Page ${data.pageNumber} of ${pageCount}  ·  KLEF Academic Registration Portal`,
+          14,
+          doc.internal.pageSize.height - 8
+        );
+      };
+
       autoTable(doc, {
         startY: 35,
         head: [["BUCKET NO.", "COURSE CODE", "NAME OF THE COURSE", "SECTION NUMBER", "DELIVERY COMPONENT", "EMP ID", "NAME OF THE FACULTY"]],
         body: tableRows,
         theme: "grid",
-        tableLineColor: [214, 211, 198], // Warm subtle border matching portal theme
-        tableLineWidth: 0.15,
+        tableLineColor: [217, 210, 195],
+        tableLineWidth: 0.2,
         headStyles: {
           fillColor: [38, 54, 74], // #26364A Top Header Navy
           textColor: [255, 255, 255],
           fontSize: 8,
           fontStyle: "bold",
           halign: "left",
-          lineColor: [214, 211, 198],
+          lineColor: [217, 210, 195],
           lineWidth: 0.2,
         },
         bodyStyles: {
           fontSize: 7.5,
-          textColor: [28, 25, 23], // Rich dark text #1c1917
-          fillColor: [253, 248, 238], // Website wash #fdf8ee
-          lineColor: [231, 226, 214], // Clean dividing grid lines
+          textColor: [28, 25, 23],
+          fillColor: [253, 248, 238], // Website wash background (#FDF8EE)
+          lineColor: [231, 223, 207], // Soft matching warm borders
           lineWidth: 0.15,
           rowPageBreak: "avoid",
         },
         alternateRowStyles: {
-          fillColor: [247, 240, 227], // Slightly deeper warm alternate row #f7f0e3
+          fillColor: [247, 240, 225], // Subtle warm alternation (#F7F0E1)
         },
         columnStyles: {
           0: { cellWidth: 18 },
@@ -192,11 +204,34 @@ export default function FacultyDirectory({ cluster, studentId, selections }) {
           6: { cellWidth: 38, fontStyle: "bold" },
         },
         margin: { left: 8, right: 8, bottom: 16 },
+        willDrawPage: (data) => {
+          // Paint entire canvas in website background wash before content draws
+          doc.setFillColor(253, 248, 238);
+          doc.rect(0, 0, doc.internal.pageSize.width, doc.internal.pageSize.height, "F");
+
+          if (data.pageNumber === 1) {
+            doc.setFillColor(38, 54, 74); // #26364A
+            doc.rect(0, 0, doc.internal.pageSize.width, 24, "F");
+
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(14);
+            doc.setTextColor(255, 255, 255);
+            doc.text("Koneru Lakshmaiah Education Foundation", 14, 11);
+
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(9);
+            doc.setTextColor(190, 205, 225);
+            doc.text("Academic Semester 8 · Faculty Allocation Directory", 14, 18);
+
+            doc.setFontSize(8);
+            doc.setTextColor(115, 115, 115);
+            doc.text(`Generated on: ${today}  |  Total Allocations: ${directoryRows.length}`, 14, 31);
+          }
+        },
         didDrawPage: (data) => {
-          // Footer Page Number
           const pageCount = doc.internal.getNumberOfPages();
           doc.setFontSize(7.5);
-          doc.setTextColor(148, 163, 184);
+          doc.setTextColor(120, 113, 108);
           doc.text(
             `Page ${data.pageNumber} of ${pageCount}  ·  KLEF Academic Registration Portal`,
             14,
