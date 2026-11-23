@@ -159,21 +159,28 @@ export default function FacultyDirectory({ cluster, studentId, selections }) {
         startY: 35,
         head: [["BUCKET NO.", "COURSE CODE", "NAME OF THE COURSE", "SECTION NUMBER", "DELIVERY COMPONENT", "EMP ID", "NAME OF THE FACULTY"]],
         body: tableRows,
-        theme: "striped",
+        theme: "grid",
+        tableLineColor: [203, 213, 225],
+        tableLineWidth: 0.15,
         headStyles: {
-          fillColor: [36, 52, 77],
+          fillColor: [38, 54, 74], // #26364A Top Header Navy
           textColor: [255, 255, 255],
           fontSize: 8,
           fontStyle: "bold",
           halign: "left",
+          lineColor: [203, 213, 225],
+          lineWidth: 0.2,
         },
         bodyStyles: {
           fontSize: 7.5,
           textColor: [30, 41, 59],
+          fillColor: [255, 255, 255], // Pure white background
+          lineColor: [226, 232, 240], // Clear row/column borders
+          lineWidth: 0.15,
           rowPageBreak: "avoid",
         },
         alternateRowStyles: {
-          fillColor: [248, 250, 252],
+          fillColor: [248, 250, 252], // Crisp neutral light slate
         },
         columnStyles: {
           0: { cellWidth: 18 },
