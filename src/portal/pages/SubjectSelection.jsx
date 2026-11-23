@@ -78,17 +78,6 @@ export default function Subjects({
         }
         if (sRes.ok && sRes.data) {
           setStudentSubjects(sRes.data);
-          // Auto-select prescribed courses if not already selected
-          sRes.data.forEach((s) => {
-            if (s.is_prescribed && s.course_code && s.course_code !== "OE1" && s.course_code !== "OE2") {
-              setSelections((curr) => {
-                if (!curr[s.bucket_id]) {
-                  return { ...curr, [s.bucket_id]: s.course_code };
-                }
-                return curr;
-              });
-            }
-          });
         }
       })
       .catch((err) => console.error("Error loading student eligible buckets:", err))
