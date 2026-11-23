@@ -153,6 +153,9 @@ export default function Login() {
       }
 
       const studentRecord = profileData.data;
+      try {
+        localStorage.setItem(`klef-student-profile-${studentId}`, JSON.stringify(studentRecord));
+      } catch {}
 
       // 2. Validate Credential
       if (studentHasCustomPassword) {

@@ -1,9 +1,14 @@
 import { useState, useEffect } from "react";
 import { FileText, ArrowRight, Check } from "lucide-react";
 import OverlayPortal from "../common/OverlayPortal";
+import { getStudentRosterInfo } from "../../services/studentService";
 
-export default function RegistrationGuidelinesModal({ studentId, onAgree }) {
-  const [student, setStudent] = useState(null);
+export default function RegistrationGuidelinesModal({ studentId, onAgree, initialProfile }) {
+  const [student, setStudent] = useState(() => {
+    if (initialProfile) return initialProfile;
+    const rosterInfo = getStudentRosterInfo(studentId);
+    return rosterInfo?.specialization ? rosterInfo : null;
+  });
   const [agreed, setAgreed] = useState(false);
 
   useEffect(() => {
@@ -13,13 +18,17 @@ export default function RegistrationGuidelinesModal({ studentId, onAgree }) {
       .then((res) => {
         if (res.ok && res.data) {
           setStudent(res.data);
+          try {
+            localStorage.setItem(`klef-student-profile-${studentId}`, JSON.stringify(res.data));
+          } catch {}
         }
       })
       .catch(() => {});
   }, [studentId]);
 
-  const specializationName = student?.specialization?.toUpperCase() || "GENERATIVE AI FOR AGENTIC AND MULTI-MODAL INTELLIGENCE";
-  const clusterName = student?.cluster_id === "Cluster-1" ? "Cluster 1" : "Cluster 2";
+  const rawSpecialization = student?.specialization || getStudentRosterInfo(studentId)?.specialization;
+  const specializationName = rawSpecialization ? rawSpecialization.toUpperCase() : null;
+  const clusterName = (student?.cluster_id === "Cluster-1" || student?.cluster === "Cluster 1" || getStudentRosterInfo(studentId)?.cluster === "Cluster 1") ? "Cluster 1" : "Cluster 2";
 
   const handleProceed = () => {
     if (!agreed) return;
@@ -63,7 +72,7 @@ export default function RegistrationGuidelinesModal({ studentId, onAgree }) {
             <div className="guideline-item guideline-item-special">
               <span className="guideline-num dark">3</span>
               <p className="guideline-content">
-                Your Specialization: <strong>{specializationName}</strong> — <strong>{clusterName}</strong>
+                Your Specialization: <strong>{specializationName || "Loading Specialization..."}</strong> — <strong>{clusterName}</strong>
               </p>
             </div>
 

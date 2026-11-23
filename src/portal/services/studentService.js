@@ -37,9 +37,24 @@ export function getStudentRosterInfo(studentId) {
   if (roster && roster[studentId]) {
     return roster[studentId];
   }
+  // Try checking localStorage for cached profile first
+  try {
+    const cached = localStorage.getItem(`klef-student-profile-${studentId}`);
+    if (cached) {
+      const parsed = JSON.parse(cached);
+      if (parsed && (parsed.specialization || parsed.name)) {
+        return {
+          name: parsed.name || "Student",
+          specialization: parsed.specialization || "",
+          cluster: parsed.cluster_id === "Cluster-1" ? "Cluster 1" : "Cluster 2"
+        };
+      }
+    }
+  } catch {}
+
   return {
-    name: "Anirudh Varma",
-    specialization: "Generative AI for Agentic and Multi-Modal Intelligence",
+    name: "Student",
+    specialization: "",
     cluster: "Cluster 2"
   };
 }

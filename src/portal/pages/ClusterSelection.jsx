@@ -52,7 +52,7 @@ export default function ClusterSelection({ studentId, cluster, setCluster, goTo 
   const currentClusterName = assignedCluster || (cluster === "Cluster 1" || cluster === "Cluster 2" ? cluster : "Cluster 2");
 
   // Determine display specialization (matches student record or falls back accurately)
-  const displaySpecialization = student?.specialization || initialInfo?.specialization || "Generative AI for Agentic and Multi-Modal Intelligence";
+  const displaySpecialization = student?.specialization || initialInfo?.specialization || "";
 
   return (
     <div className="cluster-selection-screen-fit">

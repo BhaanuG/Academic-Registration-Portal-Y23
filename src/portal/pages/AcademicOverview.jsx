@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect } from "react";
 import PageHeading from "../components/common/PageHeading";
-import { getStudentCluster } from "../services/studentService";
+import { getStudentCluster, getStudentRosterInfo } from "../services/studentService";
 import { loadPreferences } from "../services/preferenceService";
 import { readLocalRecord } from "../services/api";
 import { getSelectionStorageKey, initialSelections } from "../services/subjectService";
@@ -22,23 +22,27 @@ import {
 } from "lucide-react";
 
 export default function Overview({ studentId, goTo }) {
-  const [student, setStudent] = useState(null);
+  const initialInfo = useMemo(() => getStudentRosterInfo(studentId), [studentId]);
+  const [student, setStudent] = useState(() => initialInfo);
   const [subjects, setSubjects] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!studentId) return;
-    setLoading(true);
     Promise.all([
       fetch(`/portal-api/student-profile?studentId=${studentId}`).then((r) => r.json()),
       fetch(`/portal-api/my-subjects?studentId=${studentId}`).then((r) => r.json()),
     ])
       .then(([profRes, subRes]) => {
-        if (profRes.ok && profRes.data) setStudent(profRes.data);
+        if (profRes.ok && profRes.data) {
+          setStudent(profRes.data);
+          try {
+            localStorage.setItem(`klef-student-profile-${studentId}`, JSON.stringify(profRes.data));
+          } catch {}
+        }
         if (subRes.ok && subRes.data) setSubjects(subRes.data);
       })
-      .catch((err) => console.error("Failed to load student overview data:", err))
-      .finally(() => setLoading(false));
+      .catch((err) => console.error("Failed to load student overview data:", err));
   }, [studentId]);
 
   // Read actual student state
