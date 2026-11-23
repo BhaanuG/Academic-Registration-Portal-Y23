@@ -293,7 +293,7 @@ export default function Login() {
             aria-modal="true"
           >
             {/* Top Rounded Header Bar with Icon, Title, Subtitle & Circular Close Button */}
-            <div className="clean-popup-header">
+            <div className="clean-popup-header header-orange">
               <div className="clean-popup-header-icon">
                 <KeyRound size={20} className="text-white" />
               </div>
@@ -311,22 +311,8 @@ export default function Login() {
               </button>
             </div>
 
-            {/* Modal Body with Metric Pills & Structured Details Box */}
+            {/* Modal Body with Structured Details Box */}
             <div className="clean-popup-body">
-              {/* Top 2 Pill Metric / Summary Cards */}
-              <div className="clean-popup-pill-grid">
-                <div className="clean-popup-pill-card active-blue">
-                  <span className="clean-popup-pill-label">DEFAULT CREDENTIAL</span>
-                  <strong className="clean-popup-pill-val">01 Jan 2005</strong>
-                  <span className="clean-popup-pill-desc">Default date of birth for all students</span>
-                </div>
-                <div className="clean-popup-pill-card">
-                  <span className="clean-popup-pill-label">BACKUP CREDENTIAL</span>
-                  <strong className="clean-popup-pill-val">Official DOB</strong>
-                  <span className="clean-popup-pill-desc">As recorded in university database</span>
-                </div>
-              </div>
-
               {/* Structured Key Details Table Box */}
               <div className="clean-popup-detail-box">
                 <span className="clean-popup-detail-title">AUTHENTICATION STEPS</span>
@@ -338,7 +324,7 @@ export default function Login() {
 
                 <div className="clean-popup-detail-row">
                   <span className="clean-popup-detail-label">Step 2 · Administrator Contact</span>
-                  <span className="clean-popup-detail-value" style={{ color: "#2563eb", fontWeight: 700 }}>
+                  <span className="clean-popup-detail-value" style={{ color: "#ea580c", fontWeight: 700 }}>
                     {adminPhone}
                   </span>
                 </div>
