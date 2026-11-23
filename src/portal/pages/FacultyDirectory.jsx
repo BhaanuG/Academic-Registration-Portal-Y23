@@ -1,7 +1,8 @@
 import { useState, useMemo, useEffect } from "react";
 import PageHeading from "../components/common/PageHeading";
 import { allocations, buckets, componentNames } from "../services/academicData";
-import { Search, UserRound, ArrowUpDown, Filter, BookOpen, Layers, X, Download } from "lucide-react";
+import { Search, UserRound, ArrowUpDown, Filter, BookOpen, Layers, X, Download, Users, FileText, CheckCircle2 } from "lucide-react";
+import OverlayPortal from "../components/common/OverlayPortal";
 
 export default function FacultyDirectory({ cluster, studentId, selections }) {
   const [query, setQuery] = useState("");
@@ -9,6 +10,7 @@ export default function FacultyDirectory({ cluster, studentId, selections }) {
   const [component, setComponent] = useState("All components");
   const [facultyOrder, setFacultyOrder] = useState("asc");
   const [isExporting, setIsExporting] = useState(false);
+  const [showExportModal, setShowExportModal] = useState(false);
   const [rawDirectoryRows, setRawDirectoryRows] = useState(null);
 
   // Normalize active student cohort cluster (Cluster-1 or Cluster-2)
@@ -105,10 +107,11 @@ export default function FacultyDirectory({ cluster, studentId, selections }) {
 
   const hasActiveFilters = query.trim() !== "" || courseCode !== "All courses" || component !== "All components";
 
-  // Export full faculty data to PDF
-  const handleDownloadPdf = async () => {
+  // Export faculty data to PDF (mode: 'student' or 'entire')
+  const handleDownloadPdf = async (mode = "student") => {
     if (isExporting) return;
     setIsExporting(true);
+    setShowExportModal(false);
     try {
       const { jsPDF } = await import("jspdf");
       const autoTableModule = await import("jspdf-autotable");
@@ -126,8 +129,46 @@ export default function FacultyDirectory({ cluster, studentId, selections }) {
         day: "numeric",
       });
 
+      let targetRows = [];
+      let isEntire = mode === "entire";
+
+      if (isEntire) {
+        // Compile entire faculty allocations across Cluster 1 and Cluster 2
+        const codeToBucket = {};
+        buckets.forEach((b) => {
+          b.subjects.forEach((s) => {
+            codeToBucket[s.code] = b.id;
+          });
+        });
+
+        targetRows = allocations.map((alloc) => {
+          const subject = allCatalogCourses.find((item) => item.code === alloc.course_code);
+          const actualCourseName = subject?.name || alloc.course_name || alloc.course_code;
+          const bucketNo = codeToBucket[alloc.course_code] || alloc.bucket_id || "C0";
+
+          return {
+            bucketNo,
+            courseCode: alloc.course_code,
+            courseName: actualCourseName,
+            sectionNumber: alloc.section_number,
+            component: alloc.component,
+            empId: alloc.faculty_id,
+            facultyName: alloc.faculty_name || `Faculty Member (${alloc.faculty_id})`,
+          };
+        }).sort((a, b) => {
+          return (
+            a.bucketNo.localeCompare(b.bucketNo, undefined, { numeric: true }) ||
+            (a.sectionNumber - b.sectionNumber) ||
+            a.component.localeCompare(b.component) ||
+            a.facultyName.localeCompare(b.facultyName)
+          );
+        });
+      } else {
+        targetRows = directoryRows;
+      }
+
       // Build table rows (7 columns: BUCKET NO., COURSE CODE, NAME OF THE COURSE, SECTION NUMBER, DELIVERY COMPONENT, EMP ID, NAME OF THE FACULTY)
-      const tableRows = directoryRows.map((r) => [
+      const tableRows = targetRows.map((r) => [
         r.bucketNo,
         r.courseCode,
         r.courseName,
@@ -137,41 +178,9 @@ export default function FacultyDirectory({ cluster, studentId, selections }) {
         r.facultyName,
       ]);
 
-      const drawPageBackground = (data) => {
-        // Fill entire page with website wash background (#FDF8EE)
-        doc.setFillColor(253, 248, 238);
-        doc.rect(0, 0, doc.internal.pageSize.width, doc.internal.pageSize.height, "F");
-
-        // Top Header Banner in #26364A on first page
-        if (data.pageNumber === 1) {
-          doc.setFillColor(38, 54, 74); // #26364A
-          doc.rect(0, 0, doc.internal.pageSize.width, 24, "F");
-
-          doc.setFont("helvetica", "bold");
-          doc.setFontSize(14);
-          doc.setTextColor(255, 255, 255);
-          doc.text("Koneru Lakshmaiah Education Foundation", 14, 11);
-
-          doc.setFont("helvetica", "normal");
-          doc.setFontSize(9);
-          doc.setTextColor(190, 205, 225);
-          doc.text("Academic Semester 8 · Faculty Allocation Directory", 14, 18);
-
-          doc.setFontSize(8);
-          doc.setTextColor(115, 115, 115);
-          doc.text(`Generated on: ${today}  |  Total Allocations: ${directoryRows.length}`, 14, 31);
-        }
-
-        // Footer Page Number
-        const pageCount = doc.internal.getNumberOfPages();
-        doc.setFontSize(7.5);
-        doc.setTextColor(120, 113, 108);
-        doc.text(
-          `Page ${data.pageNumber} of ${pageCount}  ·  KLEF Academic Registration Portal`,
-          14,
-          doc.internal.pageSize.height - 8
-        );
-      };
+      const subTitleText = isEntire
+        ? "Academic Semester 8 · Master Faculty Allocation Directory (Clusters 1 & 2)"
+        : `Academic Semester 8 · Faculty Allocation Directory (${studentId || "Student"})`;
 
       autoTable(doc, {
         startY: 35,
@@ -227,11 +236,11 @@ export default function FacultyDirectory({ cluster, studentId, selections }) {
             doc.setFont("helvetica", "normal");
             doc.setFontSize(9);
             doc.setTextColor(190, 205, 225);
-            doc.text("Academic Semester 8 · Faculty Allocation Directory", 14, 18);
+            doc.text(subTitleText, 14, 18);
 
             doc.setFontSize(8);
             doc.setTextColor(115, 115, 115);
-            doc.text(`Generated on: ${today}  |  Total Allocations: ${directoryRows.length}`, 14, 31);
+            doc.text(`Generated on: ${today}  |  Total Allocations: ${targetRows.length}`, 14, 31);
           }
         },
         didDrawPage: (data) => {
@@ -246,7 +255,9 @@ export default function FacultyDirectory({ cluster, studentId, selections }) {
         },
       });
 
-      const exportFileName = studentId ? `KLEF-Faculty-Directory-${studentId}.pdf` : `KLEF-Faculty-Directory.pdf`;
+      const exportFileName = isEntire
+        ? "KLEF-Faculty-Directory.pdf"
+        : (studentId ? `KLEF-Faculty-Directory-${studentId}.pdf` : "KLEF-Faculty-Directory.pdf");
       doc.save(exportFileName);
     } catch (err) {
       console.error("PDF generation error:", err);
@@ -265,10 +276,10 @@ export default function FacultyDirectory({ cluster, studentId, selections }) {
             <button
               type="button"
               className="faculty-download-icon-btn"
-              onClick={handleDownloadPdf}
+              onClick={() => setShowExportModal(true)}
               disabled={isExporting}
-              title="Download entire faculty list in PDF format"
-              aria-label="Download faculty list PDF"
+              title="Download faculty directory PDF options"
+              aria-label="Download faculty directory PDF options"
             >
               <Download size={18} />
             </button>
@@ -420,6 +431,79 @@ export default function FacultyDirectory({ cluster, studentId, selections }) {
           </tbody>
         </table>
       </div>
+
+      {/* Floating Export Options Pop-up via OverlayPortal */}
+      {showExportModal && (
+        <OverlayPortal
+          isOpen={true}
+          onClose={() => setShowExportModal(false)}
+          className="clean-popup-backdrop"
+        >
+          <div className="clean-popup-card animate-in zoom-in-95 duration-150 max-w-lg w-full p-6 bg-white rounded-2xl shadow-2xl border border-slate-200">
+            <div className="flex items-start justify-between gap-4 pb-4 border-b border-slate-100">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-700">
+                  <FileText size={20} />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-slate-900 leading-tight">Faculty Directory Export</h3>
+                  <p className="text-xs text-slate-500 mt-0.5">Choose your preferred export scope</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                className="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100 transition-colors"
+                onClick={() => setShowExportModal(false)}
+                title="Close"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="py-4 space-y-3">
+              <div className="p-3.5 rounded-xl bg-amber-50/70 border border-amber-200/80 text-xs text-amber-900 leading-relaxed">
+                <p>
+                  <strong>Notice:</strong> This faculty directory is customized exclusively for your registration (<strong>{studentId || "Student"}</strong>). It is sorted and filtered specifically by your eligible courses and section cohort, rather than the global generic directory.
+                </p>
+              </div>
+
+              <p className="text-xs text-slate-600">
+                You can download your personalized cohort directory or export the entire university catalog across all clusters:
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-2.5 pt-2">
+              <button
+                type="button"
+                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-xs text-white bg-[#d97706] hover:bg-[#b45309] shadow-sm transition-all"
+                onClick={() => handleDownloadPdf("student")}
+                disabled={isExporting}
+              >
+                <Download size={15} />
+                <span>{isExporting ? "Generating PDF..." : "Download My Faculty Directory"}</span>
+              </button>
+
+              <button
+                type="button"
+                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-xs text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300 transition-all"
+                onClick={() => handleDownloadPdf("entire")}
+                disabled={isExporting}
+              >
+                <Users size={15} />
+                <span>Download Entire Faculty Directory</span>
+              </button>
+
+              <button
+                type="button"
+                className="w-full py-2 text-center text-xs font-medium text-slate-500 hover:text-slate-800 transition-colors"
+                onClick={() => setShowExportModal(false)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </OverlayPortal>
+      )}
     </div>
   );
 }
