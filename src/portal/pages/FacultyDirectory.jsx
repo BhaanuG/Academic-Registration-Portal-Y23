@@ -120,8 +120,8 @@ export default function FacultyDirectory({ cluster, studentId, selections }) {
         format: "a4",
       });
 
-      // Header Banner
-      doc.setFillColor(36, 52, 77); // KLEF Navy
+      // Header Banner - Brand Top Header Navy #26364A
+      doc.setFillColor(38, 54, 74);
       doc.rect(0, 0, 210, 24, "F");
 
       doc.setFont("helvetica", "bold");
@@ -132,7 +132,7 @@ export default function FacultyDirectory({ cluster, studentId, selections }) {
       doc.setFont("helvetica", "normal");
       doc.setFontSize(9);
       doc.setTextColor(190, 205, 225);
-      doc.text("Academic Semester 8 · Faculty Allocation Directory", 14, 18);
+      doc.text("Academic Registration Portal · CSE-2 · Academic Semester 8", 14, 18);
 
       // Meta Info
       doc.setFontSize(8);
@@ -142,7 +142,7 @@ export default function FacultyDirectory({ cluster, studentId, selections }) {
         month: "short",
         day: "numeric",
       });
-      doc.text(`Generated on: ${today}  |  Total Allocations: ${directoryRows.length}`, 14, 31);
+      doc.text(`Generated on: ${today}  |  Cohort: ${cluster || "All"}  |  Total Allocations: ${directoryRows.length}`, 14, 31);
 
       // Build table rows (7 columns: BUCKET NO., COURSE CODE, NAME OF THE COURSE, SECTION NUMBER, DELIVERY COMPONENT, EMP ID, NAME OF THE FACULTY)
       const tableRows = directoryRows.map((r) => [
@@ -160,7 +160,7 @@ export default function FacultyDirectory({ cluster, studentId, selections }) {
         head: [["BUCKET NO.", "COURSE CODE", "NAME OF THE COURSE", "SECTION NUMBER", "DELIVERY COMPONENT", "EMP ID", "NAME OF THE FACULTY"]],
         body: tableRows,
         theme: "grid",
-        tableLineColor: [203, 213, 225],
+        tableLineColor: [214, 211, 198], // Warm subtle border matching portal theme
         tableLineWidth: 0.15,
         headStyles: {
           fillColor: [38, 54, 74], // #26364A Top Header Navy
@@ -168,19 +168,19 @@ export default function FacultyDirectory({ cluster, studentId, selections }) {
           fontSize: 8,
           fontStyle: "bold",
           halign: "left",
-          lineColor: [203, 213, 225],
+          lineColor: [214, 211, 198],
           lineWidth: 0.2,
         },
         bodyStyles: {
           fontSize: 7.5,
-          textColor: [30, 41, 59],
-          fillColor: [255, 255, 255], // Pure white background
-          lineColor: [226, 232, 240], // Clear row/column borders
+          textColor: [28, 25, 23], // Rich dark text #1c1917
+          fillColor: [253, 248, 238], // Website wash #fdf8ee
+          lineColor: [231, 226, 214], // Clean dividing grid lines
           lineWidth: 0.15,
           rowPageBreak: "avoid",
         },
         alternateRowStyles: {
-          fillColor: [248, 250, 252], // Crisp neutral light slate
+          fillColor: [247, 240, 227], // Slightly deeper warm alternate row #f7f0e3
         },
         columnStyles: {
           0: { cellWidth: 18 },
