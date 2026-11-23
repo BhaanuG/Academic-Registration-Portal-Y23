@@ -30,7 +30,7 @@ export async function getStudentPrivateDetails(studentId) {
 
   try {
     const res = await p.query(
-      'SELECT student_id, aadhaar_number, apaar_number, mobile_number, parent_phone_number FROM students WHERE student_id = $1 LIMIT 1',
+      'SELECT student_id, aadhaar_number, apaar_number, mobile_number, parent_phone_number, counselor_name, counselor_mobile, counselor_email FROM students WHERE student_id = $1 LIMIT 1',
       [studentId]
     );
     if (res.rows && res.rows.length > 0) {

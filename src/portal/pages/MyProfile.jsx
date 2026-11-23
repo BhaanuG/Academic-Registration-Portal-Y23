@@ -32,14 +32,26 @@ export default function Profile({ studentId }) {
   const [apaarLoading, setApaarLoading] = useState(false);
   const [apaarCountdown, setApaarCountdown] = useState(0);
 
+  const [revealedParentPhone, setRevealedParentPhone] = useState(null);
+  const [parentPhoneLoading, setParentPhoneLoading] = useState(false);
+  const [parentPhoneCountdown, setParentPhoneCountdown] = useState(0);
+
+  const [revealedCounselorMobile, setRevealedCounselorMobile] = useState(null);
+  const [counselorMobileLoading, setCounselorMobileLoading] = useState(false);
+  const [counselorMobileCountdown, setCounselorMobileCountdown] = useState(0);
+
   const aadhaarTimerRef = useRef(null);
   const apaarTimerRef = useRef(null);
+  const parentPhoneTimerRef = useRef(null);
+  const counselorMobileTimerRef = useRef(null);
 
   // Clear timers on unmount
   useEffect(() => {
     return () => {
       if (aadhaarTimerRef.current) clearInterval(aadhaarTimerRef.current);
       if (apaarTimerRef.current) clearInterval(apaarTimerRef.current);
+      if (parentPhoneTimerRef.current) clearInterval(parentPhoneTimerRef.current);
+      if (counselorMobileTimerRef.current) clearInterval(counselorMobileTimerRef.current);
     };
   }, []);
 
@@ -121,6 +133,84 @@ export default function Profile({ studentId }) {
     }
   };
 
+  const handleToggleParentPhone = async () => {
+    if (revealedParentPhone) {
+      if (parentPhoneTimerRef.current) clearInterval(parentPhoneTimerRef.current);
+      setRevealedParentPhone(null);
+      setParentPhoneCountdown(0);
+      return;
+    }
+
+    setParentPhoneLoading(true);
+    try {
+      const res = await fetch("/portal-api/reveal-student-credential", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ studentId: profile?.rollNumber || studentId, field: "parent_phone" }),
+      });
+      const data = await res.json();
+      if (data.ok && data.value) {
+        setRevealedParentPhone(data.value);
+        setParentPhoneCountdown(5);
+
+        if (parentPhoneTimerRef.current) clearInterval(parentPhoneTimerRef.current);
+        let secondsLeft = 5;
+        parentPhoneTimerRef.current = setInterval(() => {
+          secondsLeft -= 1;
+          setParentPhoneCountdown(secondsLeft);
+          if (secondsLeft <= 0) {
+            clearInterval(parentPhoneTimerRef.current);
+            setRevealedParentPhone(null);
+            setParentPhoneCountdown(0);
+          }
+        }, 1000);
+      }
+    } catch (err) {
+      console.error("Failed to reveal parent phone:", err);
+    } finally {
+      setParentPhoneLoading(false);
+    }
+  };
+
+  const handleToggleCounselorMobile = async () => {
+    if (revealedCounselorMobile) {
+      if (counselorMobileTimerRef.current) clearInterval(counselorMobileTimerRef.current);
+      setRevealedCounselorMobile(null);
+      setCounselorMobileCountdown(0);
+      return;
+    }
+
+    setCounselorMobileLoading(true);
+    try {
+      const res = await fetch("/portal-api/reveal-student-credential", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ studentId: profile?.rollNumber || studentId, field: "counselor_mobile" }),
+      });
+      const data = await res.json();
+      if (data.ok && data.value) {
+        setRevealedCounselorMobile(data.value);
+        setCounselorMobileCountdown(5);
+
+        if (counselorMobileTimerRef.current) clearInterval(counselorMobileTimerRef.current);
+        let secondsLeft = 5;
+        counselorMobileTimerRef.current = setInterval(() => {
+          secondsLeft -= 1;
+          setCounselorMobileCountdown(secondsLeft);
+          if (secondsLeft <= 0) {
+            clearInterval(counselorMobileTimerRef.current);
+            setRevealedCounselorMobile(null);
+            setCounselorMobileCountdown(0);
+          }
+        }, 1000);
+      }
+    } catch (err) {
+      console.error("Failed to reveal counselor mobile:", err);
+    } finally {
+      setCounselorMobileLoading(false);
+    }
+  };
+
   const [hasCustomPwd, setHasCustomPwd] = useState(() => hasCustomPassword(studentId));
 
   // Keep hasCustomPwd in sync whenever studentId changes or after an update
@@ -149,6 +239,9 @@ export default function Profile({ studentId }) {
             residencyStatus: s.residency_status || "—",
             parentName: s.parent_name || "—",
             parentPhoneNumber: s.parent_phone_number || "—",
+            counselorName: s.counselor_name || "—",
+            counselorMobile: s.counselor_mobile || "—",
+            counselorEmail: s.counselor_email || "—",
           });
           setPersonalEmail(s.personal_email || `${s.student_id}@kluniversity.in`);
           setMobile(s.mobile_number || "—");
@@ -373,8 +466,74 @@ export default function Profile({ studentId }) {
             </div>
 
             <div className="field-block">
-              <span className="field-label">Parent Contact Number</span>
-              <input disabled value={profile?.parentPhoneNumber || "—"} readOnly className="field-input readonly" />
+              <div className="field-label-row">
+                <span className="field-label">Parent Contact Number</span>
+                {parentPhoneCountdown > 0 && (
+                  <span className="countdown-badge">Auto-hiding in {parentPhoneCountdown}s</span>
+                )}
+              </div>
+              <div className="credential-input-wrap">
+                <input
+                  disabled
+                  value={revealedParentPhone || profile?.parentPhoneNumber || "—"}
+                  readOnly
+                  className={`field-input readonly credential-input ${revealedParentPhone ? "credential-revealed" : ""}`}
+                />
+                <button
+                  type="button"
+                  onClick={handleToggleParentPhone}
+                  disabled={parentPhoneLoading}
+                  className="credential-toggle-btn"
+                  title={revealedParentPhone ? "Hide Contact" : "Click to view full Parent Contact (5s)"}
+                  aria-label="Toggle Parent Contact visibility"
+                >
+                  {parentPhoneLoading ? (
+                    <Loader2 size={16} className="animate-spin text-gray-500" />
+                  ) : revealedParentPhone ? (
+                    <EyeOff size={16} className="text-amber-600" />
+                  ) : (
+                    <Eye size={16} className="text-gray-500 hover:text-gray-800" />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            <div className="field-block">
+              <span className="field-label">Faculty Counselor</span>
+              <input disabled value={profile?.counselorName || "—"} readOnly className="field-input readonly" />
+            </div>
+
+            <div className="field-block">
+              <div className="field-label-row">
+                <span className="field-label">Counselor Mobile Number</span>
+                {counselorMobileCountdown > 0 && (
+                  <span className="countdown-badge">Auto-hiding in {counselorMobileCountdown}s</span>
+                )}
+              </div>
+              <div className="credential-input-wrap">
+                <input
+                  disabled
+                  value={revealedCounselorMobile || profile?.counselorMobile || "—"}
+                  readOnly
+                  className={`field-input readonly credential-input ${revealedCounselorMobile ? "credential-revealed" : ""}`}
+                />
+                <button
+                  type="button"
+                  onClick={handleToggleCounselorMobile}
+                  disabled={counselorMobileLoading}
+                  className="credential-toggle-btn"
+                  title={revealedCounselorMobile ? "Hide Contact" : "Click to view full Counselor Contact (5s)"}
+                  aria-label="Toggle Counselor Contact visibility"
+                >
+                  {counselorMobileLoading ? (
+                    <Loader2 size={16} className="animate-spin text-gray-500" />
+                  ) : revealedCounselorMobile ? (
+                    <EyeOff size={16} className="text-amber-600" />
+                  ) : (
+                    <Eye size={16} className="text-gray-500 hover:text-gray-800" />
+                  )}
+                </button>
+              </div>
             </div>
           </div>
         </section>

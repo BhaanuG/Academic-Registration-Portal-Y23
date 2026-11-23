@@ -552,7 +552,8 @@ export async function POST(request, { params }) {
           }
         }
 
-        if (field !== 'aadhaar' && field !== 'apaar') {
+        const allowedFields = ['aadhaar', 'apaar', 'parent_phone', 'counselor_mobile', 'mobile'];
+        if (!allowedFields.includes(field)) {
           return NextResponse.json({ ok: false, message: 'Invalid field requested' }, { status: 400 });
         }
 
@@ -563,6 +564,9 @@ export async function POST(request, { params }) {
         if (privateData) {
           if (field === 'aadhaar') unmaskedValue = privateData.aadhaar_number;
           if (field === 'apaar') unmaskedValue = privateData.apaar_number;
+          if (field === 'parent_phone') unmaskedValue = privateData.parent_phone_number;
+          if (field === 'counselor_mobile') unmaskedValue = privateData.counselor_mobile;
+          if (field === 'mobile') unmaskedValue = privateData.mobile_number;
         }
 
         // Fallback to local db if Supabase pooler is not configured or offline
@@ -571,6 +575,9 @@ export async function POST(request, { params }) {
           if (localStudent) {
             if (field === 'aadhaar') unmaskedValue = localStudent.aadhaar_number;
             if (field === 'apaar') unmaskedValue = localStudent.apaar_number;
+            if (field === 'parent_phone') unmaskedValue = localStudent.parent_phone_number;
+            if (field === 'counselor_mobile') unmaskedValue = localStudent.counselor_mobile;
+            if (field === 'mobile') unmaskedValue = localStudent.mobile_number;
           }
         }
 
