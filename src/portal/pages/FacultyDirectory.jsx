@@ -120,6 +120,12 @@ export default function FacultyDirectory({ cluster, studentId, selections }) {
         format: "a4",
       });
 
+      const today = new Date().toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      });
+
       // Build table rows (7 columns: BUCKET NO., COURSE CODE, NAME OF THE COURSE, SECTION NUMBER, DELIVERY COMPONENT, EMP ID, NAME OF THE FACULTY)
       const tableRows = directoryRows.map((r) => [
         r.bucketNo,
