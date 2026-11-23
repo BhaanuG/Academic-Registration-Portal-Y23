@@ -356,14 +356,14 @@ export default function Login() {
                 </div>
 
                 <div className="clean-popup-detail-row">
-                  <span className="clean-popup-detail-label">Step 2 · Administrator Contact</span>
+                  <span className="clean-popup-detail-label">Step 2 · Administrator Contact (If Step 1 Fails)</span>
                   <span className="clean-popup-detail-value" style={{ color: "#ea580c", fontWeight: 700 }}>
                     {adminPhone}
                   </span>
                 </div>
 
                 <div className="clean-popup-detail-row full-col">
-                  <span className="clean-popup-detail-label">Support Message Template</span>
+                  <span className="clean-popup-detail-label">Support Message Template (Send to Admin if Step 1 fails)</span>
                   <div className="clean-popup-code-snippet">
 {`Hi,
 
