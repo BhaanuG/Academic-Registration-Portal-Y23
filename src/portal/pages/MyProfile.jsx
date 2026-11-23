@@ -230,7 +230,7 @@ export default function Profile({ studentId }) {
           <section className="security-card">
             <div className="security-header">
               <div className="security-icon-wrap">
-                <KeyRound size={20} className="text-blue-600" />
+                <KeyRound size={20} className="text-amber-600" />
               </div>
               <div>
                 <p className="eyebrow">Account Security</p>

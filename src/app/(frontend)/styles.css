@@ -4354,6 +4354,35 @@ select:focus {
 
 
 
+.login-panel .primary-btn,
+.login-form .primary-btn,
+.security-card .primary-btn,
+.account-sidebar .primary-btn {
+  background: #d97706 !important;
+  background-color: #d97706 !important;
+  border-color: #b45309 !important;
+  color: #ffffff !important;
+  box-shadow: 0 1px 3px rgba(217, 119, 6, 0.2) !important;
+}
+
+.login-panel .primary-btn:hover,
+.login-form .primary-btn:hover,
+.security-card .primary-btn:hover,
+.account-sidebar .primary-btn:hover {
+  background: #b45309 !important;
+  background-color: #b45309 !important;
+  border-color: #92400e !important;
+  box-shadow: 0 4px 12px rgba(180, 83, 9, 0.25) !important;
+}
+
+.login-panel .primary-btn:active,
+.login-form .primary-btn:active,
+.security-card .primary-btn:active,
+.account-sidebar .primary-btn:active {
+  background: #92400e !important;
+  background-color: #92400e !important;
+}
+
 /* ==========================================================================
    MODULAR PORTAL & PAGE STYLES
    ========================================================================== */
