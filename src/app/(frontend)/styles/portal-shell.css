@@ -627,7 +627,7 @@
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba(15, 23, 42, 0.82) !important;
+  background: #26364A !important;
   backdrop-filter: blur(14px) saturate(180%);
   -webkit-backdrop-filter: blur(14px) saturate(180%);
   border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
