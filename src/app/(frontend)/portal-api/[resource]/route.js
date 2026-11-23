@@ -538,6 +538,50 @@ export async function POST(request, { params }) {
         return NextResponse.json({ ok: true, message: 'Administrator password updated in SQL database successfully' });
       }
 
+      case 'reveal-student-credential': {
+        const { studentId, field } = body;
+        if (!studentId || !field) {
+          return NextResponse.json({ ok: false, message: 'studentId and field are required' }, { status: 400 });
+        }
+
+        // Enforce session security: student can only reveal their own credential
+        if (currentUser && currentUser.role === 'student') {
+          const authStudentId = currentUser.studentId || currentUser.username;
+          if (authStudentId && authStudentId !== studentId) {
+            return NextResponse.json({ ok: false, message: 'Unauthorized' }, { status: 403 });
+          }
+        }
+
+        if (field !== 'aadhaar' && field !== 'apaar') {
+          return NextResponse.json({ ok: false, message: 'Invalid field requested' }, { status: 400 });
+        }
+
+        const { getStudentPrivateDetails } = await import('@/lib/db/supabaseClient');
+        const privateData = await getStudentPrivateDetails(studentId);
+
+        let unmaskedValue = null;
+        if (privateData) {
+          if (field === 'aadhaar') unmaskedValue = privateData.aadhaar_number;
+          if (field === 'apaar') unmaskedValue = privateData.apaar_number;
+        }
+
+        // Fallback to local db if Supabase pooler is not configured or offline
+        if (!unmaskedValue) {
+          const localStudent = academicDb.getStudent(studentId);
+          if (localStudent) {
+            if (field === 'aadhaar') unmaskedValue = localStudent.aadhaar_number;
+            if (field === 'apaar') unmaskedValue = localStudent.apaar_number;
+          }
+        }
+
+        return NextResponse.json({
+          ok: true,
+          field,
+          value: unmaskedValue || '—',
+          expiresInSeconds: 5,
+        });
+      }
+
       default:
         return NextResponse.json({ ok: false, message: `Mutation not supported for resource: ${resource}` }, { status: 404 });
     }

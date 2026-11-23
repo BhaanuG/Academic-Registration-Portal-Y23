@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import DatePicker from "../components/common/DatePicker";
 import PageHeading from "../components/common/PageHeading";
 import PasswordInput from "../components/common/PasswordInput";
@@ -9,7 +9,7 @@ import {
   setCustomPassword,
   getRememberedDateOfBirth,
 } from "../services/authService";
-import { Check, CheckCircle2, Lock, Shield, User, KeyRound, AlertCircle } from "lucide-react";
+import { Check, CheckCircle2, Lock, Shield, User, KeyRound, AlertCircle, Eye, EyeOff, Loader2 } from "lucide-react";
 
 export default function Profile({ studentId }) {
   const [profile, setProfile] = useState(null);
@@ -22,6 +22,104 @@ export default function Profile({ studentId }) {
   const [currentDob, setCurrentDob] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
+  // Sensitive credential 5-second unmask state
+  const [revealedAadhaar, setRevealedAadhaar] = useState(null);
+  const [aadhaarLoading, setAadhaarLoading] = useState(false);
+  const [aadhaarCountdown, setAadhaarCountdown] = useState(0);
+
+  const [revealedApaar, setRevealedApaar] = useState(null);
+  const [apaarLoading, setApaarLoading] = useState(false);
+  const [apaarCountdown, setApaarCountdown] = useState(0);
+
+  const aadhaarTimerRef = useRef(null);
+  const apaarTimerRef = useRef(null);
+
+  // Clear timers on unmount
+  useEffect(() => {
+    return () => {
+      if (aadhaarTimerRef.current) clearInterval(aadhaarTimerRef.current);
+      if (apaarTimerRef.current) clearInterval(apaarTimerRef.current);
+    };
+  }, []);
+
+  const handleToggleAadhaar = async () => {
+    if (revealedAadhaar) {
+      if (aadhaarTimerRef.current) clearInterval(aadhaarTimerRef.current);
+      setRevealedAadhaar(null);
+      setAadhaarCountdown(0);
+      return;
+    }
+
+    setAadhaarLoading(true);
+    try {
+      const res = await fetch("/portal-api/reveal-student-credential", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ studentId: profile?.rollNumber || studentId, field: "aadhaar" }),
+      });
+      const data = await res.json();
+      if (data.ok && data.value) {
+        setRevealedAadhaar(data.value);
+        setAadhaarCountdown(5);
+
+        if (aadhaarTimerRef.current) clearInterval(aadhaarTimerRef.current);
+        let secondsLeft = 5;
+        aadhaarTimerRef.current = setInterval(() => {
+          secondsLeft -= 1;
+          setAadhaarCountdown(secondsLeft);
+          if (secondsLeft <= 0) {
+            clearInterval(aadhaarTimerRef.current);
+            setRevealedAadhaar(null);
+            setAadhaarCountdown(0);
+          }
+        }, 1000);
+      }
+    } catch (err) {
+      console.error("Failed to reveal Aadhaar:", err);
+    } finally {
+      setAadhaarLoading(false);
+    }
+  };
+
+  const handleToggleApaar = async () => {
+    if (revealedApaar) {
+      if (apaarTimerRef.current) clearInterval(apaarTimerRef.current);
+      setRevealedApaar(null);
+      setApaarCountdown(0);
+      return;
+    }
+
+    setApaarLoading(true);
+    try {
+      const res = await fetch("/portal-api/reveal-student-credential", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ studentId: profile?.rollNumber || studentId, field: "apaar" }),
+      });
+      const data = await res.json();
+      if (data.ok && data.value) {
+        setRevealedApaar(data.value);
+        setApaarCountdown(5);
+
+        if (apaarTimerRef.current) clearInterval(apaarTimerRef.current);
+        let secondsLeft = 5;
+        apaarTimerRef.current = setInterval(() => {
+          secondsLeft -= 1;
+          setApaarCountdown(secondsLeft);
+          if (secondsLeft <= 0) {
+            clearInterval(apaarTimerRef.current);
+            setRevealedApaar(null);
+            setApaarCountdown(0);
+          }
+        }, 1000);
+      }
+    } catch (err) {
+      console.error("Failed to reveal APAAR:", err);
+    } finally {
+      setApaarLoading(false);
+    }
+  };
 
   const [hasCustomPwd, setHasCustomPwd] = useState(() => hasCustomPassword(studentId));
 
@@ -199,13 +297,69 @@ export default function Profile({ studentId }) {
             </div>
 
             <div className="field-block">
-              <span className="field-label">Aadhaar Number</span>
-              <input disabled value={profile?.aadhaarNumber || "—"} readOnly className="field-input readonly" />
+              <div className="field-label-row">
+                <span className="field-label">Aadhaar Number</span>
+                {aadhaarCountdown > 0 && (
+                  <span className="countdown-badge">Auto-hiding in {aadhaarCountdown}s</span>
+                )}
+              </div>
+              <div className="credential-input-wrap">
+                <input
+                  disabled
+                  value={revealedAadhaar || profile?.aadhaarNumber || "—"}
+                  readOnly
+                  className={`field-input readonly credential-input ${revealedAadhaar ? "credential-revealed" : ""}`}
+                />
+                <button
+                  type="button"
+                  onClick={handleToggleAadhaar}
+                  disabled={aadhaarLoading}
+                  className="credential-toggle-btn"
+                  title={revealedAadhaar ? "Hide Aadhaar" : "Click to view full Aadhaar (5s)"}
+                  aria-label="Toggle Aadhaar visibility"
+                >
+                  {aadhaarLoading ? (
+                    <Loader2 size={16} className="animate-spin text-gray-500" />
+                  ) : revealedAadhaar ? (
+                    <EyeOff size={16} className="text-amber-600" />
+                  ) : (
+                    <Eye size={16} className="text-gray-500 hover:text-gray-800" />
+                  )}
+                </button>
+              </div>
             </div>
 
             <div className="field-block">
-              <span className="field-label">APAAR Number</span>
-              <input disabled value={profile?.apaarNumber || profile?.aapaarNumber || "—"} readOnly className="field-input readonly" />
+              <div className="field-label-row">
+                <span className="field-label">APAAR Number</span>
+                {apaarCountdown > 0 && (
+                  <span className="countdown-badge">Auto-hiding in {apaarCountdown}s</span>
+                )}
+              </div>
+              <div className="credential-input-wrap">
+                <input
+                  disabled
+                  value={revealedApaar || profile?.apaarNumber || profile?.aapaarNumber || "—"}
+                  readOnly
+                  className={`field-input readonly credential-input ${revealedApaar ? "credential-revealed" : ""}`}
+                />
+                <button
+                  type="button"
+                  onClick={handleToggleApaar}
+                  disabled={apaarLoading}
+                  className="credential-toggle-btn"
+                  title={revealedApaar ? "Hide APAAR" : "Click to view full APAAR (5s)"}
+                  aria-label="Toggle APAAR visibility"
+                >
+                  {apaarLoading ? (
+                    <Loader2 size={16} className="animate-spin text-gray-500" />
+                  ) : revealedApaar ? (
+                    <EyeOff size={16} className="text-amber-600" />
+                  ) : (
+                    <Eye size={16} className="text-gray-500 hover:text-gray-800" />
+                  )}
+                </button>
+              </div>
             </div>
 
             <div className="field-block">

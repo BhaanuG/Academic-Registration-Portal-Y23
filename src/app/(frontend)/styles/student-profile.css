@@ -151,3 +151,71 @@
   color: #b91c1c;
 }
 
+/* ==========================================================================
+   SENSITIVE CREDENTIAL TOGGLE (AADHAAR & APAAR 5-SECOND UNMASK)
+   ========================================================================== */
+.field-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.countdown-badge {
+  font-size: 11px;
+  font-weight: 600;
+  color: #b45309;
+  background: #fef3c7;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid #fde68a;
+  letter-spacing: 0.02em;
+  animation: pulse-countdown 1s infinite alternate;
+}
+
+@keyframes pulse-countdown {
+  from { opacity: 0.85; }
+  to { opacity: 1; }
+}
+
+.credential-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.credential-input {
+  padding-right: 42px !important;
+  font-family: inherit;
+  letter-spacing: 0.04em;
+}
+
+.credential-input.credential-revealed {
+  background: #fffbeb !important;
+  border-color: #f59e0b !important;
+  color: #92400e !important;
+  font-weight: 600;
+}
+
+.credential-toggle-btn {
+  position: absolute;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+}
+
+.credential-toggle-btn:hover {
+  background: var(--surface-subtle);
+}
+
+.credential-toggle-btn:focus-visible {
+  outline: 2px solid var(--accent-focus);
+}
+
+
