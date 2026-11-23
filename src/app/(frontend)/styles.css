@@ -131,7 +131,7 @@
   min-height: calc(100vh - 55px);
   flex: 1;
   display: grid;
-  grid-template-columns: 70fr 30fr;
+  grid-template-columns: 60fr 40fr;
   background: var(--wash);
 }
 .login-context {
