@@ -292,28 +292,6 @@ export default function MyPreference({ studentId, selections = {}, setSelections
         description="A consolidated, automatically saved view of your faculty preferences across all delivery components for each selected course."
         aside={
           <div className="flex items-center gap-2">
-            {!isFinalized ? (
-              <button
-                className="summary-download-btn finalize-action-btn"
-                type="button"
-                onClick={handleFinalize}
-                title="Finalize your preferences"
-              >
-                <Lock size={15} />
-                <span>Finalize Preferences</span>
-              </button>
-            ) : (
-              <button
-                className="summary-download-btn reopen-action-btn"
-                type="button"
-                onClick={handleReopen}
-                title="Reopen preferences for editing"
-              >
-                <RotateCcw size={15} />
-                <span>Reopen Preferences</span>
-              </button>
-            )}
-
             <button
               className="summary-download-btn"
               type="button"
@@ -322,7 +300,7 @@ export default function MyPreference({ studentId, selections = {}, setSelections
               title="Download clean table image for official college registration reference"
             >
               <Download size={15} />
-              <span>{downloadState === "working" ? "Generating..." : "Download Preference Sheet"}</span>
+              <span>{downloadState === "working" ? "Generating..." : "Download PNG"}</span>
             </button>
           </div>
         }
