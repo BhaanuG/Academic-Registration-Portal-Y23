@@ -325,7 +325,7 @@ export default function Login() {
             role="dialog"
             aria-modal="true"
           >
-            {/* Top Rounded Header Bar with Icon, Title, Subtitle & Circular Close Button */}
+            {/* Top Rounded Header Bar with Icon, Title, Subtitle */}
             <div className="clean-popup-header header-orange">
               <div className="clean-popup-header-icon">
                 <KeyRound size={20} className="text-white" />
@@ -334,14 +334,6 @@ export default function Login() {
                 <h3>Password &amp; Credential Support</h3>
                 <p>Official student credential recovery &amp; administration assistance</p>
               </div>
-              <button
-                type="button"
-                className="clean-popup-close-btn"
-                onClick={closeResetModal}
-                aria-label="Close dialog"
-              >
-                <X size={18} />
-              </button>
             </div>
 
             {/* Modal Body with Structured Details Box */}
@@ -355,15 +347,19 @@ export default function Login() {
                   <span className="clean-popup-detail-value">Try 01 January 2005, then your official DOB</span>
                 </div>
 
+                <div className="text-xs font-semibold text-amber-700 bg-amber-50 border border-amber-200 rounded-md py-1.5 px-3 text-center">
+                  If Step 1 fails, proceed to Step 2
+                </div>
+
                 <div className="clean-popup-detail-row">
-                  <span className="clean-popup-detail-label">Step 2 · Administrator Contact (If Step 1 Fails)</span>
+                  <span className="clean-popup-detail-label">Step 2 · Administrator Contact</span>
                   <span className="clean-popup-detail-value" style={{ color: "#ea580c", fontWeight: 700 }}>
                     {adminPhone}
                   </span>
                 </div>
 
                 <div className="clean-popup-detail-row full-col">
-                  <span className="clean-popup-detail-label">Support Message Template (Send to Admin if Step 1 fails)</span>
+                  <span className="clean-popup-detail-label">Support Message Template</span>
                   <div className="clean-popup-code-snippet">
 {`Hi,
 
