@@ -72,7 +72,7 @@ export default function RegistrationGuidelinesModal({ studentId, onAgree, initia
             <div className="guideline-item guideline-item-special">
               <span className="guideline-num dark">3</span>
               <p className="guideline-content">
-                Your Specialization: <strong>{specializationName || "Loading Specialization..."}</strong> — <strong>{clusterName}</strong>
+                Your Specialization: <strong>{specializationName || "Loading Specialization..."}</strong>
               </p>
             </div>
 
