@@ -635,19 +635,19 @@
 }
 
 .topbar-inner {
-  height: 56px !important;
+  height: 62px !important;
   padding: 0 28px !important;
 }
 
 .portal-title strong {
   font-family: var(--font-sans) !important;
-  font-size: 14px !important;
+  font-size: 15px !important;
   font-weight: 700 !important;
   letter-spacing: -0.01em !important;
 }
 
 .portal-title span {
-  font-size: 10px !important;
+  font-size: 11px !important;
   letter-spacing: 0.06em !important;
   margin-top: 1px !important;
   color: #94a3b8 !important;
@@ -661,20 +661,29 @@
 }
 
 .nav-inner {
-  height: 44px !important;
-  overflow-x: hidden !important;
+  height: 48px !important;
+  overflow-x: auto !important;
   overflow-y: hidden !important;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+  -webkit-overflow-scrolling: touch !important;
   justify-content: center !important;
-  gap: clamp(10px, 1.8vw, 24px) !important;
+  gap: clamp(8px, 1.6vw, 24px) !important;
   padding: 0 16px !important;
 }
 
+.nav-inner::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
 .nav-item-btn {
-  height: 44px !important;
-  font-size: 13px !important;
-  padding: 0 8px !important;
+  height: 48px !important;
+  font-size: 14px !important;
+  padding: 0 10px !important;
   white-space: nowrap !important;
-  flex: 0 1 auto !important;
+  flex: 0 0 auto !important;
 }
 
 .portal-breadcrumb-ribbon {
