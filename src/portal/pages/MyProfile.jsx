@@ -26,19 +26,15 @@ export default function Profile({ studentId }) {
   // Sensitive credential 5-second unmask state
   const [revealedAadhaar, setRevealedAadhaar] = useState(null);
   const [aadhaarLoading, setAadhaarLoading] = useState(false);
-  const [aadhaarCountdown, setAadhaarCountdown] = useState(0);
 
   const [revealedApaar, setRevealedApaar] = useState(null);
   const [apaarLoading, setApaarLoading] = useState(false);
-  const [apaarCountdown, setApaarCountdown] = useState(0);
 
   const [revealedParentPhone, setRevealedParentPhone] = useState(null);
   const [parentPhoneLoading, setParentPhoneLoading] = useState(false);
-  const [parentPhoneCountdown, setParentPhoneCountdown] = useState(0);
 
   const [revealedCounselorMobile, setRevealedCounselorMobile] = useState(null);
   const [counselorMobileLoading, setCounselorMobileLoading] = useState(false);
-  const [counselorMobileCountdown, setCounselorMobileCountdown] = useState(0);
 
   const aadhaarTimerRef = useRef(null);
   const apaarTimerRef = useRef(null);
@@ -48,18 +44,17 @@ export default function Profile({ studentId }) {
   // Clear timers on unmount
   useEffect(() => {
     return () => {
-      if (aadhaarTimerRef.current) clearInterval(aadhaarTimerRef.current);
-      if (apaarTimerRef.current) clearInterval(apaarTimerRef.current);
-      if (parentPhoneTimerRef.current) clearInterval(parentPhoneTimerRef.current);
-      if (counselorMobileTimerRef.current) clearInterval(counselorMobileTimerRef.current);
+      if (aadhaarTimerRef.current) clearTimeout(aadhaarTimerRef.current);
+      if (apaarTimerRef.current) clearTimeout(apaarTimerRef.current);
+      if (parentPhoneTimerRef.current) clearTimeout(parentPhoneTimerRef.current);
+      if (counselorMobileTimerRef.current) clearTimeout(counselorMobileTimerRef.current);
     };
   }, []);
 
   const handleToggleAadhaar = async () => {
     if (revealedAadhaar) {
-      if (aadhaarTimerRef.current) clearInterval(aadhaarTimerRef.current);
+      if (aadhaarTimerRef.current) clearTimeout(aadhaarTimerRef.current);
       setRevealedAadhaar(null);
-      setAadhaarCountdown(0);
       return;
     }
 
@@ -73,22 +68,13 @@ export default function Profile({ studentId }) {
       const data = await res.json();
       if (data.ok && data.value) {
         setRevealedAadhaar(data.value);
-        setAadhaarCountdown(5);
-
-        if (aadhaarTimerRef.current) clearInterval(aadhaarTimerRef.current);
-        let secondsLeft = 5;
-        aadhaarTimerRef.current = setInterval(() => {
-          secondsLeft -= 1;
-          setAadhaarCountdown(secondsLeft);
-          if (secondsLeft <= 0) {
-            clearInterval(aadhaarTimerRef.current);
-            setRevealedAadhaar(null);
-            setAadhaarCountdown(0);
-          }
-        }, 1000);
+        if (aadhaarTimerRef.current) clearTimeout(aadhaarTimerRef.current);
+        aadhaarTimerRef.current = setTimeout(() => {
+          setRevealedAadhaar(null);
+        }, 7000);
       }
     } catch (err) {
-      console.error("Failed to reveal Aadhaar:", err);
+      console.error("Failed to reveal aadhaar:", err);
     } finally {
       setAadhaarLoading(false);
     }
@@ -96,9 +82,8 @@ export default function Profile({ studentId }) {
 
   const handleToggleApaar = async () => {
     if (revealedApaar) {
-      if (apaarTimerRef.current) clearInterval(apaarTimerRef.current);
+      if (apaarTimerRef.current) clearTimeout(apaarTimerRef.current);
       setRevealedApaar(null);
-      setApaarCountdown(0);
       return;
     }
 
@@ -112,22 +97,13 @@ export default function Profile({ studentId }) {
       const data = await res.json();
       if (data.ok && data.value) {
         setRevealedApaar(data.value);
-        setApaarCountdown(5);
-
-        if (apaarTimerRef.current) clearInterval(apaarTimerRef.current);
-        let secondsLeft = 5;
-        apaarTimerRef.current = setInterval(() => {
-          secondsLeft -= 1;
-          setApaarCountdown(secondsLeft);
-          if (secondsLeft <= 0) {
-            clearInterval(apaarTimerRef.current);
-            setRevealedApaar(null);
-            setApaarCountdown(0);
-          }
-        }, 1000);
+        if (apaarTimerRef.current) clearTimeout(apaarTimerRef.current);
+        apaarTimerRef.current = setTimeout(() => {
+          setRevealedApaar(null);
+        }, 7000);
       }
     } catch (err) {
-      console.error("Failed to reveal APAAR:", err);
+      console.error("Failed to reveal apaar:", err);
     } finally {
       setApaarLoading(false);
     }
@@ -135,9 +111,8 @@ export default function Profile({ studentId }) {
 
   const handleToggleParentPhone = async () => {
     if (revealedParentPhone) {
-      if (parentPhoneTimerRef.current) clearInterval(parentPhoneTimerRef.current);
+      if (parentPhoneTimerRef.current) clearTimeout(parentPhoneTimerRef.current);
       setRevealedParentPhone(null);
-      setParentPhoneCountdown(0);
       return;
     }
 
@@ -151,22 +126,13 @@ export default function Profile({ studentId }) {
       const data = await res.json();
       if (data.ok && data.value) {
         setRevealedParentPhone(data.value);
-        setParentPhoneCountdown(5);
-
-        if (parentPhoneTimerRef.current) clearInterval(parentPhoneTimerRef.current);
-        let secondsLeft = 5;
-        parentPhoneTimerRef.current = setInterval(() => {
-          secondsLeft -= 1;
-          setParentPhoneCountdown(secondsLeft);
-          if (secondsLeft <= 0) {
-            clearInterval(parentPhoneTimerRef.current);
-            setRevealedParentPhone(null);
-            setParentPhoneCountdown(0);
-          }
-        }, 1000);
+        if (parentPhoneTimerRef.current) clearTimeout(parentPhoneTimerRef.current);
+        parentPhoneTimerRef.current = setTimeout(() => {
+          setRevealedParentPhone(null);
+        }, 7000);
       }
     } catch (err) {
-      console.error("Failed to reveal parent phone:", err);
+      console.error("Failed to reveal parent_phone:", err);
     } finally {
       setParentPhoneLoading(false);
     }
@@ -174,9 +140,8 @@ export default function Profile({ studentId }) {
 
   const handleToggleCounselorMobile = async () => {
     if (revealedCounselorMobile) {
-      if (counselorMobileTimerRef.current) clearInterval(counselorMobileTimerRef.current);
+      if (counselorMobileTimerRef.current) clearTimeout(counselorMobileTimerRef.current);
       setRevealedCounselorMobile(null);
-      setCounselorMobileCountdown(0);
       return;
     }
 
@@ -190,22 +155,13 @@ export default function Profile({ studentId }) {
       const data = await res.json();
       if (data.ok && data.value) {
         setRevealedCounselorMobile(data.value);
-        setCounselorMobileCountdown(5);
-
-        if (counselorMobileTimerRef.current) clearInterval(counselorMobileTimerRef.current);
-        let secondsLeft = 5;
-        counselorMobileTimerRef.current = setInterval(() => {
-          secondsLeft -= 1;
-          setCounselorMobileCountdown(secondsLeft);
-          if (secondsLeft <= 0) {
-            clearInterval(counselorMobileTimerRef.current);
-            setRevealedCounselorMobile(null);
-            setCounselorMobileCountdown(0);
-          }
-        }, 1000);
+        if (counselorMobileTimerRef.current) clearTimeout(counselorMobileTimerRef.current);
+        counselorMobileTimerRef.current = setTimeout(() => {
+          setRevealedCounselorMobile(null);
+        }, 7000);
       }
     } catch (err) {
-      console.error("Failed to reveal counselor mobile:", err);
+      console.error("Failed to reveal counselor_mobile:", err);
     } finally {
       setCounselorMobileLoading(false);
     }
@@ -379,25 +335,20 @@ export default function Profile({ studentId }) {
             </div>
 
             <div className="field-block">
-              <div className="field-label-row">
-                <span className="field-label">Aadhaar Number</span>
-                {aadhaarCountdown > 0 && (
-                  <span className="countdown-badge">Auto-hiding in {aadhaarCountdown}s</span>
-                )}
-              </div>
+              <span className="field-label">Aadhaar Number</span>
               <div className="credential-input-wrap">
                 <input
                   disabled
                   value={revealedAadhaar || profile?.aadhaarNumber || "—"}
                   readOnly
-                  className={`field-input readonly credential-input ${revealedAadhaar ? "credential-revealed" : ""}`}
+                  className={`field-input readonly credential-input`}
                 />
                 <button
                   type="button"
                   onClick={handleToggleAadhaar}
                   disabled={aadhaarLoading}
                   className="credential-toggle-btn"
-                  title={revealedAadhaar ? "Hide Aadhaar" : "Click to view full Aadhaar (5s)"}
+                  title={revealedAadhaar ? "Hide Aadhaar" : "Click to view full Aadhaar"}
                   aria-label="Toggle Aadhaar visibility"
                 >
                   {aadhaarLoading ? (
@@ -412,25 +363,20 @@ export default function Profile({ studentId }) {
             </div>
 
             <div className="field-block">
-              <div className="field-label-row">
-                <span className="field-label">APAAR Number</span>
-                {apaarCountdown > 0 && (
-                  <span className="countdown-badge">Auto-hiding in {apaarCountdown}s</span>
-                )}
-              </div>
+              <span className="field-label">APAAR Number</span>
               <div className="credential-input-wrap">
                 <input
                   disabled
                   value={revealedApaar || profile?.apaarNumber || profile?.aapaarNumber || "—"}
                   readOnly
-                  className={`field-input readonly credential-input ${revealedApaar ? "credential-revealed" : ""}`}
+                  className={`field-input readonly credential-input`}
                 />
                 <button
                   type="button"
                   onClick={handleToggleApaar}
                   disabled={apaarLoading}
                   className="credential-toggle-btn"
-                  title={revealedApaar ? "Hide APAAR" : "Click to view full APAAR (5s)"}
+                  title={revealedApaar ? "Hide APAAR" : "Click to view full APAAR"}
                   aria-label="Toggle APAAR visibility"
                 >
                   {apaarLoading ? (
@@ -455,25 +401,20 @@ export default function Profile({ studentId }) {
             </div>
 
             <div className="field-block">
-              <div className="field-label-row">
-                <span className="field-label">Parent Contact Number</span>
-                {parentPhoneCountdown > 0 && (
-                  <span className="countdown-badge">Auto-hiding in {parentPhoneCountdown}s</span>
-                )}
-              </div>
+              <span className="field-label">Parent Contact Number</span>
               <div className="credential-input-wrap">
                 <input
                   disabled
                   value={revealedParentPhone || profile?.parentPhoneNumber || "—"}
                   readOnly
-                  className={`field-input readonly credential-input ${revealedParentPhone ? "credential-revealed" : ""}`}
+                  className={`field-input readonly credential-input`}
                 />
                 <button
                   type="button"
                   onClick={handleToggleParentPhone}
                   disabled={parentPhoneLoading}
                   className="credential-toggle-btn"
-                  title={revealedParentPhone ? "Hide Contact" : "Click to view full Parent Contact (5s)"}
+                  title={revealedParentPhone ? "Hide Contact" : "Click to view full Parent Contact"}
                   aria-label="Toggle Parent Contact visibility"
                 >
                   {parentPhoneLoading ? (
@@ -493,25 +434,20 @@ export default function Profile({ studentId }) {
             </div>
 
             <div className="field-block">
-              <div className="field-label-row">
-                <span className="field-label">Counselor Mobile Number</span>
-                {counselorMobileCountdown > 0 && (
-                  <span className="countdown-badge">Auto-hiding in {counselorMobileCountdown}s</span>
-                )}
-              </div>
+              <span className="field-label">Counselor Mobile Number</span>
               <div className="credential-input-wrap">
                 <input
                   disabled
                   value={revealedCounselorMobile || profile?.counselorMobile || "—"}
                   readOnly
-                  className={`field-input readonly credential-input ${revealedCounselorMobile ? "credential-revealed" : ""}`}
+                  className={`field-input readonly credential-input`}
                 />
                 <button
                   type="button"
                   onClick={handleToggleCounselorMobile}
                   disabled={counselorMobileLoading}
                   className="credential-toggle-btn"
-                  title={revealedCounselorMobile ? "Hide Contact" : "Click to view full Counselor Contact (5s)"}
+                  title={revealedCounselorMobile ? "Hide Contact" : "Click to view full Counselor Contact"}
                   aria-label="Toggle Counselor Contact visibility"
                 >
                   {counselorMobileLoading ? (
