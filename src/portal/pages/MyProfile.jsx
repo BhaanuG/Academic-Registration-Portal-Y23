@@ -363,17 +363,6 @@ export default function Profile({ studentId }) {
             </div>
 
             <div className="field-block">
-              <span className="field-label">Personal Email</span>
-              <input
-                disabled
-                type="email"
-                value={personalEmail}
-                readOnly
-                className="field-input readonly"
-              />
-            </div>
-
-            <div className="field-block">
               <span className="field-label">Mobile Number</span>
               <input
                 disabled
